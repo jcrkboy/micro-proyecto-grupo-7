@@ -1,0 +1,6 @@
+[core]
+    remote = r2
+['remote "r2"']
+    url = s3://proyecto-maestria-ia
+    endpointurl = https://ca27d380ddc6ca2d60a179e573c858d1.r2.cloudflarestorage.com
+    region = auto

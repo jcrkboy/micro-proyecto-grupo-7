@@ -1,0 +1,18 @@
+# Data versioning (s3 extra = Cloudflare R2 / S3-compatible support)
+dvc[s3]==3.67.1
+
+# EEG signal processing (Sleep-EDFx .edf files)
+mne==1.12.1
+
+# Scientific stack
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
+
+# Visualization
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# Notebook environment
+jupyterlab==4.6.3
+ipykernel==7.3.0

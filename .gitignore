@@ -1,2 +1,13 @@
+# Data tracked by DVC
 /data
-/.dvc/config
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local tooling cache
+.atl/
