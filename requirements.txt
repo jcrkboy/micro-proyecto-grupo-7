@@ -8,6 +8,9 @@ mne==1.12.1
 numpy==2.2.6
 pandas==2.3.3
 scipy==1.15.3
+xlrd==2.0.2        # leer data/ST-subjects.xls (.xls OLE, motor de pandas)
+pyarrow==21.0.0    # cache .parquet de features en data/processed/
+tqdm==4.70.0       # barra de progreso del barrido de 44 registros
 
 # Visualization
 matplotlib==3.10.9
