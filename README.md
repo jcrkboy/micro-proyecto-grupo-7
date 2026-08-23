@@ -47,11 +47,19 @@ dvc remote modify --local r2 secret_access_key 'TU_SECRET_ACCESS_KEY'
 dvc pull
 ```
 
-**6.** Abre `EDA/EDA_Sleep_EEG_ST7242J0.ipynb` este paso ya opcional
+**6.** Abre los notebooks de EDA, este paso ya opcional
 
 ```bash
 jupyter lab
 ```
+
+| Notebook | Alcance |
+|---|---|
+| `EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb` | **Los 44 registros** (22 sujetos x 2 noches) |
+| `EDA/EDA_Sleep_EEG_ST7242J0_individual/EDA_Sleep_EEG_ST7242J0.ipynb` | Un unico registro (`ST7242J0`), analisis de referencia |
+
+El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features en
+`data/processed/`; las ejecuciones siguientes cargan de ahi (~18 s).
 
 ---
 
@@ -60,14 +68,22 @@ jupyter lab
 ```
 .
 ├── data/                          # dataset (DVC, ignorado por Git)
-│   ├── ST-subjects.xls            # metadatos de los 22 sujetos
-│   └── sleep-telemetry/           # 88 archivos EDF
-│       ├── ST70xxJ0-PSG.edf       #   44 registros polisomnograficos
-│       └── ST70xxJx-Hypnogram.edf #   44 hipnogramas
+│   ├── ST-subjects.xls            # metadatos de los 22 sujetos + noche placebo/temazepam
+│   ├── sleep-telemetry/           # 88 archivos EDF
+│   │   ├── ST70xxJ0-PSG.edf       #   44 registros polisomnograficos
+│   │   └── ST70xxJx-Hypnogram.edf #   44 hipnogramas
+│   └── processed/                 # cache generado por el EDA de dataset completo
+│       ├── epochs_features.parquet    # una fila por epoca de 30 s (~42 700)
+│       └── psd_record_stage.parquet   # PSD media por registro x estadio x canal
 ├── data.dvc                       # puntero al dataset (esto si va en Git)
 ├── EDA/
-│   ├── EDA_Sleep_EEG_ST7242J0.ipynb
-│   └── *.png                      # figuras exportadas
+│   ├── EDA_Sleep_EEG_ST7242J0_datset/      # EDA de los 44 registros
+│   │   ├── EDA_Sleep_EEG_dataset.ipynb
+│   │   └── img/*.png                       # figuras exportadas
+│   ├── EDA_Sleep_EEG_ST7242J0_individual/  # EDA de un solo registro
+│   │   ├── EDA_Sleep_EEG_ST7242J0.ipynb
+│   │   └── img/*.png
+│   └── EDA_Sleep_EEG_ST7242J0/             # export en Markdown del EDA individual
 ├── docs/                          # MLOps Stack Canvas y reportes
 ├── requirements.txt
 └── .dvc/
@@ -91,6 +107,10 @@ dvc push
 
 DVC es content-addressable: solo se suben los archivos nuevos, no el dataset
 completo.
+
+> El notebook de EDA de dataset completo escribe su cache en `data/processed/`, que
+> esta dentro del directorio que rastrea DVC. Tras ejecutarlo, `dvc status` aparecera
+> sucio: hay que registrarlo con el mismo flujo de arriba (`dvc add data` / `dvc push`).
 
 ### Traer cambios de datos hechos por otro
 
