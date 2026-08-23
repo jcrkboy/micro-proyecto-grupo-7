@@ -11,22 +11,27 @@ Git solo guarda el puntero `data.dvc`.
 
 ## Setup
 
+**1.** Crea el entorno virtual
+
 ```bash
 python -m venv .venv
 ```
 
+**2.** Activalo segun tu terminal
+
 ```bash
-.venv/Scripts/activate           # Windows (powershell, cmd)
-source .venv/Scripts/activate    # Git Bash (Windows)
-# .venv\Scripts\activate         # PowerShell
-# source .venv/bin/activate      # Linux / macOS
+.venv\Scripts\activate           # PowerShell / cmd
+source .venv/Scripts/activate    # Git Bash
+source .venv/bin/activate        # Linux / macOS
 ```
+
+**3.** Instala las dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Credenciales de R2:
+**4.** Configura las credenciales de R2 (pedirselas a quien administra el bucket)
 
 ```bash
 dvc remote modify --local r2 access_key_id 'TU_ACCESS_KEY_ID'
@@ -36,15 +41,17 @@ dvc remote modify --local r2 secret_access_key 'TU_SECRET_ACCESS_KEY'
 > **`--local` es obligatorio.** Escribe en `.dvc/config.local`, que esta
 > ignorado. Sin esa bandera las credenciales se commitean al repositorio.
 
+**5.** Descarga el dataset desde R2 (1.1 GB)
+
 ```bash
 dvc pull
 ```
 
+**6.** Abre `EDA/EDA_Sleep_EEG_ST7242J0.ipynb` este paso ya opcional
+
 ```bash
 jupyter lab
 ```
-
-Abrir `EDA/EDA_Sleep_EEG_ST7242J0.ipynb`.
 
 ---
 
