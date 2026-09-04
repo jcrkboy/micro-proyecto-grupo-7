@@ -19,3 +19,6 @@ seaborn==0.13.2
 # Notebook environment
 jupyterlab==4.6.3
 ipykernel==7.3.0
+
+# Reusable local package, model training, optional MLflow tracking and tests
+-e ./packages/sleep-staging[training,test]
