@@ -14,7 +14,7 @@ from sleep_staging.preprocessing import PreprocessingPipeline
 from sleep_staging.training.dataset import SupervisedDataset, build_supervised_dataset
 
 
-CACHE_SCHEMA_VERSION = 1
+CACHE_SCHEMA_VERSION = 2
 
 
 def _cache_payload(

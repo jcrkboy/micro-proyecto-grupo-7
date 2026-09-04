@@ -69,6 +69,8 @@ class PreprocessingPipeline:
             base_features,
             neighbors=self.config.context_neighbors,
             rolling_windows=self.config.rolling_windows,
+            difference_offsets=self.config.temporal_difference_offsets,
+            difference_tokens=self.config.temporal_difference_tokens,
         )
         features = features.replace([np.inf, -np.inf], 0.0).fillna(0.0)
         if not np.isfinite(features.to_numpy()).all():
@@ -87,4 +89,3 @@ class PreprocessingPipeline:
             sfreq=signals.sfreq,
             channels=signals.channels,
         )
-

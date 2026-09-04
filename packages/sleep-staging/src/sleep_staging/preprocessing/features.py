@@ -26,6 +26,110 @@ def hjorth_parameters(values: np.ndarray) -> tuple[float, float, float]:
     return var_values, float(mobility), float(complexity)
 
 
+def _spectral_band_powers(
+    values: np.ndarray,
+    sfreq: float,
+    config: PreprocessingConfig,
+) -> dict[str, float]:
+    """Calcula potencias por banda con el estimador robusto común."""
+
+    nperseg = min(len(values), int(4 * sfreq))
+    frequencies, psd = signal.welch(
+        values,
+        fs=sfreq,
+        nperseg=nperseg,
+        average="median",
+    )
+    powers: dict[str, float] = {}
+    for name, (low, high) in config.bands.items():
+        mask = (frequencies >= low) & (frequencies < high)
+        powers[name] = (
+            float(trapezoid(psd[mask], frequencies[mask])) if mask.any() else 0.0
+        )
+    return powers
+
+
+def _linear_slope(values: np.ndarray) -> float:
+    """Pendiente sobre posiciones normalizadas; estable para cualquier longitud."""
+
+    if len(values) < 2:
+        return 0.0
+    positions = np.linspace(0.0, 1.0, len(values))
+    return float(np.polyfit(positions, values, deg=1)[0])
+
+
+def _subepoch_features(
+    values: np.ndarray,
+    sfreq: float,
+    prefix: str,
+    config: PreprocessingConfig,
+) -> dict[str, float]:
+    """Describe cambios espectrales dentro de una época EEG de 30 segundos."""
+
+    samples_per_chunk = int(round(config.subepoch_seconds * sfreq))
+    chunk_count = len(values) // samples_per_chunk
+    if chunk_count < 2:
+        return {}
+
+    epsilon = 1e-12
+    chunks = values[: chunk_count * samples_per_chunk].reshape(
+        chunk_count, samples_per_chunk
+    )
+    relative: dict[str, list[float]] = {
+        band: [] for band in ("theta", "alpha", "sigma", "beta")
+    }
+    rms_values: list[float] = []
+    for chunk in chunks:
+        powers = _spectral_band_powers(chunk, sfreq, config)
+        total = sum(power for name, power in powers.items() if name != "sw")
+        for band in relative:
+            relative[band].append(powers[band] / total if total > 0 else 0.0)
+        rms_values.append(float(np.sqrt(np.mean(chunk**2))))
+
+    result: dict[str, float] = {}
+    arrays = {band: np.asarray(values_) for band, values_ in relative.items()}
+    for band, band_values in arrays.items():
+        result[f"{prefix}_sub_rel_{band}_mean"] = float(np.mean(band_values))
+        result[f"{prefix}_sub_rel_{band}_std"] = float(np.std(band_values))
+        result[f"{prefix}_sub_rel_{band}_range"] = float(np.ptp(band_values))
+
+    theta_alpha = arrays["theta"] / (arrays["alpha"] + epsilon)
+    result[f"{prefix}_sub_theta_alpha_ratio_mean"] = float(np.mean(theta_alpha))
+    result[f"{prefix}_sub_theta_alpha_ratio_std"] = float(np.std(theta_alpha))
+    result[f"{prefix}_sub_theta_alpha_ratio_max"] = float(np.max(theta_alpha))
+    result[f"{prefix}_sub_theta_dominant_fraction"] = float(
+        np.mean(arrays["theta"] > arrays["alpha"])
+    )
+    result[f"{prefix}_sub_alpha_slope"] = _linear_slope(arrays["alpha"])
+    result[f"{prefix}_sub_theta_slope"] = _linear_slope(arrays["theta"])
+    result[f"{prefix}_sub_rms_mean"] = float(np.mean(rms_values))
+    result[f"{prefix}_sub_rms_std"] = float(np.std(rms_values))
+    return result
+
+
+def _signal_quality_features(
+    values: np.ndarray,
+    prefix: str,
+    config: PreprocessingConfig,
+) -> dict[str, float]:
+    """Cuantifica artefactos sin descartar épocas ni desalinear etiquetas."""
+
+    gradients = np.abs(np.diff(values))
+    return {
+        f"{prefix}_quality_extreme_amplitude_fraction": float(
+            np.mean(np.abs(values) > config.artifact_amplitude_threshold_uv)
+        ),
+        f"{prefix}_quality_extreme_gradient_fraction": float(
+            np.mean(gradients > config.artifact_gradient_threshold_uv)
+        ),
+        f"{prefix}_quality_flatline_fraction": float(
+            np.mean(gradients <= config.flatline_gradient_threshold_uv)
+        ),
+        f"{prefix}_quality_max_abs": float(np.max(np.abs(values))),
+        f"{prefix}_quality_max_gradient": float(np.max(gradients)),
+    }
+
+
 def extract_channel_features(
     values: np.ndarray,
     slow_wave: np.ndarray,
@@ -119,6 +223,10 @@ def extract_channel_features(
     result[f"{prefix}_huso_n_rafagas"] = float(
         np.sum((durations >= 0.5) & (durations <= 2.0))
     )
+    if config.include_subepoch_features:
+        result.update(_subepoch_features(values, sfreq, prefix, config))
+    if config.include_signal_quality_features:
+        result.update(_signal_quality_features(values, prefix, config))
     return result
 
 
@@ -156,7 +264,10 @@ def extract_epoch_features(
         rows.append(row)
 
     features = pd.DataFrame(rows)
-    if len(channels) == 2:
+    # Las dos primeras derivaciones configuradas son el par EEG actual. Mantener
+    # esta lógica con >= 2 permite agregar modalidades futuras sin perder estas
+    # relaciones entre derivaciones EEG.
+    if len(channels) >= 2:
         first, second = map(_channel_prefix, channels)
         epsilon = 1e-12
         for band in ("delta", "theta", "alpha", "sigma", "beta"):
@@ -168,4 +279,3 @@ def extract_epoch_features(
             features[f"{first}_std"] / (features[f"{second}_std"] + epsilon)
         )
     return features
-

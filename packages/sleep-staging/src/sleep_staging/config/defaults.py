@@ -28,6 +28,21 @@ class PreprocessingConfig:
     normalize_per_record: bool = True
     context_neighbors: int = 2
     rolling_windows: tuple[int, ...] = (11,)
+    include_subepoch_features: bool = False
+    subepoch_seconds: float = 5.0
+    include_signal_quality_features: bool = False
+    artifact_amplitude_threshold_uv: float = 300.0
+    artifact_gradient_threshold_uv: float = 100.0
+    flatline_gradient_threshold_uv: float = 0.1
+    temporal_difference_offsets: tuple[int, ...] = ()
+    temporal_difference_tokens: tuple[str, ...] = (
+        "rel_theta",
+        "rel_alpha",
+        "rel_beta",
+        "ratio_theta_alpha",
+        "huso_n_rafagas",
+        "hjorth_actividad",
+    )
 
     def __post_init__(self) -> None:
         if not self.channels:
@@ -42,4 +57,13 @@ class PreprocessingConfig:
             raise ValueError("context_neighbors no puede ser negativo")
         if any(window <= 0 or window % 2 == 0 for window in self.rolling_windows):
             raise ValueError("Las ventanas móviles deben ser enteros impares positivos")
-
+        if not 0 < self.subepoch_seconds <= self.epoch_seconds:
+            raise ValueError("subepoch_seconds debe estar entre cero y epoch_seconds")
+        if self.artifact_amplitude_threshold_uv <= 0:
+            raise ValueError("artifact_amplitude_threshold_uv debe ser positivo")
+        if self.artifact_gradient_threshold_uv <= 0:
+            raise ValueError("artifact_gradient_threshold_uv debe ser positivo")
+        if self.flatline_gradient_threshold_uv < 0:
+            raise ValueError("flatline_gradient_threshold_uv no puede ser negativo")
+        if any(offset <= 0 for offset in self.temporal_difference_offsets):
+            raise ValueError("Los offsets temporales deben ser enteros positivos")
