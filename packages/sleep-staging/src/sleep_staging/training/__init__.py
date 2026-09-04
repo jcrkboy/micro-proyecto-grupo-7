@@ -1,5 +1,6 @@
 """Utilidades reutilizables para experimentos de entrenamiento."""
 
+from sleep_staging.training.cache import load_or_build_supervised_dataset
 from sleep_staging.training.dataset import (
     SupervisedDataset,
     TrainValidationSplit,
@@ -30,6 +31,7 @@ __all__ = [
     "create_random_forest_classifier",
     "display_evaluation",
     "grouped_grid_search",
+    "load_or_build_supervised_dataset",
     "split_by_subject",
     "train_and_evaluate",
 ]

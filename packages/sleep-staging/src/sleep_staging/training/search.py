@@ -11,7 +11,11 @@ from sklearn.model_selection import GridSearchCV, GroupKFold
 from sleep_staging.datasets import VALID_STAGES
 from sleep_staging.training.dataset import TrainValidationSplit
 from sleep_staging.training.evaluation import ModelEvaluation, evaluate_classifier
-from sleep_staging.training.runner import MlflowConfig
+from sleep_staging.training.runner import (
+    MlflowConfig,
+    _skops_trusted_types_for,
+    _warn_mlflow_failure,
+)
 
 
 @dataclass(frozen=True)
@@ -109,54 +113,66 @@ def grouped_grid_search(
         n_jobs=n_jobs,
         verbose=verbose,
     )
+    search.fit(split.X_train, split.y_train, groups=groups)
+    evaluation = evaluate_classifier(
+        search.best_estimator_,
+        split.X_validation,
+        split.y_validation,
+        model_name=model_name,
+    )
+
     tracking = mlflow_config or MlflowConfig()
-
     if tracking.enabled:
-        import mlflow
-        import mlflow.sklearn
+        try:
+            import mlflow
+            import mlflow.sklearn
 
-        mlflow.set_tracking_uri(tracking.tracking_uri)
-        experiment = mlflow.set_experiment(tracking.experiment_name)
-        with mlflow.start_run(
-            experiment_id=experiment.experiment_id,
-            run_name=f"grid_search_{model_name}",
-        ):
-            mlflow.log_params(
-                {
-                    "model_name": model_name,
-                    "cv_splits": n_splits,
-                    "refit_metric": refit_metric,
-                    "parameter_grid": json.dumps(parameter_grid, default=str),
-                    "train_epochs": len(split.X_train),
-                    "validation_epochs": len(split.X_validation),
-                    "train_subjects": len(split.train_subjects),
-                    "validation_subjects": len(split.validation_subjects),
-                }
-            )
-            search.fit(split.X_train, split.y_train, groups=groups)
-            evaluation = evaluate_classifier(
-                search.best_estimator_,
-                split.X_validation,
-                split.y_validation,
-                model_name=model_name,
-            )
-            mlflow.log_params(
-                {f"best_{key}": value for key, value in search.best_params_.items()}
-            )
-            mlflow.log_metric(f"best_cv_{refit_metric}", float(search.best_score_))
-            mlflow.log_metrics(
-                {f"validation_{key}": value for key, value in evaluation.metrics.items()}
-            )
-            if tracking.log_model:
-                mlflow.sklearn.log_model(sk_model=search.best_estimator_, name="model")
-    else:
-        search.fit(split.X_train, split.y_train, groups=groups)
-        evaluation = evaluate_classifier(
-            search.best_estimator_,
-            split.X_validation,
-            split.y_validation,
-            model_name=model_name,
-        )
+            mlflow.set_tracking_uri(tracking.tracking_uri)
+            experiment = mlflow.set_experiment(tracking.experiment_name)
+            with mlflow.start_run(
+                experiment_id=experiment.experiment_id,
+                run_name=f"grid_search_{model_name}",
+            ):
+                try:
+                    mlflow.log_params(
+                        {
+                            "model_name": model_name,
+                            "cv_splits": n_splits,
+                            "refit_metric": refit_metric,
+                            "parameter_grid": json.dumps(parameter_grid, default=str),
+                            "train_epochs": len(split.X_train),
+                            "validation_epochs": len(split.X_validation),
+                            "train_subjects": len(split.train_subjects),
+                            "validation_subjects": len(split.validation_subjects),
+                        }
+                    )
+                    mlflow.log_params(
+                        {
+                            f"best_{key}": value
+                            for key, value in search.best_params_.items()
+                        }
+                    )
+                    mlflow.log_metric(
+                        f"best_cv_{refit_metric}", float(search.best_score_)
+                    )
+                    mlflow.log_metrics(
+                        {
+                            f"validation_{key}": value
+                            for key, value in evaluation.metrics.items()
+                        }
+                    )
+                    if tracking.log_model:
+                        mlflow.sklearn.log_model(
+                            sk_model=search.best_estimator_,
+                            name="model",
+                            skops_trusted_types=_skops_trusted_types_for(
+                                search.best_estimator_
+                            ),
+                        )
+                except Exception as error:
+                    _warn_mlflow_failure(error)
+        except Exception as error:
+            _warn_mlflow_failure(error)
 
     return GroupedGridSearchResult(
         model_name=model_name,
