@@ -29,7 +29,7 @@ dominio sin incrustar una dirección particular en el bundle.
 
 ## Archivo de ejemplo
 
-Desde la pantalla de carga puede seleccionarse `assets/example.edf`. Es el PSG
+Desde la pantalla de carga puede seleccionarse `data/example.edf`. Es el PSG
 nocturno real y anonimizado `ST7011J0-PSG.edf` de Sleep-EDF Expanded, publicado
 por PhysioNet bajo Open Data Commons Attribution License v1.0. Contiene los
 canales `EEG Fpz-Cz` y `EEG Pz-Oz` a 100 Hz, dura 35.900 segundos y produce
