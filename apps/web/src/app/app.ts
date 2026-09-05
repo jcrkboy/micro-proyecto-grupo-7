@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { switchMap } from 'rxjs';
 
+import { AnalysisModalComponent } from './components/analysis-modal/analysis-modal';
 import { HypnogramComponent } from './components/hypnogram/hypnogram';
 import { SleepSummaryComponent } from './components/sleep-summary/sleep-summary';
 import { AnalysisRequest, UploadFormComponent } from './components/upload-form/upload-form';
@@ -13,7 +14,7 @@ export type WorkflowState = 'ready' | 'uploading' | 'processing' | 'result' | 'e
 
 @Component({
   selector: 'app-root',
-  imports: [UploadFormComponent, HypnogramComponent, SleepSummaryComponent],
+  imports: [UploadFormComponent, AnalysisModalComponent, HypnogramComponent, SleepSummaryComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -24,6 +25,7 @@ export class App implements OnInit {
   protected readonly prediction = signal<PredictionResponse | null>(null);
   protected readonly model = signal<ModelInfo | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly analysisModalOpen = signal(false);
 
   ngOnInit(): void {
     this.api.getModelInfo().subscribe({
@@ -33,7 +35,6 @@ export class App implements OnInit {
   }
 
   protected analyze(request: AnalysisRequest): void {
-    this.prediction.set(null);
     this.errorMessage.set(null);
     this.state.set('uploading');
 
@@ -49,6 +50,7 @@ export class App implements OnInit {
         next: (prediction) => {
           this.prediction.set(prediction);
           this.state.set('result');
+          this.analysisModalOpen.set(false);
         },
         error: (error: unknown) => {
           this.errorMessage.set(this.describeError(error));
@@ -57,8 +59,20 @@ export class App implements OnInit {
       });
   }
 
-  protected reset(): void {
-    this.prediction.set(null);
+  protected openNewAnalysis(): void {
+    this.errorMessage.set(null);
+    this.state.set('ready');
+    this.analysisModalOpen.set(true);
+  }
+
+  protected closeNewAnalysis(): void {
+    if (['uploading', 'processing'].includes(this.state())) return;
+    this.errorMessage.set(null);
+    this.state.set(this.prediction() ? 'result' : 'ready');
+    this.analysisModalOpen.set(false);
+  }
+
+  protected clearInitialError(): void {
     this.errorMessage.set(null);
     this.state.set('ready');
   }

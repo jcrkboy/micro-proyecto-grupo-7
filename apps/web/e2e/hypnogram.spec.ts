@@ -17,9 +17,16 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
 
   let releaseUpload!: () => void;
   let releaseInference!: () => void;
+  let releaseSecondUpload!: () => void;
+  let releaseSecondInference!: () => void;
   const uploadGate = new Promise<void>((resolve) => (releaseUpload = resolve));
   const inferenceGate = new Promise<void>((resolve) => (releaseInference = resolve));
+  const secondUploadGate = new Promise<void>((resolve) => (releaseSecondUpload = resolve));
+  const secondInferenceGate = new Promise<void>((resolve) => (releaseSecondInference = resolve));
   const prediction = createPrediction();
+  const secondPrediction = createPrediction('Segundo paciente');
+  let uploadRequestCount = 0;
+  let inferenceRequestCount = 0;
 
   await page.route('**/api/v1/model', (route) =>
     route.fulfill({
@@ -31,7 +38,8 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
     }),
   );
   await page.route('**/api/v1/uploads', async (route) => {
-    await uploadGate;
+    uploadRequestCount += 1;
+    await (uploadRequestCount === 1 ? uploadGate : secondUploadGate);
     await route.fulfill({
       status: 201,
       json: {
@@ -45,11 +53,16 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
     });
   });
   await page.route('**/api/v1/inferencia', async (route) => {
-    await inferenceGate;
-    await route.fulfill({ json: prediction });
+    inferenceRequestCount += 1;
+    await (inferenceRequestCount === 1 ? inferenceGate : secondInferenceGate);
+    await route.fulfill({ json: inferenceRequestCount === 1 ? prediction : secondPrediction });
   });
 
   await page.goto('/');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'favicon.svg');
+  const faviconResponse = await page.request.get('/favicon.svg');
+  expect(faviconResponse.ok()).toBe(true);
+  expect(faviconResponse.headers()['content-type']).toContain('image/svg+xml');
   await page.getByLabel('Nombre o identificador del paciente').fill('Paciente Playwright');
   await page.locator('#edf-file').setInputFiles({
     name: 'registro.edf',
@@ -63,6 +76,8 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   await expect(page.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
   releaseInference();
 
+  await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+  await expect(page.getByText('Convierte un registro EEG')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Hipnograma' })).toBeVisible();
   await expect(page.locator('app-hypnogram canvas').first()).toBeVisible();
   await page.waitForTimeout(500);
@@ -136,10 +151,46 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   await expect(page.getByTestId('epoch-tooltip')).toContainText('84.0%');
 
   await page.screenshot({ path: 'test-results/hypnogram-colored.png', fullPage: true });
+
+  await page.getByRole('button', { name: 'Nuevo análisis' }).click();
+  const modal = page.getByRole('dialog', { name: 'Iniciar un nuevo análisis' });
+  await expect(modal).toBeVisible();
+  await expect(modal.getByRole('heading', { name: 'Carga del registro' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+  await expect(modal.getByRole('button', { name: 'Cerrar nuevo análisis' })).toBeFocused();
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: 'test-results/new-analysis-modal.png' });
+
+  await page.keyboard.press('Escape');
+  await expect(modal).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Nuevo análisis' }).click();
+  await modal.getByLabel('Nombre o identificador del paciente').fill('Segundo paciente');
+  await modal.locator('#edf-file').setInputFiles({
+    name: 'segundo-registro.edf',
+    mimeType: 'application/octet-stream',
+    buffer: Buffer.from('0       segundo contenido de prueba'),
+  });
+  await modal.getByRole('button', { name: 'Analizar registro' }).click();
+
+  await expect(modal.getByRole('button', { name: 'Cargando archivo…' })).toBeVisible();
+  await expect(modal.getByRole('button', { name: 'Cerrar nuevo análisis' })).toBeDisabled();
+  await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(modal).toBeVisible();
+
+  releaseSecondUpload();
+  await expect(modal.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+  releaseSecondInference();
+
+  await expect(modal).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Resumen de Segundo paciente' })).toBeVisible();
   expect(consoleErrors).toEqual([]);
 });
 
-function createPrediction() {
+function createPrediction(patientName = 'Paciente Playwright') {
   const epochs = Array.from({ length: 400 }, (_, epochIndex) => {
     const block = Math.floor(epochIndex / 20);
     const stage = STAGES[block % STAGES.length];
@@ -160,7 +211,7 @@ function createPrediction() {
   return {
     prediction_id: '10000000-0000-0000-0000-000000000000',
     upload_id: '20000000-0000-0000-0000-000000000000',
-    patient_name: 'Paciente Playwright',
+    patient_name: patientName,
     model_version: 'test-v1',
     preprocessing_version: 'test-v1',
     channels: ['EEG Fpz-Cz', 'EEG Pz-Oz'],

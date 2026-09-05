@@ -3,6 +3,11 @@
 Aplicación Angular standalone para cargar un PSG EDF, solicitar la inferencia al
 backend y visualizar el hipnograma preliminar. Usa Tailwind CSS y Apache ECharts.
 
+La portada muestra el formulario hasta completar el primer análisis. Después,
+el resultado reemplaza esa sección y el botón `Nuevo análisis` reutiliza el mismo
+formulario dentro de un diálogo modal, sin descartar el resultado anterior hasta
+que la siguiente inferencia termina correctamente.
+
 ## Ejecución local
 
 La API debe estar disponible en `http://127.0.0.1:8080`. El servidor de
@@ -57,7 +62,9 @@ las épocas vecinas iguales formen barras continuas, que un salto entre estadios
 tenga segmentos verticales del color de cada fila atravesada y que no existan
 errores de consola. Finalmente mueve el mouse sobre una fila vacía y verifica
 que la guía vertical seleccione la época por su posición horizontal y muestre
-confianza y probabilidades.
+confianza y probabilidades. También verifica el reemplazo de la portada, el
+foco y cierre del modal, el bloqueo del cierre durante el procesamiento y la
+conservación del resultado anterior mientras llega la nueva respuesta.
 
 ## Contenedor
 

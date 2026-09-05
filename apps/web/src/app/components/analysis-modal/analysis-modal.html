@@ -1,0 +1,36 @@
+<dialog
+  #dialog
+  class="analysis-dialog"
+  aria-labelledby="analysis-modal-title"
+  (cancel)="onCancel($event)"
+  (click)="onBackdropClick($event)"
+>
+  <div class="dialog-shell">
+    <h2 id="analysis-modal-title" class="sr-only">Iniciar un nuevo análisis</h2>
+    <button
+      #closeButton
+      class="close-button"
+      type="button"
+      aria-label="Cerrar nuevo análisis"
+      [disabled]="busy()"
+      (click)="requestClose()"
+    >
+      <svg viewBox="0 0 24 24" class="size-5 fill-none stroke-current" stroke-width="2">
+        <path d="m6 6 12 12M18 6 6 18" />
+      </svg>
+    </button>
+
+    <app-upload-form
+      [state]="state()"
+      [modal]="true"
+      (analyzeRequest)="analyzeRequest.emit($event)"
+    />
+
+    @if (errorMessage()) {
+      <div class="modal-error" role="alert">
+        <p class="font-semibold">No pudimos completar el análisis</p>
+        <p class="mt-1 text-sm">{{ errorMessage() }}</p>
+      </div>
+    }
+  </div>
+</dialog>

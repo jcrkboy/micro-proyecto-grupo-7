@@ -38,6 +38,7 @@ function nonBlank(control: AbstractControl<string>): ValidationErrors | null {
 })
 export class UploadFormComponent {
   readonly state = input.required<WorkflowState>();
+  readonly modal = input(false);
   readonly analyzeRequest = output<AnalysisRequest>();
 
   protected readonly patientName = new FormControl('', {

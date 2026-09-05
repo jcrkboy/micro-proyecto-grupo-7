@@ -34,74 +34,8 @@
   </header>
 
   <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">
-    <div class="grid items-start gap-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-14">
-      <div class="pt-3">
-        <span
-          class="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
-          >Clasificación automática de estadios</span
-        >
-        <h2
-          class="mt-5 max-w-xl text-4xl font-semibold leading-[1.08] tracking-[-0.04em] text-slate-950 sm:text-5xl"
-        >
-          Convierte un registro EEG en un hipnograma preliminar.
-        </h2>
-        <p class="mt-5 max-w-xl text-base leading-7 text-slate-600">
-          Carga un PSG en formato EDF. El modelo analiza épocas de 30 segundos usando los canales
-          EEG Fpz-Cz y EEG Pz-Oz.
-        </p>
-
-        <div class="mt-8 grid max-w-xl grid-cols-3 gap-3">
-          <div class="metric-card"><strong>100 Hz</strong><span>Frecuencia</span></div>
-          <div class="metric-card"><strong>30 s</strong><span>Por época</span></div>
-          <div class="metric-card"><strong>5</strong><span>Estadios</span></div>
-        </div>
-
-        <div
-          class="mt-8 flex gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 text-sm leading-6 text-amber-950"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            class="mt-0.5 size-5 shrink-0 fill-none stroke-current"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <path
-              d="M12 9v4m0 4h.01M10.3 3.7 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
-            />
-          </svg>
-          <p>
-            <strong>Uso de apoyo profesional.</strong> El resultado es preliminar, requiere revisión
-            experta y no constituye un diagnóstico.
-          </p>
-        </div>
-      </div>
-
-      <app-upload-form [state]="state()" (analyzeRequest)="analyze($event)" />
-    </div>
-
-    @if (errorMessage()) {
-      <section
-        class="mt-8 rounded-3xl border border-red-200 bg-red-50 p-5 text-red-900 shadow-sm"
-        role="alert"
-      >
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <p class="font-semibold">No pudimos completar el análisis</p>
-            <p class="mt-1 text-sm">{{ errorMessage() }}</p>
-          </div>
-          <button
-            class="rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm"
-            type="button"
-            (click)="reset()"
-          >
-            Reintentar
-          </button>
-        </div>
-      </section>
-    }
-
     @if (prediction(); as result) {
-      <section class="mt-12 space-y-6 animate-reveal" aria-label="Resultado del análisis">
+      <section class="space-y-6 animate-reveal" aria-label="Resultado del análisis">
         <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p class="text-xs font-semibold tracking-[0.2em] text-emerald-700 uppercase">
@@ -122,7 +56,9 @@
             <button class="secondary-button" type="button" (click)="downloadJson()">
               Descargar JSON
             </button>
-            <button class="primary-button" type="button" (click)="reset()">Nuevo análisis</button>
+            <button class="primary-button" type="button" (click)="openNewAnalysis()">
+              Nuevo análisis
+            </button>
           </div>
         </div>
 
@@ -137,6 +73,82 @@
           {{ result.disclaimer }}
         </p>
       </section>
+    } @else {
+      <div class="grid items-start gap-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-14">
+        <div class="pt-3">
+          <span
+            class="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
+            >Clasificación automática de estadios</span
+          >
+          <h2
+            class="mt-5 max-w-xl text-4xl font-semibold leading-[1.08] tracking-[-0.04em] text-slate-950 sm:text-5xl"
+          >
+            Convierte un registro EEG en un hipnograma preliminar.
+          </h2>
+          <p class="mt-5 max-w-xl text-base leading-7 text-slate-600">
+            Carga un PSG en formato EDF. El modelo analiza épocas de 30 segundos usando los canales
+            EEG Fpz-Cz y EEG Pz-Oz.
+          </p>
+
+          <div class="mt-8 grid max-w-xl grid-cols-3 gap-3">
+            <div class="metric-card"><strong>100 Hz</strong><span>Frecuencia</span></div>
+            <div class="metric-card"><strong>30 s</strong><span>Por época</span></div>
+            <div class="metric-card"><strong>5</strong><span>Estadios</span></div>
+          </div>
+
+          <div
+            class="mt-8 flex gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 text-sm leading-6 text-amber-950"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="mt-0.5 size-5 shrink-0 fill-none stroke-current"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 9v4m0 4h.01M10.3 3.7 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
+              />
+            </svg>
+            <p>
+              <strong>Uso de apoyo profesional.</strong> El resultado es preliminar, requiere
+              revisión experta y no constituye un diagnóstico.
+            </p>
+          </div>
+        </div>
+
+        <app-upload-form [state]="state()" (analyzeRequest)="analyze($event)" />
+      </div>
+
+      @if (errorMessage()) {
+        <section
+          class="mt-8 rounded-3xl border border-red-200 bg-red-50 p-5 text-red-900 shadow-sm"
+          role="alert"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-semibold">No pudimos completar el análisis</p>
+              <p class="mt-1 text-sm">{{ errorMessage() }}</p>
+            </div>
+            <button
+              class="rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm"
+              type="button"
+              (click)="clearInitialError()"
+            >
+              Reintentar
+            </button>
+          </div>
+        </section>
+      }
     }
   </section>
+
+  @if (analysisModalOpen()) {
+    <app-analysis-modal
+      [open]="true"
+      [state]="state()"
+      [errorMessage]="errorMessage()"
+      (analyzeRequest)="analyze($event)"
+      (closeRequest)="closeNewAnalysis()"
+    />
+  }
 </main>
