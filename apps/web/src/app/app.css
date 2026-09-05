@@ -1,0 +1,72 @@
+:host {
+  display: block;
+}
+
+.metric-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.62);
+  padding: 0.9rem;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 0.05);
+}
+.metric-card strong {
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+.metric-card span {
+  margin-top: 0.15rem;
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.primary-button,
+.secondary-button {
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+.primary-button {
+  background: #113d39;
+  color: white;
+  box-shadow: 0 8px 20px rgb(17 61 57 / 0.2);
+}
+.secondary-button {
+  border: 1px solid #dbe2e7;
+  background: white;
+  color: #334155;
+}
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-reveal {
+  animation: reveal 420ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-reveal {
+    animation: none;
+  }
+  .primary-button,
+  .secondary-button {
+    transition: none;
+  }
+}

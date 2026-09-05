@@ -1,0 +1,60 @@
+<section class="rounded-[1.75rem] border border-slate-200/80 bg-white p-5 shadow-sm sm:p-7">
+  <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+    <div>
+      <p class="text-xs font-semibold tracking-[0.18em] text-emerald-700 uppercase">
+        Secuencia temporal
+      </p>
+      <h3 class="mt-1 text-xl font-semibold">Hipnograma</h3>
+    </div>
+    <p class="text-xs text-slate-500">Desliza o usa la rueda para explorar las épocas</p>
+  </div>
+  <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2" aria-label="Colores de los estadios">
+    @for (item of stageLegend; track item.stage) {
+      <span class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+        <span class="size-3 rounded-sm" [style.background]="item.color" aria-hidden="true"></span>
+        {{ item.stage }}
+      </span>
+    }
+  </div>
+  <div class="relative mt-4" (mousemove)="onPointerMove($event)" (mouseleave)="clearPointer()">
+    <div
+      echarts
+      [options]="chartOption()"
+      (chartInit)="onChartInit($event)"
+      class="h-[390px] w-full"
+      aria-label="Hipnograma interactivo"
+    ></div>
+    @if (hoveredEpoch(); as epoch) {
+      <div
+        data-testid="epoch-pointer"
+        class="pointer-events-none absolute top-7 bottom-[76px] z-10 border-l-2 border-dashed border-slate-500/80"
+        [style.left.px]="pointerLeft()"
+        aria-hidden="true"
+      ></div>
+      <div
+        data-testid="epoch-tooltip"
+        class="pointer-events-none absolute top-3 z-20 w-[250px] rounded-2xl border border-slate-200 bg-white/95 p-3 text-xs shadow-xl backdrop-blur"
+        [style.left.px]="tooltipLeft()"
+        role="tooltip"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <strong class="text-sm text-slate-900">{{ formattedOnset() }} · {{ epoch.stage }}</strong>
+          <span class="rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+            {{ (epoch.confidence * 100).toFixed(1) }}%
+          </span>
+        </div>
+        <p class="mt-1 text-slate-500">Época {{ epoch.epoch_index + 1 }} · Confianza</p>
+        <div class="mt-2 grid grid-cols-5 gap-1">
+          @for (probability of sortedProbabilities(); track probability[0]) {
+            <div class="rounded-lg bg-slate-50 px-1 py-1.5 text-center">
+              <strong class="block text-slate-700">{{ probability[0] }}</strong>
+              <span class="text-[10px] text-slate-500"
+                >{{ (probability[1] * 100).toFixed(1) }}%</span
+              >
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

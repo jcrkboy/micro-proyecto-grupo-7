@@ -1,0 +1,29 @@
+<section class="grid gap-4 lg:grid-cols-[0.35fr_0.65fr]">
+  <div class="rounded-[1.75rem] bg-[#113d39] p-6 text-white shadow-lg shadow-emerald-950/10">
+    <p class="text-xs font-semibold tracking-[0.18em] text-emerald-200 uppercase">
+      Tiempo analizado
+    </p>
+    <p class="mt-3 text-4xl font-semibold tracking-tight">{{ duration() }}</p>
+    <p class="mt-2 text-sm text-emerald-100/75">{{ summary().total_epochs }} épocas clasificadas</p>
+  </div>
+  <div class="rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm">
+    <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-5">
+      @for (item of stages(); track item.stage) {
+        <div>
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="text-sm font-semibold">{{ item.stage }}</span
+            ><strong class="text-sm">{{ item.percentage.toFixed(1) }}%</strong>
+          </div>
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              class="h-full rounded-full"
+              [style.width.%]="item.percentage"
+              [style.background]="item.color"
+            ></div>
+          </div>
+          <p class="mt-1.5 text-[11px] text-slate-500">{{ item.minutes.toFixed(1) }} min</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

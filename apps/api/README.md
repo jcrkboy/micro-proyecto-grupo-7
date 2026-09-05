@@ -3,46 +3,73 @@
 Backend FastAPI para cargar un PSG EDF y generar un hipnograma preliminar con
 el bundle exportado por `Notebooks/model_jhoan_saavedra_preprocessing_v2.ipynb`.
 
-## Ejecución local
+## Preparación inicial
 
-Desde la raíz de `micro-proyecto-grupo-7`:
+Todos los comandos deben ejecutarse desde la raíz de
+`micro-proyecto-grupo-7`. La configuración del backend se encuentra en
+`apps/api/.env`; puede crearse inicialmente copiando `apps/api/.env.example`.
+El bundle configurado debe contener `manifest.json` y `model.txt`.
 
-```bash
-python -m pip install -e "./packages/sleep-staging[inference,test]"
-python -m pip install -e "./apps/api[test]"
-uvicorn sleep_api.main:app --host 0.0.0.0 --port 8080
+### Windows
+
+En PowerShell, cree el entorno e instale las dependencias:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".\packages\sleep-staging[inference,test]"
+.\.venv\Scripts\python.exe -m pip install -e ".\apps\api[dev]"
 ```
 
-La configuración se toma de `apps/api/.env`. La plantilla versionada está en
-`.env.example`. El bundle debe contener `manifest.json` y `model.txt`.
-
-También puede iniciarse desde Linux, WSL o Git Bash mediante el script incluido:
+Desde Git Bash puede iniciar directamente el backend como ya fue probado:
 
 ```bash
+apps/api/run.sh
+```
+
+Si se encuentra en PowerShell y tiene Git Bash disponible en el `PATH`, use:
+
+```powershell
 bash apps/api/run.sh
 ```
 
-El script activa recarga automática de forma predeterminada. Se puede cambiar la
-dirección, el puerto o desactivar la recarga mediante variables:
+### Linux
 
 ```bash
-HOST=127.0.0.1 PORT=8080 RELOAD=false bash apps/api/run.sh
+python3 -m venv .venv
+./.venv/bin/python -m pip install -e "./packages/sleep-staging[inference,test]"
+./.venv/bin/python -m pip install -e "./apps/api[dev]"
+chmod +x apps/api/run.sh
+./apps/api/run.sh
 ```
+
+### macOS
+
+Con Python 3 instalado —por ejemplo mediante Homebrew o el instalador oficial—:
+
+```bash
+python3 -m venv .venv
+./.venv/bin/python -m pip install -e "./packages/sleep-staging[inference,test]"
+./.venv/bin/python -m pip install -e "./apps/api[dev]"
+chmod +x apps/api/run.sh
+./apps/api/run.sh
+```
+
+En los tres sistemas la API queda disponible en `http://localhost:8080` y
+Swagger en `http://localhost:8080/docs`. El script activa recarga automática de
+forma predeterminada.
 
 ### Depuración
 
-Instale las dependencias de desarrollo y arranque `debugpy`:
+Después de instalar el extra `apps/api[dev]`, arranque `debugpy` desde Linux,
+macOS o Git Bash:
 
 ```bash
-python -m pip install -e "./packages/sleep-staging[inference]"
-python -m pip install -e "./apps/api[dev]"
-DEBUG=true DEBUG_WAIT=true bash apps/api/run.sh
+DEBUG=true DEBUG_WAIT=true apps/api/run.sh
 ```
 
 La API esperará un depurador en `127.0.0.1:5678`. En VS Code se puede usar una
 configuración de tipo `debugpy`, solicitud `attach`, host `localhost` y puerto
-`5678`. Para aceptar conexiones desde otra máquina o contenedor se debe definir
-conscientemente `DEBUG_HOST=0.0.0.0` y proteger el puerto; `debugpy` no aporta
+`5678`. El depurador escucha localmente para no exponer un puerto sin
 autenticación.
 
 ## Contrato MVP

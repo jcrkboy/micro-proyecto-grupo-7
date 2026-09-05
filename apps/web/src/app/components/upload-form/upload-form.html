@@ -1,0 +1,107 @@
+<section
+  class="rounded-[2rem] border border-white/90 bg-white/88 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur sm:p-7"
+  aria-labelledby="upload-title"
+>
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold tracking-[0.18em] text-emerald-700 uppercase">
+        Nuevo estudio
+      </p>
+      <h2 id="upload-title" class="mt-2 text-2xl font-semibold tracking-tight">
+        Carga del registro
+      </h2>
+    </div>
+    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500"
+      >EDF · máx. 50 MB</span
+    >
+  </div>
+
+  <form class="mt-7 space-y-5" [formGroup]="form" (ngSubmit)="submit()">
+    <div>
+      <label for="patient-name" class="mb-2 block text-sm font-semibold text-slate-700"
+        >Nombre o identificador del paciente</label
+      >
+      <input
+        id="patient-name"
+        type="text"
+        formControlName="patientName"
+        autocomplete="off"
+        maxlength="120"
+        placeholder="Ej. Paciente 024"
+        class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+      />
+      @if (patientName.touched && patientName.invalid) {
+        <p class="mt-2 text-xs font-medium text-red-600">
+          Ingresa un nombre o identificador válido.
+        </p>
+      }
+    </div>
+
+    <div>
+      <span class="mb-2 block text-sm font-semibold text-slate-700">Archivo polisomnográfico</span>
+      <label
+        for="edf-file"
+        class="group flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/80 px-5 text-center transition hover:border-emerald-400 hover:bg-emerald-50/50"
+        [class.border-red-300]="file.touched && file.invalid"
+      >
+        <input
+          id="edf-file"
+          class="sr-only"
+          type="file"
+          accept=".edf,application/octet-stream"
+          (change)="onFileSelected($event)"
+        />
+        <span
+          class="grid size-12 place-items-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200 transition group-hover:-translate-y-0.5"
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 24 24" class="size-6 fill-none stroke-current" stroke-width="1.8">
+            <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+          </svg>
+        </span>
+        @if (file.value; as selected) {
+          <strong class="mt-3 max-w-full truncate text-sm text-slate-800">{{
+            selected.name
+          }}</strong>
+          <span class="mt-1 text-xs text-slate-500"
+            >{{ formatSize(selected.size) }} · Haz clic para reemplazar</span
+          >
+        } @else {
+          <strong class="mt-3 text-sm text-slate-800">Selecciona un archivo EDF</strong>
+          <span class="mt-1 text-xs text-slate-500">No se carga hasta iniciar el análisis</span>
+        }
+      </label>
+      @if (file.touched && file.hasError('edfExtension')) {
+        <p class="mt-2 text-xs font-medium text-red-600">El archivo debe tener extensión .edf.</p>
+      }
+      @if (file.touched && file.hasError('emptyFile')) {
+        <p class="mt-2 text-xs font-medium text-red-600">El archivo está vacío.</p>
+      }
+      @if (file.touched && file.hasError('maxSize')) {
+        <p class="mt-2 text-xs font-medium text-red-600">El archivo supera el límite de 50 MB.</p>
+      }
+      @if (file.touched && file.hasError('required')) {
+        <p class="mt-2 text-xs font-medium text-red-600">Selecciona un archivo EDF.</p>
+      }
+    </div>
+
+    <button
+      class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#113d39] px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/15 transition hover:-translate-y-0.5 hover:bg-[#164b46] disabled:cursor-wait disabled:opacity-65 disabled:hover:translate-y-0"
+      type="submit"
+      [disabled]="busy()"
+      aria-live="polite"
+    >
+      @if (busy()) {
+        <span
+          class="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white"
+          aria-hidden="true"
+        ></span>
+      }
+      {{ statusLabel() }}
+    </button>
+  </form>
+
+  <div class="mt-5 flex items-center justify-center gap-5 text-[11px] font-medium text-slate-500">
+    <span>✓ Procesamiento seguro</span><span>✓ 2 canales EEG</span><span>✓ Sin diagnóstico</span>
+  </div>
+</section>
