@@ -21,3 +21,6 @@ mlruns/
 /apps/api/.env
 /apps/api/storage/uploads/*
 !/apps/api/storage/uploads/.gitkeep
+
+# Configuracion local del despliegue
+/apps/deploy/.env
