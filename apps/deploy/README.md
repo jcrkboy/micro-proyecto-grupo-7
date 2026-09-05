@@ -33,14 +33,22 @@ Ambos aceptan ejecucion manual con `workflow_dispatch`.
 
 1. Instalar Docker Engine y el plugin Compose.
 
-2. Autenticar contra GHCR. Si el paquete es privado hace falta un Personal
-   Access Token con alcance `read:packages`:
+2. Autenticacion contra GHCR: no hace falta. Los paquetes son publicos porque
+   el repositorio lo es, asi que `docker compose pull` funciona sin login.
+
+   Para comprobarlo desde una maquina sin sesion en GHCR, si el comando
+   devuelve el manifiesto la imagen es publica:
+
+   ```bash
+   docker manifest inspect ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
+   ```
+
+   Si algun dia se vuelven privados, hace falta un Personal Access Token con
+   alcance `read:packages`:
 
    ```bash
    echo "$GHCR_TOKEN" | docker login ghcr.io -u <usuario-github> --password-stdin
    ```
-
-   Alternativa: marcar los paquetes como publicos en GitHub y omitir el login.
 
 3. Colocar el artefacto del modelo en el host. Los binarios no viajan dentro de
    la imagen porque `data/` esta excluido en `.dockerignore`:
