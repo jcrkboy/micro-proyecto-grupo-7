@@ -1,0 +1,4 @@
+cd apps/deploy  
+docker compose up -d
+docker compose ps
+curl http://localhost:8081/api/v1/model

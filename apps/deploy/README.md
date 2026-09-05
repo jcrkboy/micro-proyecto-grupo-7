@@ -70,8 +70,9 @@ docker compose up -d
 ```
 
 El mismo par de comandos actualiza el despliegue cuando Actions publica una
-imagen nueva. `pull_policy: always` garantiza que `up` no reutilice una capa
-`latest` obsoleta del cache local.
+imagen nueva. El `pull` explicito no es opcional: `up` por si solo reutiliza la
+capa `latest` que ya esta en el cache local y el despliegue quedaria en la
+version anterior sin ningun error visible.
 
 Verificacion:
 
@@ -80,6 +81,25 @@ docker compose ps
 docker compose logs -f api
 curl -f http://localhost/api/v1/model
 ```
+
+## Prueba local antes de desplegar
+
+El mismo archivo sirve para un smoke test en la maquina de desarrollo, sin pasar
+por GHCR. Se construyen las imagenes con los nombres que declara el `.env` y
+Compose las encuentra localmente:
+
+```bash
+# desde la raiz del repositorio
+docker build -f apps/api/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest .
+docker build -f apps/web/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest apps/web
+
+cd apps/deploy
+docker compose up -d
+curl http://localhost:${WEB_HOST_PORT:-80}/api/v1/model
+```
+
+Para la prueba local conviene apuntar `HOST_MODEL_DIR` al directorio del modelo
+del repositorio y usar un `WEB_HOST_PORT` libre, por ejemplo 8081.
 
 ## Red interna
 
