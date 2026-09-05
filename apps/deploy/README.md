@@ -2,7 +2,7 @@
 
 Stack de ejecucion para una maquina virtual Linux (por ejemplo EC2). No compila
 codigo: descarga las imagenes que GitHub Actions publica en GHCR desde `main`.
-
+ 
 ## Piezas
 
 | Archivo | Rol |
