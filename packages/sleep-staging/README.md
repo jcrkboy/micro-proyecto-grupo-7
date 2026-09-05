@@ -19,6 +19,26 @@ contexto temporal hasta completar 486 columnas.
 No usa el hipnograma ni recorta vigilia a partir de etiquetas. Esto permite que
 la misma transformación se utilice tanto al entrenar como al servir el modelo.
 
+## Inferencia
+
+El extra `inference` instala LightGBM y permite cargar directamente el bundle
+exportado por el notebook de Jhoan Saavedra:
+
+```bash
+pip install -e ".[inference]"
+```
+
+```python
+from sleep_staging import SleepStagePredictor
+
+predictor = SleepStagePredictor("../../data/models/sleep_staging_lightgbm_eeg_v2")
+resultado = predictor.predict_edf("registro-PSG.edf")
+```
+
+El predictor valida el manifiesto, el número y orden de features, las dimensiones
+de probabilidades y los valores finitos. Devuelve una predicción por época con
+tiempos, canales y frecuencia; no contiene ninguna dependencia de FastAPI.
+
 ## Utilidades de entrenamiento
 
 Las dependencias de entrenamiento se instalan como un extra para no obligar al

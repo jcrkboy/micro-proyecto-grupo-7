@@ -6,6 +6,8 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+.pytest_cache/
+.pytest_tmp_*/
 mlflow.db
 mlruns/
 
@@ -14,3 +16,8 @@ mlruns/
 
 # Local tooling cache
 .atl/
+
+# Runtime state and local environment for the API
+/apps/api/.env
+/apps/api/storage/uploads/*
+!/apps/api/storage/uploads/.gitkeep

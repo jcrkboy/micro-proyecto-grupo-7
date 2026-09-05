@@ -16,6 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+inference = [
+    "lightgbm==4.7.0",
+]
 training = [
     "lightgbm==4.7.0",
     "matplotlib>=3.10,<4",
@@ -24,6 +27,7 @@ training = [
     "seaborn>=0.13,<1",
 ]
 test = [
+    "edfio>=0.4,<1",
     "pytest>=8,<10",
     "scikit-learn==1.7.2",
 ]

@@ -1,0 +1,2 @@
+"""Endpoints agrupados por responsabilidad."""
+

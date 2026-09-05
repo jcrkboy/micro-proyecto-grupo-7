@@ -1,0 +1,14 @@
+.git
+.codegraph
+.dvc/cache
+.venv
+.pytest_cache
+**/__pycache__
+**/*.pyc
+**/.env
+data
+EDA
+Notebooks
+matlab
+mlruns
+.pytest_tmp_*
