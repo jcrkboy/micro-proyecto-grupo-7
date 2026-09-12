@@ -67,28 +67,65 @@ El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features
 
 ```
 .
-├── data/                          # dataset (DVC, ignorado por Git)
-│   ├── ST-subjects.xls            # metadatos de los 22 sujetos + noche placebo/temazepam
-│   ├── sleep-telemetry/           # 88 archivos EDF
-│   │   ├── ST70xxJ0-PSG.edf       #   44 registros polisomnograficos
-│   │   └── ST70xxJx-Hypnogram.edf #   44 hipnogramas
-│   └── processed/                 # cache generado por el EDA de dataset completo
-│       ├── epochs_features.parquet    # una fila por epoca de 30 s (~42 700)
-│       └── psd_record_stage.parquet   # PSD media por registro x estadio x canal
-├── data.dvc                       # puntero al dataset (esto si va en Git)
-├── EDA/
+├── apps/                           # Aplicaciones (backend, frontend, despliegue)
+│   ├── api/                        # Backend FastAPI + LightGBM
+│   │   ├── Dockerfile             # Imagen para la API
+│   │   ├── .env.example            # Plantilla de configuracion
+│   │   ├── run.sh                  # Script para ejecutar la API
+│   │   ├── README.md               # Documentacion del backend
+│   │   └── tests/
+│   ├── web/                        # Frontend Angular
+│   │   ├── Dockerfile             # Imagen para el frontend
+│   │   └── ...                     # Codigo Angular
+│   └── deploy/                     # Stack Docker Compose para producion
+│       ├── docker-compose.yml      # Orquestacion de servicios (api + web)
+│       ├── .env.example            # Variables de entorno para despliegue
+│       └── README.md               # Guia de despliegue en VM
+├── packages/                       # Librerias reutilizables
+│   └── sleep-staging/              # Libreria de preprocesamiento e inferencia de sueno
+│       ├── setup.py                # Configuracion del paquete
+│       └── src/                    # Codigo fuente del paquete
+├── Notebooks/                      # Notebooks de investigacion y desarrollo
+│   ├── model_cnn_sleep_v2.ipynb
+│   ├── model_jhoan_saavedra.ipynb
+│   ├── model_jhoan_saavedra_preprocessing_v2.ipynb    # Bundle exportado a API
+│   ├── model_grid_search_finding_light.ipynb          # Hyperparameter tuning LightGBM
+│   ├── model_grid_search_finding_heavy.ipynb
+│   ├── model_jj.ipynb
+│   ├── model_jj_api.ipynb
+│   └── model_juan_javier_valera.ipynb
+├── EDA/                            # Analisis exploratorio de datos
+│   ├── EDA_Sleep_EEG_ST7242J0/             # Export Markdown del EDA individual
 │   ├── EDA_Sleep_EEG_ST7242J0_datset/      # EDA de los 44 registros
 │   │   ├── EDA_Sleep_EEG_dataset.ipynb
-│   │   └── img/*.png                       # figuras exportadas
-│   ├── EDA_Sleep_EEG_ST7242J0_individual/  # EDA de un solo registro
-│   │   ├── EDA_Sleep_EEG_ST7242J0.ipynb
-│   │   └── img/*.png
-│   └── EDA_Sleep_EEG_ST7242J0/             # export en Markdown del EDA individual
-├── docs/                          # MLOps Stack Canvas y reportes
+│   │   └── img/*.png                       # Figuras exportadas
+│   └── EDA_Sleep_EEG_ST7242J0_individual/  # EDA de un solo registro
+│       ├── EDA_Sleep_EEG_ST7242J0.ipynb
+│       └── img/*.png
+├── scripts/                        # Scripts utilitarios
+│   ├── generate_sample_edf.py      # Genera EDF de ejemplo para testing
+│   └── run_lgbm_v2_candidate.py    # Script para entrenar candidato LightGBM v2
+├── matlab/                         # Codigo legacy en MATLAB
+│   ├── min.m                       # Script MATLAB de referencia
+│   └── EEG_Hipnograma.png          # Figura de referencia
+├── docs/                           # Documentacion (MLOps Stack Canvas, reportes)
+├── data/                           # Dataset (DVC, ignorado por Git)
+│   ├── ST-subjects.xls             # Metadatos de los 22 sujetos
+│   ├── sleep-telemetry/            # 88 archivos EDF
+│   │   ├── ST70xxJ0-PSG.edf        #   44 registros polisomnograficos
+│   │   └── ST70xxJx-Hypnogram.edf  #   44 hipnogramas
+│   └── processed/                  # Cache generado por EDA
+│       ├── epochs_features.parquet
+│       └── psd_record_stage.parquet
+├── data.dvc                        # Puntero al dataset (va en Git)
+├── .dvc/
+│   ├── config                      # Bucket y endpoint de R2 (versionado)
+│   └── config.local                # Credenciales (ignorado)
+├── .github/workflows/              # GitHub Actions CI/CD
+├── .gitignore
+├── .dockerignore
 ├── requirements.txt
-└── .dvc/
-    ├── config                     # bucket y endpoint (versionado)
-    └── config.local               # credenciales (ignorado)
+└── README.md
 ```
 
 ---
