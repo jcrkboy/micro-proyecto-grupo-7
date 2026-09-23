@@ -33,6 +33,8 @@
 
 Abra su navegador web (se recomienda Google Chrome o Mozilla Firefox) e ingrese a la dirección web proporcionada por el administrador del sistema (Ejemplo: `http://98.89.35.132`).
 
+<img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/06fed007-8c32-448f-9581-ed32fbd2f9fb" />
+
 ---
 
 ## 2. Flujo de Trabajo Clínico
@@ -40,6 +42,9 @@ Abra su navegador web (se recomienda Google Chrome o Mozilla Firefox) e ingrese 
 ### Paso 1: Carga del Estudio (Módulo de Ingesta)
 
 Al ingresar a la plataforma, se encontrará con la pantalla de "Nuevo Estudio".
+
+<img style="max-width:100%;height:auto;" src="https://github.com/user-attachments/assets/13cab7e5-be6c-4ce6-b0d7-30afe286a70e" />
+
 
 *   **Identificación:** Ingrese manualmente el nombre o el Identificador (ID) del paciente en el campo correspondiente.
 *   **Carga del Archivo:** Arrastre y suelte el archivo del estudio polisomnográfico en el recuadro punteado, o haga clic para buscarlo en su computadora.
@@ -53,6 +58,8 @@ Al ingresar a la plataforma, se encontrará con la pantalla de "Nuevo Estudio".
 ### Paso 2: Análisis del Resumen Estadístico
 
 Una vez finalizado el procesamiento, la interfaz desplegará el panel de resultados:
+
+<img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/b68df597-db19-4e75-9118-ef5c0b048f7e" />
 
 *   En la parte superior, observará el **Resumen del Paciente**, que indica el tiempo total analizado (en épocas de 30 segundos).
 *   A la derecha, verá un desglose porcentual y en minutos de la **arquitectura del sueño**: W (Vigilia), N1, N2, N3 (Sueño Profundo) y REM. Este panel le brinda un panorama general rápido de la salud del sueño del paciente.
