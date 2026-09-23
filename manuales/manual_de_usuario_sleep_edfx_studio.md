@@ -1,4 +1,4 @@
-# Acesco - Documentación de Producto
+# Documentación de la solución
 
 ## Manual de Usuario: Sleep-EDFx Studio
 **Plataforma de Pre-diagnóstico Clínico de Polisomnografía (PSG)**  
