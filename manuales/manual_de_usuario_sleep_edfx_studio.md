@@ -68,6 +68,10 @@ Una vez finalizado el procesamiento, la interfaz desplegará el panel de resulta
 
 La sección central contiene la **Secuencia Temporal (Hipnograma)**, la cual gráfica los estadios del sueño a lo largo de toda la noche. Aquí es donde el especialista ejerce su criterio médico:
 
+<img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/3478ecf2-01dc-411a-8bde-a67be8f2d9d2" />
+
+<img width="1189" height="527" alt="image" src="https://github.com/user-attachments/assets/631c88bd-6a50-4c87-a184-4df40a621352" />
+
 *   **Navegación:** Deslice la barra inferior o utilice la rueda del ratón para explorar las diferentes horas del estudio.
 *   **Nivel de Confianza:** Al pasar el cursor sobre cualquier época (bloque de 30 segundos), un panel flotante le indicará el estadio predicho y el porcentaje de confianza de la IA para esa decisión.
 *   **Revisión de Alertas (Zonas Amarillas/Naranjas):** Preste especial atención a las épocas marcadas con alertas visuales de baja confianza. El sistema le sugiere auditar manualmente estas áreas de transición complejas (generalmente estadios N1 o REM).
@@ -76,6 +80,8 @@ La sección central contiene la **Secuencia Temporal (Hipnograma)**, la cual gr�
 ### Paso 4: Exportación de Resultados
 
 Una vez que haya revisado el hipnograma y validado las alertas generadas por la IA:
+
+<img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/5aaa1406-fc33-4f5a-8087-c11b3a7fad41" />
 
 1.  Diríjase a la esquina superior derecha del panel de resultados.
 2.  Seleccione **"Descargar CSV"** o **"Descargar JSON"**.
