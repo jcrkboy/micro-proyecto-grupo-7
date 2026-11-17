@@ -3,6 +3,7 @@
 from sleep_staging.datasets.sleep_edfx import (
     VALID_STAGES,
     SleepEdfRecord,
+    discover_sleep_cassette_records,
     discover_sleep_telemetry_records,
     read_epoch_labels,
 )
@@ -10,6 +11,7 @@ from sleep_staging.datasets.sleep_edfx import (
 __all__ = [
     "VALID_STAGES",
     "SleepEdfRecord",
+    "discover_sleep_cassette_records",
     "discover_sleep_telemetry_records",
     "read_epoch_labels",
 ]

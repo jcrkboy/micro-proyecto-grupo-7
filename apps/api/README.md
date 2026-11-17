@@ -1,7 +1,7 @@
 # Sleep-EDFx API
 
 Backend FastAPI para cargar un PSG EDF y generar un hipnograma preliminar con
-el bundle exportado por `Notebooks/model_jhoan_saavedra_preprocessing_v2.ipynb`.
+el bundle exportado por `Notebooks/historicos/model_jhoan_saavedra_preprocessing_v2.ipynb`.
 
 ## Preparación inicial
 

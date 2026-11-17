@@ -4,8 +4,15 @@ EEG polisomnografico del subset **Sleep Telemetry** de
 [Sleep-EDFx](https://physionet.org/content/sleep-edfx/): 22 sujetos, 2 noches
 cada uno (44 pares PSG + hipnograma, ~8 h a 100 Hz, epocas de 30 s).
 
-El dataset (1.1 GB) se versiona con [DVC](https://dvc.org) sobre Cloudflare R2.
-Git solo guarda el puntero `data.dvc`.
+El proyecto incluye también una entrega parcial de **Sleep Cassette** con 75 EDF.
+Hay 12 noches con PSG e hipnograma emparejados y 51 archivos sin pareja. El
+experimento multicanal usa las 44 noches de Telemetry y las 12 disponibles de
+Cassette. El directorio `data/` ocupa unos 4,4 GB, incluidos cachés de
+características y artefactos. Se versiona con [DVC](https://dvc.org) en
+Cloudflare R2 mediante el puntero `data.dvc`.
+
+El experimento compara los dos modelos en las mismas épocas de Cassette.
+[Resultados y protocolo de evaluación](agent.md#comparación-directa-con-el-híbrido-v6).
 
 ---
 
@@ -41,7 +48,7 @@ dvc remote modify --local r2 secret_access_key 'TU_SECRET_ACCESS_KEY'
 > **`--local` es obligatorio.** Escribe en `.dvc/config.local`, que esta
 > ignorado. Sin esa bandera las credenciales se commitean al repositorio.
 
-**5.** Descarga el dataset desde R2 (1.1 GB)
+**5.** Descarga los datos y artefactos desde R2
 
 ```bash
 dvc pull
@@ -86,14 +93,9 @@ El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features
 │       ├── setup.py                # Configuracion del paquete
 │       └── src/                    # Codigo fuente del paquete
 ├── Notebooks/                      # Notebooks de investigacion y desarrollo
-│   ├── model_cnn_sleep_v2.ipynb
-│   ├── model_jhoan_saavedra.ipynb
-│   ├── model_jhoan_saavedra_preprocessing_v2.ipynb    # Bundle exportado a API
-│   ├── model_grid_search_finding_light.ipynb          # Hyperparameter tuning LightGBM
-│   ├── model_grid_search_finding_heavy.ipynb
-│   ├── model_jj.ipynb
-│   ├── model_jj_api.ipynb
-│   └── model_juan_javier_valera.ipynb
+│   ├── model_jhoan_saavedra_all_channels.ipynb        # LightGBM, control y entrenamiento mixto
+│   ├── model_v6.ipynb                                 # Referencia de Colab, CRNN + LightGBM + HMM
+│   └── historicos/                                    # Modelos anteriores y búsquedas de parámetros
 ├── EDA/                            # Analisis exploratorio de datos
 │   ├── EDA_Sleep_EEG_ST7242J0/             # Export Markdown del EDA individual
 │   ├── EDA_Sleep_EEG_ST7242J0_datset/      # EDA de los 44 registros
@@ -114,6 +116,9 @@ El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features
 │   ├── sleep-telemetry/            # 88 archivos EDF
 │   │   ├── ST70xxJ0-PSG.edf        #   44 registros polisomnograficos
 │   │   └── ST70xxJx-Hypnogram.edf  #   44 hipnogramas
+│   ├── sleep-cassette/             # 35 PSG y 40 hipnogramas
+│   ├── referencias/                # Predicciones LOSO de Telemetry para comparar por época
+│   ├── experimentos/lightgbm_st_sc/ # Modelo mixto, hiperparámetros y esquema de características
 │   └── processed/                  # Cache generado por EDA
 │       ├── epochs_features.parquet
 │       └── psd_record_stage.parquet

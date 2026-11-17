@@ -63,6 +63,28 @@ def discover_sleep_telemetry_records(base: str | Path) -> list[SleepEdfRecord]:
     return records
 
 
+def discover_sleep_cassette_records(base: str | Path) -> list[SleepEdfRecord]:
+    """Empareja noches SC por sujeto, noche y código del registro."""
+    directory = Path(base)
+    if not directory.is_dir():
+        raise FileNotFoundError(directory)
+    records = []
+    for psg in sorted(directory.glob("SC*-PSG.edf")):
+        match = re.fullmatch(r"(SC4\d{2})(\d)([A-Z])0-PSG\.edf", psg.name)
+        if match is None:
+            continue
+        subject, night, code = match.groups()
+        record = subject + night
+        labels = list(directory.glob(f"{record}{code}?-Hypnogram.edf"))
+        if len(labels) > 1:
+            raise ValueError(f"Hay varios hipnogramas para {psg.name}")
+        if labels:
+            records.append(SleepEdfRecord(psg, labels[0], record, subject, int(night)))
+    if not records:
+        raise ValueError(f"No se encontraron pares Sleep Cassette en {directory}")
+    return records
+
+
 def read_epoch_labels(
     hypnogram_path: str | Path,
     n_epochs: int,
