@@ -264,11 +264,11 @@ def extract_epoch_features(
         rows.append(row)
 
     features = pd.DataFrame(rows)
-    # Las dos primeras derivaciones configuradas son el par EEG actual. Mantener
-    # esta lógica con >= 2 permite agregar modalidades futuras sin perder estas
-    # relaciones entre derivaciones EEG.
-    if len(channels) >= 2:
-        first, second = map(_channel_prefix, channels)
+    # Las relaciones son entre las dos derivaciones EEG, nunca entre modalidades.
+    # Seleccionarlas por nombre permite añadir EOG/EMG y cambiar su posición.
+    eeg_pair = ("EEG Fpz-Cz", "EEG Pz-Oz")
+    if all(channel in channels for channel in eeg_pair):
+        first, second = map(_channel_prefix, eeg_pair)
         epsilon = 1e-12
         for band in ("delta", "theta", "alpha", "sigma", "beta"):
             features[f"inter_ratio_{band}"] = (
