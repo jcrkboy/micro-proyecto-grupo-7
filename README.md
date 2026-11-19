@@ -92,10 +92,12 @@ El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features
 │   └── sleep-staging/              # Libreria de preprocesamiento e inferencia de sueno
 │       ├── setup.py                # Configuracion del paquete
 │       └── src/                    # Codigo fuente del paquete
-├── Notebooks/                      # Notebooks de investigacion y desarrollo
-│   ├── model_jhoan_saavedra_all_channels.ipynb        # LightGBM, control y entrenamiento mixto
-│   ├── model_v6.ipynb                                 # Referencia de Colab, CRNN + LightGBM + HMM
-│   └── historicos/                                    # Modelos anteriores y búsquedas de parámetros
+├── Notebooks/
+│   ├── dart_crnn_mixto.ipynb       # Evaluación por persona y ajuste final de DART + CRNN
+│   └── experiments/                # Comparaciones y búsquedas en Telemetry y Cassette
+│       ├── model_jhoan_saavedra_all_channels.ipynb   # Control LightGBM multicanal
+│       ├── model_v6.ipynb           # Experimento CRNN + LightGBM + HMM de Colab
+│       └── historicos/              # Modelos y búsquedas iniciales
 ├── EDA/                            # Analisis exploratorio de datos
 │   ├── EDA_Sleep_EEG_ST7242J0/             # Export Markdown del EDA individual
 │   ├── EDA_Sleep_EEG_ST7242J0_datset/      # EDA de los 44 registros

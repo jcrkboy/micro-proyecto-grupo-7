@@ -14,8 +14,9 @@ En entrenamiento, el paquete Python extrae características del PSG y usa el hip
 | `.dvc/` | Configuración del remoto R2. Git guarda el puntero `data.dvc` en la raíz. Usa `dvc pull` para recuperar los datos y `dvc remote modify --local` para escribir las credenciales en `.dvc/config.local`. |
 | `EDA/` | Análisis exploratorio. `EDA_Sleep_EEG_ST7242J0_individual/` estudia una noche y `EDA_Sleep_EEG_ST7242J0_datset/` recorre las 44. Cada uno tiene su notebook y una carpeta `img/` con figuras. `EDA_Sleep_EEG_ST7242J0/` conserva el informe individual en Markdown con sus gráficos. |
 | `data/sleep-cassette/` y `data/referencias/` | EDF de la entrega parcial de Cassette y predicciones por época de la CRNN de Telemetry. El adaptador de Cassette empareja por sujeto y noche. |
-| `Notebooks/` | `model_jhoan_saavedra_all_channels.ipynb` entrena los controles LightGBM con Telemetry y con ambas cohortes. `model_v6.ipynb` conserva el experimento híbrido del compañero, con sus rutas de Colab, las comparaciones y los resultados originales. |
-| `Notebooks/historicos/` | Modelos previos y búsquedas de hiperparámetros. `model_jhoan_saavedra_preprocessing_v2.ipynb` exporta el modelo EEG usado por la API. |
+| `Notebooks/` | Evaluación por persona y entrenamiento final de la combinación geométrica de 70 % DART y 30 % CRNN en Telemetry y Cassette. [Notebook principal](Notebooks/dart_crnn_mixto.ipynb) · [Registro de experimentos](Notebooks/agent.md) |
+| `Notebooks/experiments/` | `model_jhoan_saavedra_all_channels.ipynb` entrena los controles LightGBM. `model_v6.ipynb` conserva la arquitectura y los resultados originales del compañero. La carpeta también contiene las comparaciones y búsquedas posteriores. |
+| `Notebooks/experiments/historicos/` | Modelos previos y búsquedas de hiperparámetros. `model_jhoan_saavedra_preprocessing_v2.ipynb` exporta el modelo EEG usado por la API. |
 | `scripts/` | `generate_sample_edf.py` genera un EDF de prueba. `run_lgbm_v2_candidate.py` entrena un candidato LightGBM v2. |
 | `matlab/` | Script MATLAB de referencia y figura del EEG con su hipnograma. |
 | `docs/` | Presentación e informe del MLOps Stack Canvas y maqueta visual de la aplicación. |

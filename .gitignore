@@ -12,6 +12,7 @@ mlflow.db
 mlruns/
 
 # Jupyter
+/.sleep-cv/
 .ipynb_checkpoints/
 
 # Local tooling cache
