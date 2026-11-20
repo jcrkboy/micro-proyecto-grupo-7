@@ -1,6 +1,6 @@
 # 🛠️ Manual de Instalación - Sleep-EDFx Studio (Grupo 7)
 
-Este documento describe cómo desplegar **Sleep-EDFx Studio** —formado por un frontend Angular y una API FastAPI con LightGBM— en una máquina virtual Linux, por ejemplo una instancia AWS EC2.
+Este documento describe cómo desplegar **Sleep-EDFx Studio** —formado por un frontend Angular y una API FastAPI con DART y CRNN— en una máquina virtual Linux, por ejemplo una instancia AWS EC2.
 
 El despliegue utiliza Docker Compose para ejecutar las imágenes publicadas por GitHub Actions en GitHub Container Registry (GHCR). La máquina virtual no compila el código: descarga y ejecuta las imágenes ya construidas.
 
@@ -10,7 +10,7 @@ La solución se ejecuta mediante dos servicios Docker:
 
 | Servicio | Función |
 | --- | --- |
-| `api` | Backend FastAPI y motor de clasificación basado en LightGBM. |
+| `api` | Backend FastAPI y motor de clasificación DART + CRNN. |
 | `web` | Frontend Angular compilado y servido mediante nginx. También funciona como proxy hacia la API. |
 
 Las imágenes publicadas son:
@@ -77,10 +77,10 @@ Cree el directorio donde se almacenará el modelo:
 sudo mkdir -p /opt/sleep-edfx/model
 ```
 
-Copie los archivos `manifest.json` y `model.txt` desde la máquina de desarrollo:
+Copie los archivos `manifest.json`, `dart.txt` y `crnn.keras` desde la máquina de desarrollo:
 
 ```bash
-scp data/models/sleep_staging_lightgbm_eeg_v2/{manifest.json,model.txt} \
+scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart.txt,crnn.keras} \
   usuario@vm:/opt/sleep-edfx/model/
 ```
 
@@ -121,7 +121,7 @@ SLEEP_API_CORS_ORIGINS=["http://localhost"]
 Aspectos importantes:
 
 - `API_IMAGE` y `WEB_IMAGE` indican las imágenes que descargará Docker Compose.
-- `HOST_MODEL_DIR` debe apuntar al directorio del host que contiene `manifest.json` y `model.txt`.
+- `HOST_MODEL_DIR` debe apuntar al directorio del host que contiene `manifest.json`, `dart.txt` y `crnn.keras`.
 - `WEB_HOST_PORT` es el puerto que se expondrá hacia el exterior. Su valor predeterminado es `80`.
 - `SLEEP_API_MAX_UPLOAD_BYTES=52428800` limita los archivos cargados a 50 MB.
 - Las rutas `SLEEP_API_MODEL_DIR` y `SLEEP_API_UPLOAD_DIR` son rutas internas de los contenedores y deben permanecer absolutas.
@@ -142,7 +142,7 @@ El comando `docker compose pull` es necesario cuando se utiliza `latest`, ya que
 
 Durante el arranque:
 
-1. Se descarga la imagen del backend FastAPI con LightGBM.
+1. Se descarga la imagen del backend FastAPI con DART y CRNN.
 2. Se descarga la imagen del frontend Angular servido por nginx.
 3. Se inicia el servicio `api`.
 4. Se inicia el servicio `web` cuando la API está saludable.
@@ -197,7 +197,7 @@ Esto permite que el contenedor utilice el modelo sin modificar sus archivos.
 
 Para reemplazar el modelo:
 
-1. Sustituya `manifest.json` y `model.txt` en el directorio configurado en `HOST_MODEL_DIR`.
+1. Sustituya `manifest.json`, `dart.txt` y `crnn.keras` en el directorio configurado en `HOST_MODEL_DIR`.
 2. Reinicie el backend:
 
 ```bash

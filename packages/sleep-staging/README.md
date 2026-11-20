@@ -21,17 +21,17 @@ la misma transformación se utilice tanto al entrenar como al servir el modelo.
 
 ## Inferencia
 
-El extra `inference` instala LightGBM y permite cargar directamente el bundle
-exportado por el notebook de Jhoan Saavedra:
+El extra `inference` instala LightGBM y TensorFlow. El notebook
+`Notebooks/dart_crnn_mixto_final_100.ipynb` exporta ambos pesos junto a un manifiesto de inferencia.
 
 ```bash
 pip install -e ".[inference]"
 ```
 
 ```python
-from sleep_staging import SleepStagePredictor
+from sleep_staging.inference.mixed import MixedSleepStagePredictor
 
-predictor = SleepStagePredictor("../../data/models/sleep_staging_lightgbm_eeg_v2")
+predictor = MixedSleepStagePredictor("../../data/models/dart_crnn_mixto/final_100")
 resultado = predictor.predict_edf("registro-PSG.edf")
 ```
 
