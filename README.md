@@ -4,14 +4,16 @@ EEG polisomnografico del subset **Sleep Telemetry** de
 [Sleep-EDFx](https://physionet.org/content/sleep-edfx/): 22 sujetos, 2 noches
 cada uno (44 pares PSG + hipnograma, ~8 h a 100 Hz, epocas de 30 s).
 
-El proyecto incluye también una entrega parcial de **Sleep Cassette** con 75 EDF.
-Hay 12 noches con PSG e hipnograma emparejados y 51 archivos sin pareja. El
-experimento multicanal usa las 44 noches de Telemetry y las 12 disponibles de
-Cassette. El directorio `data/` ocupa unos 4,4 GB, incluidos cachés de
-características y artefactos. Se versiona con [DVC](https://dvc.org) en
-Cloudflare R2 mediante el puntero `data.dvc`.
+**Sleep Cassette** aporta 153 noches de 78 personas, cada una con su PSG e
+hipnograma. Junto con Telemetry hay 197 noches de 100 personas. El
+[notebook mixto](Notebooks/dart_crnn_mixto.ipynb) entrena con 80 personas
+(158 noches) y evalúa con 20 (39 noches). El
+[ajuste final con las 100 personas](Notebooks/dart_crnn_mixto_final_100.ipynb)
+se ejecuta aparte. Las características preprocesadas se conservan en
+`data/processed/`. El puntero `data.dvc` identifica la versión de datos y modelos.
 
-El experimento compara los dos modelos en las mismas épocas de Cassette.
+El experimento anterior comparó los dos modelos en las mismas épocas de la
+entrega parcial, que incluía 12 noches completas de Cassette.
 [Resultados y protocolo de evaluación](agent.md#comparación-directa-con-el-híbrido-v6).
 
 ---
@@ -118,7 +120,7 @@ El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features
 │   ├── sleep-telemetry/            # 88 archivos EDF
 │   │   ├── ST70xxJ0-PSG.edf        #   44 registros polisomnograficos
 │   │   └── ST70xxJx-Hypnogram.edf  #   44 hipnogramas
-│   ├── sleep-cassette/             # 35 PSG y 40 hipnogramas
+│   ├── sleep-cassette/             # 153 PSG y 153 hipnogramas
 │   ├── referencias/                # Predicciones LOSO de Telemetry para comparar por época
 │   ├── experimentos/lightgbm_st_sc/ # Modelo mixto, hiperparámetros y esquema de características
 │   └── processed/                  # Cache generado por EDA

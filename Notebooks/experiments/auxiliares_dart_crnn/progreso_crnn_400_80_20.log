@@ -1,0 +1,498 @@
+2026-11-19T19:10:23 INICIO celda 1 c5f3b596
+2026-11-19T19:10:26 FIN celda 1
+2026-11-19T19:10:26 INICIO celda 3 4facb20a
+2026-11-19T19:10:35 FIN celda 3
+2026-11-19T19:10:35 INICIO celda 5 40114dc1
+2026-11-19T19:10:36 FIN celda 5
+2026-11-19T19:10:36 INICIO celda 7 b07d6707
+2026-11-19T19:10:36 Inicio de CRNN desde cero. 80 personas en entrenamiento, 20 en evaluación. Resultados en Notebooks\auxiliares_dart_crnn\resultados_crnn_400\20261119_191036_303071
+2026-11-19T19:10:37 WARNING:tensorflow:From E:\PROJECTS\Maestria Inteligencia Artificial\masterIADesarollo\micro-proyecto-grupo-7\.venv\lib\site-packages\keras\src\backend\common\global_state.py:82: The name tf.reset_default_graph is deprecated. Please use tf.compat.v1.reset_default_graph instead.
+2026-11-19T19:10:37 WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+2026-11-19T19:10:57 Época   1/400 (0%) | F1 macro 0.7713 | mejor 0.7713 en época 1
+2026-11-19T19:11:11 Época   2/400 (0%) | F1 macro 0.7779 | mejor 0.7779 en época 2
+2026-11-19T19:11:23 Época   3/400 (1%) | F1 macro 0.7832 | mejor 0.7832 en época 3
+2026-11-19T19:11:36 Época   4/400 (1%) | F1 macro 0.7790 | mejor 0.7832 en época 3
+2026-11-19T19:11:50 Época   5/400 (1%) | F1 macro 0.7847 | mejor 0.7847 en época 5
+2026-11-19T19:11:50 CRNN · 5/400 épocas
+2026-11-19T19:12:03 Época   6/400 (2%) | F1 macro 0.7867 | mejor 0.7867 en época 6
+2026-11-19T19:12:16 Época   7/400 (2%) | F1 macro 0.7830 | mejor 0.7867 en época 6
+2026-11-19T19:12:29 Época   8/400 (2%) | F1 macro 0.7899 | mejor 0.7899 en época 8
+2026-11-19T19:12:42 Época   9/400 (2%) | F1 macro 0.7870 | mejor 0.7899 en época 8
+2026-11-19T19:12:55 Época  10/400 (2%) | F1 macro 0.7844 | mejor 0.7899 en época 8
+2026-11-19T19:12:55 CRNN · 10/400 épocas
+2026-11-19T19:13:09 Época  11/400 (3%) | F1 macro 0.7677 | mejor 0.7899 en época 8
+2026-11-19T19:13:22 Época  12/400 (3%) | F1 macro 0.7912 | mejor 0.7912 en época 12
+2026-11-19T19:13:35 Época  13/400 (3%) | F1 macro 0.7883 | mejor 0.7912 en época 12
+2026-11-19T19:13:48 Época  14/400 (4%) | F1 macro 0.7909 | mejor 0.7912 en época 12
+2026-11-19T19:14:01 Época  15/400 (4%) | F1 macro 0.7826 | mejor 0.7912 en época 12
+2026-11-19T19:14:01 CRNN · 15/400 épocas
+2026-11-19T19:14:13 Época  16/400 (4%) | F1 macro 0.7822 | mejor 0.7912 en época 12
+2026-11-19T19:14:26 Época  17/400 (4%) | F1 macro 0.7770 | mejor 0.7912 en época 12
+2026-11-19T19:14:38 Época  18/400 (4%) | F1 macro 0.7871 | mejor 0.7912 en época 12
+2026-11-19T19:14:51 Época  19/400 (5%) | F1 macro 0.7888 | mejor 0.7912 en época 12
+2026-11-19T19:15:03 Época  20/400 (5%) | F1 macro 0.7903 | mejor 0.7912 en época 12
+2026-11-19T19:15:03 CRNN · 20/400 épocas
+2026-11-19T19:15:16 Época  21/400 (5%) | F1 macro 0.7900 | mejor 0.7912 en época 12
+2026-11-19T19:15:28 Época  22/400 (6%) | F1 macro 0.7807 | mejor 0.7912 en época 12
+2026-11-19T19:15:40 Época  23/400 (6%) | F1 macro 0.7895 | mejor 0.7912 en época 12
+2026-11-19T19:15:52 Época  24/400 (6%) | F1 macro 0.7883 | mejor 0.7912 en época 12
+2026-11-19T19:16:04 Época  25/400 (6%) | F1 macro 0.7911 | mejor 0.7912 en época 12
+2026-11-19T19:16:04 CRNN · 25/400 épocas
+2026-11-19T19:16:16 Época  26/400 (6%) | F1 macro 0.7914 | mejor 0.7914 en época 26
+2026-11-19T19:16:28 Época  27/400 (7%) | F1 macro 0.7934 | mejor 0.7934 en época 27
+2026-11-19T19:16:40 Época  28/400 (7%) | F1 macro 0.7925 | mejor 0.7934 en época 27
+2026-11-19T19:16:51 Época  29/400 (7%) | F1 macro 0.7894 | mejor 0.7934 en época 27
+2026-11-19T19:17:03 Época  30/400 (8%) | F1 macro 0.7910 | mejor 0.7934 en época 27
+2026-11-19T19:17:03 CRNN · 30/400 épocas
+2026-11-19T19:17:15 Época  31/400 (8%) | F1 macro 0.7854 | mejor 0.7934 en época 27
+2026-11-19T19:17:28 Época  32/400 (8%) | F1 macro 0.7897 | mejor 0.7934 en época 27
+2026-11-19T19:17:40 Época  33/400 (8%) | F1 macro 0.7874 | mejor 0.7934 en época 27
+2026-11-19T19:17:52 Época  34/400 (8%) | F1 macro 0.7933 | mejor 0.7934 en época 27
+2026-11-19T19:18:04 Época  35/400 (9%) | F1 macro 0.7890 | mejor 0.7934 en época 27
+2026-11-19T19:18:04 CRNN · 35/400 épocas
+2026-11-19T19:18:16 Época  36/400 (9%) | F1 macro 0.7816 | mejor 0.7934 en época 27
+2026-11-19T19:18:28 Época  37/400 (9%) | F1 macro 0.7861 | mejor 0.7934 en época 27
+2026-11-19T19:18:40 Época  38/400 (10%) | F1 macro 0.7852 | mejor 0.7934 en época 27
+2026-11-19T19:18:52 Época  39/400 (10%) | F1 macro 0.7805 | mejor 0.7934 en época 27
+2026-11-19T19:19:05 Época  40/400 (10%) | F1 macro 0.7896 | mejor 0.7934 en época 27
+2026-11-19T19:19:05 CRNN · 40/400 épocas
+2026-11-19T19:19:17 Época  41/400 (10%) | F1 macro 0.7821 | mejor 0.7934 en época 27
+2026-11-19T19:19:29 Época  42/400 (10%) | F1 macro 0.7904 | mejor 0.7934 en época 27
+2026-11-19T19:19:42 Época  43/400 (11%) | F1 macro 0.7529 | mejor 0.7934 en época 27
+2026-11-19T19:19:54 Época  44/400 (11%) | F1 macro 0.7739 | mejor 0.7934 en época 27
+2026-11-19T19:20:06 Época  45/400 (11%) | F1 macro 0.7774 | mejor 0.7934 en época 27
+2026-11-19T19:20:06 CRNN · 45/400 épocas
+2026-11-19T19:20:18 Época  46/400 (12%) | F1 macro 0.7861 | mejor 0.7934 en época 27
+2026-11-19T19:20:30 Época  47/400 (12%) | F1 macro 0.7836 | mejor 0.7934 en época 27
+2026-11-19T19:20:42 Época  48/400 (12%) | F1 macro 0.7875 | mejor 0.7934 en época 27
+2026-11-19T19:20:54 Época  49/400 (12%) | F1 macro 0.7873 | mejor 0.7934 en época 27
+2026-11-19T19:21:06 Época  50/400 (12%) | F1 macro 0.7793 | mejor 0.7934 en época 27
+2026-11-19T19:21:06 CRNN · 50/400 épocas
+2026-11-19T19:21:18 Época  51/400 (13%) | F1 macro 0.7788 | mejor 0.7934 en época 27
+2026-11-19T19:21:29 Época  52/400 (13%) | F1 macro 0.7829 | mejor 0.7934 en época 27
+2026-11-19T19:21:41 Época  53/400 (13%) | F1 macro 0.7830 | mejor 0.7934 en época 27
+2026-11-19T19:21:53 Época  54/400 (14%) | F1 macro 0.7861 | mejor 0.7934 en época 27
+2026-11-19T19:22:05 Época  55/400 (14%) | F1 macro 0.7827 | mejor 0.7934 en época 27
+2026-11-19T19:22:05 CRNN · 55/400 épocas
+2026-11-19T19:22:17 Época  56/400 (14%) | F1 macro 0.7786 | mejor 0.7934 en época 27
+2026-11-19T19:22:29 Época  57/400 (14%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T19:22:41 Época  58/400 (14%) | F1 macro 0.7740 | mejor 0.7934 en época 27
+2026-11-19T19:22:53 Época  59/400 (15%) | F1 macro 0.7843 | mejor 0.7934 en época 27
+2026-11-19T19:23:04 Época  60/400 (15%) | F1 macro 0.7861 | mejor 0.7934 en época 27
+2026-11-19T19:23:04 CRNN · 60/400 épocas
+2026-11-19T19:23:16 Época  61/400 (15%) | F1 macro 0.7842 | mejor 0.7934 en época 27
+2026-11-19T19:23:28 Época  62/400 (16%) | F1 macro 0.7869 | mejor 0.7934 en época 27
+2026-11-19T19:23:40 Época  63/400 (16%) | F1 macro 0.7852 | mejor 0.7934 en época 27
+2026-11-19T19:23:52 Época  64/400 (16%) | F1 macro 0.7800 | mejor 0.7934 en época 27
+2026-11-19T19:24:04 Época  65/400 (16%) | F1 macro 0.7790 | mejor 0.7934 en época 27
+2026-11-19T19:24:04 CRNN · 65/400 épocas
+2026-11-19T19:24:16 Comparación de las primeras 66 épocas con el ensayo anterior: diferencia máxima de F1 0.00000000
+2026-11-19T19:24:16 Época  66/400 (16%) | F1 macro 0.7840 | mejor 0.7934 en época 27
+2026-11-19T19:24:28 Época  67/400 (17%) | F1 macro 0.7825 | mejor 0.7934 en época 27
+2026-11-19T19:24:40 Época  68/400 (17%) | F1 macro 0.7821 | mejor 0.7934 en época 27
+2026-11-19T19:24:52 Época  69/400 (17%) | F1 macro 0.7809 | mejor 0.7934 en época 27
+2026-11-19T19:25:03 Época  70/400 (18%) | F1 macro 0.7806 | mejor 0.7934 en época 27
+2026-11-19T19:25:03 CRNN · 70/400 épocas
+2026-11-19T19:25:15 Época  71/400 (18%) | F1 macro 0.7818 | mejor 0.7934 en época 27
+2026-11-19T19:25:28 Época  72/400 (18%) | F1 macro 0.7819 | mejor 0.7934 en época 27
+2026-11-19T19:25:40 Época  73/400 (18%) | F1 macro 0.7756 | mejor 0.7934 en época 27
+2026-11-19T19:25:53 Época  74/400 (18%) | F1 macro 0.7865 | mejor 0.7934 en época 27
+2026-11-19T19:26:05 Época  75/400 (19%) | F1 macro 0.7836 | mejor 0.7934 en época 27
+2026-11-19T19:26:05 CRNN · 75/400 épocas
+2026-11-19T19:26:18 Época  76/400 (19%) | F1 macro 0.7812 | mejor 0.7934 en época 27
+2026-11-19T19:26:30 Época  77/400 (19%) | F1 macro 0.7864 | mejor 0.7934 en época 27
+2026-11-19T19:26:42 Época  78/400 (20%) | F1 macro 0.7840 | mejor 0.7934 en época 27
+2026-11-19T19:26:54 Época  79/400 (20%) | F1 macro 0.7819 | mejor 0.7934 en época 27
+2026-11-19T19:27:07 Época  80/400 (20%) | F1 macro 0.7804 | mejor 0.7934 en época 27
+2026-11-19T19:27:07 CRNN · 80/400 épocas
+2026-11-19T19:27:19 Época  81/400 (20%) | F1 macro 0.7788 | mejor 0.7934 en época 27
+2026-11-19T19:27:32 Época  82/400 (20%) | F1 macro 0.7818 | mejor 0.7934 en época 27
+2026-11-19T19:27:44 Época  83/400 (21%) | F1 macro 0.7784 | mejor 0.7934 en época 27
+2026-11-19T19:27:56 Época  84/400 (21%) | F1 macro 0.7825 | mejor 0.7934 en época 27
+2026-11-19T19:28:09 Época  85/400 (21%) | F1 macro 0.7766 | mejor 0.7934 en época 27
+2026-11-19T19:28:09 CRNN · 85/400 épocas
+2026-11-19T19:28:21 Época  86/400 (22%) | F1 macro 0.7787 | mejor 0.7934 en época 27
+2026-11-19T19:28:34 Época  87/400 (22%) | F1 macro 0.7807 | mejor 0.7934 en época 27
+2026-11-19T19:28:46 Época  88/400 (22%) | F1 macro 0.7823 | mejor 0.7934 en época 27
+2026-11-19T19:28:59 Época  89/400 (22%) | F1 macro 0.7832 | mejor 0.7934 en época 27
+2026-11-19T19:29:11 Época  90/400 (22%) | F1 macro 0.7814 | mejor 0.7934 en época 27
+2026-11-19T19:29:11 CRNN · 90/400 épocas
+2026-11-19T19:29:24 Época  91/400 (23%) | F1 macro 0.7785 | mejor 0.7934 en época 27
+2026-11-19T19:29:37 Época  92/400 (23%) | F1 macro 0.7797 | mejor 0.7934 en época 27
+2026-11-19T19:29:50 Época  93/400 (23%) | F1 macro 0.7783 | mejor 0.7934 en época 27
+2026-11-19T19:30:03 Época  94/400 (24%) | F1 macro 0.7796 | mejor 0.7934 en época 27
+2026-11-19T19:30:16 Época  95/400 (24%) | F1 macro 0.7812 | mejor 0.7934 en época 27
+2026-11-19T19:30:16 CRNN · 95/400 épocas
+2026-11-19T19:30:29 Época  96/400 (24%) | F1 macro 0.7802 | mejor 0.7934 en época 27
+2026-11-19T19:30:41 Época  97/400 (24%) | F1 macro 0.7798 | mejor 0.7934 en época 27
+2026-11-19T19:30:54 Época  98/400 (24%) | F1 macro 0.7809 | mejor 0.7934 en época 27
+2026-11-19T19:31:06 Época  99/400 (25%) | F1 macro 0.7792 | mejor 0.7934 en época 27
+2026-11-19T19:31:18 Época 100/400 (25%) | F1 macro 0.7796 | mejor 0.7934 en época 27
+2026-11-19T19:31:18 CRNN · 100/400 épocas
+2026-11-19T19:31:30 Época 101/400 (25%) | F1 macro 0.7787 | mejor 0.7934 en época 27
+2026-11-19T19:31:43 Época 102/400 (26%) | F1 macro 0.7808 | mejor 0.7934 en época 27
+2026-11-19T19:31:55 Época 103/400 (26%) | F1 macro 0.7787 | mejor 0.7934 en época 27
+2026-11-19T19:32:07 Época 104/400 (26%) | F1 macro 0.7785 | mejor 0.7934 en época 27
+2026-11-19T19:32:19 Época 105/400 (26%) | F1 macro 0.7803 | mejor 0.7934 en época 27
+2026-11-19T19:32:19 CRNN · 105/400 épocas
+2026-11-19T19:32:32 Época 106/400 (26%) | F1 macro 0.7737 | mejor 0.7934 en época 27
+2026-11-19T19:32:44 Época 107/400 (27%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T19:32:57 Época 108/400 (27%) | F1 macro 0.7815 | mejor 0.7934 en época 27
+2026-11-19T19:33:09 Época 109/400 (27%) | F1 macro 0.7773 | mejor 0.7934 en época 27
+2026-11-19T19:33:21 Época 110/400 (28%) | F1 macro 0.7787 | mejor 0.7934 en época 27
+2026-11-19T19:33:21 CRNN · 110/400 épocas
+2026-11-19T19:33:34 Época 111/400 (28%) | F1 macro 0.7800 | mejor 0.7934 en época 27
+2026-11-19T19:33:46 Época 112/400 (28%) | F1 macro 0.7766 | mejor 0.7934 en época 27
+2026-11-19T19:33:58 Época 113/400 (28%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T19:34:11 Época 114/400 (28%) | F1 macro 0.7841 | mejor 0.7934 en época 27
+2026-11-19T19:34:23 Época 115/400 (29%) | F1 macro 0.7809 | mejor 0.7934 en época 27
+2026-11-19T19:34:23 CRNN · 115/400 épocas
+2026-11-19T19:34:36 Época 116/400 (29%) | F1 macro 0.7777 | mejor 0.7934 en época 27
+2026-11-19T19:34:48 Época 117/400 (29%) | F1 macro 0.7781 | mejor 0.7934 en época 27
+2026-11-19T19:35:01 Época 118/400 (30%) | F1 macro 0.7794 | mejor 0.7934 en época 27
+2026-11-19T19:35:13 Época 119/400 (30%) | F1 macro 0.7759 | mejor 0.7934 en época 27
+2026-11-19T19:35:26 Época 120/400 (30%) | F1 macro 0.7802 | mejor 0.7934 en época 27
+2026-11-19T19:35:26 CRNN · 120/400 épocas
+2026-11-19T19:35:38 Época 121/400 (30%) | F1 macro 0.7760 | mejor 0.7934 en época 27
+2026-11-19T19:35:51 Época 122/400 (30%) | F1 macro 0.7781 | mejor 0.7934 en época 27
+2026-11-19T19:36:03 Época 123/400 (31%) | F1 macro 0.7793 | mejor 0.7934 en época 27
+2026-11-19T19:36:15 Época 124/400 (31%) | F1 macro 0.7751 | mejor 0.7934 en época 27
+2026-11-19T19:36:27 Época 125/400 (31%) | F1 macro 0.7802 | mejor 0.7934 en época 27
+2026-11-19T19:36:27 CRNN · 125/400 épocas
+2026-11-19T19:36:40 Época 126/400 (32%) | F1 macro 0.7761 | mejor 0.7934 en época 27
+2026-11-19T19:36:52 Época 127/400 (32%) | F1 macro 0.7821 | mejor 0.7934 en época 27
+2026-11-19T19:37:04 Época 128/400 (32%) | F1 macro 0.7788 | mejor 0.7934 en época 27
+2026-11-19T19:37:16 Época 129/400 (32%) | F1 macro 0.7748 | mejor 0.7934 en época 27
+2026-11-19T19:37:28 Época 130/400 (32%) | F1 macro 0.7818 | mejor 0.7934 en época 27
+2026-11-19T19:37:28 CRNN · 130/400 épocas
+2026-11-19T19:37:40 Época 131/400 (33%) | F1 macro 0.7722 | mejor 0.7934 en época 27
+2026-11-19T19:37:52 Época 132/400 (33%) | F1 macro 0.7798 | mejor 0.7934 en época 27
+2026-11-19T19:38:04 Época 133/400 (33%) | F1 macro 0.7795 | mejor 0.7934 en época 27
+2026-11-19T19:38:16 Época 134/400 (34%) | F1 macro 0.7792 | mejor 0.7934 en época 27
+2026-11-19T19:38:28 Época 135/400 (34%) | F1 macro 0.7818 | mejor 0.7934 en época 27
+2026-11-19T19:38:28 CRNN · 135/400 épocas
+2026-11-19T19:38:40 Época 136/400 (34%) | F1 macro 0.7765 | mejor 0.7934 en época 27
+2026-11-19T19:38:52 Época 137/400 (34%) | F1 macro 0.7805 | mejor 0.7934 en época 27
+2026-11-19T19:39:04 Época 138/400 (34%) | F1 macro 0.7813 | mejor 0.7934 en época 27
+2026-11-19T19:39:17 Época 139/400 (35%) | F1 macro 0.7765 | mejor 0.7934 en época 27
+2026-11-19T19:39:29 Época 140/400 (35%) | F1 macro 0.7819 | mejor 0.7934 en época 27
+2026-11-19T19:39:29 CRNN · 140/400 épocas
+2026-11-19T19:39:41 Época 141/400 (35%) | F1 macro 0.7770 | mejor 0.7934 en época 27
+2026-11-19T19:39:53 Época 142/400 (36%) | F1 macro 0.7763 | mejor 0.7934 en época 27
+2026-11-19T19:40:06 Época 143/400 (36%) | F1 macro 0.7791 | mejor 0.7934 en época 27
+2026-11-19T19:40:18 Época 144/400 (36%) | F1 macro 0.7774 | mejor 0.7934 en época 27
+2026-11-19T19:40:30 Época 145/400 (36%) | F1 macro 0.7802 | mejor 0.7934 en época 27
+2026-11-19T19:40:30 CRNN · 145/400 épocas
+2026-11-19T19:40:42 Época 146/400 (36%) | F1 macro 0.7826 | mejor 0.7934 en época 27
+2026-11-19T19:40:55 Época 147/400 (37%) | F1 macro 0.7790 | mejor 0.7934 en época 27
+2026-11-19T19:41:08 Época 148/400 (37%) | F1 macro 0.7804 | mejor 0.7934 en época 27
+2026-11-19T19:41:20 Época 149/400 (37%) | F1 macro 0.7792 | mejor 0.7934 en época 27
+2026-11-19T19:41:32 Época 150/400 (38%) | F1 macro 0.7800 | mejor 0.7934 en época 27
+2026-11-19T19:41:32 CRNN · 150/400 épocas
+2026-11-19T19:41:45 Época 151/400 (38%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T19:41:57 Época 152/400 (38%) | F1 macro 0.7772 | mejor 0.7934 en época 27
+2026-11-19T19:42:09 Época 153/400 (38%) | F1 macro 0.7826 | mejor 0.7934 en época 27
+2026-11-19T19:42:21 Época 154/400 (38%) | F1 macro 0.7771 | mejor 0.7934 en época 27
+2026-11-19T19:42:33 Época 155/400 (39%) | F1 macro 0.7740 | mejor 0.7934 en época 27
+2026-11-19T19:42:33 CRNN · 155/400 épocas
+2026-11-19T19:42:45 Época 156/400 (39%) | F1 macro 0.7811 | mejor 0.7934 en época 27
+2026-11-19T19:42:57 Época 157/400 (39%) | F1 macro 0.7786 | mejor 0.7934 en época 27
+2026-11-19T19:43:09 Época 158/400 (40%) | F1 macro 0.7800 | mejor 0.7934 en época 27
+2026-11-19T19:43:21 Época 159/400 (40%) | F1 macro 0.7797 | mejor 0.7934 en época 27
+2026-11-19T19:43:33 Época 160/400 (40%) | F1 macro 0.7726 | mejor 0.7934 en época 27
+2026-11-19T19:43:33 CRNN · 160/400 épocas
+2026-11-19T19:43:45 Época 161/400 (40%) | F1 macro 0.7741 | mejor 0.7934 en época 27
+2026-11-19T19:43:57 Época 162/400 (40%) | F1 macro 0.7777 | mejor 0.7934 en época 27
+2026-11-19T19:44:09 Época 163/400 (41%) | F1 macro 0.7796 | mejor 0.7934 en época 27
+2026-11-19T19:44:22 Época 164/400 (41%) | F1 macro 0.7792 | mejor 0.7934 en época 27
+2026-11-19T19:44:34 Época 165/400 (41%) | F1 macro 0.7718 | mejor 0.7934 en época 27
+2026-11-19T19:44:34 CRNN · 165/400 épocas
+2026-11-19T19:44:46 Época 166/400 (42%) | F1 macro 0.7781 | mejor 0.7934 en época 27
+2026-11-19T19:44:58 Época 167/400 (42%) | F1 macro 0.7767 | mejor 0.7934 en época 27
+2026-11-19T19:45:10 Época 168/400 (42%) | F1 macro 0.7799 | mejor 0.7934 en época 27
+2026-11-19T19:45:22 Época 169/400 (42%) | F1 macro 0.7772 | mejor 0.7934 en época 27
+2026-11-19T19:45:34 Época 170/400 (42%) | F1 macro 0.7791 | mejor 0.7934 en época 27
+2026-11-19T19:45:34 CRNN · 170/400 épocas
+2026-11-19T19:45:46 Época 171/400 (43%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T19:45:59 Época 172/400 (43%) | F1 macro 0.7797 | mejor 0.7934 en época 27
+2026-11-19T19:46:11 Época 173/400 (43%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T19:46:23 Época 174/400 (44%) | F1 macro 0.7800 | mejor 0.7934 en época 27
+2026-11-19T19:46:35 Época 175/400 (44%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T19:46:35 CRNN · 175/400 épocas
+2026-11-19T19:46:47 Época 176/400 (44%) | F1 macro 0.7768 | mejor 0.7934 en época 27
+2026-11-19T19:47:00 Época 177/400 (44%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T19:47:12 Época 178/400 (44%) | F1 macro 0.7792 | mejor 0.7934 en época 27
+2026-11-19T19:47:24 Época 179/400 (45%) | F1 macro 0.7769 | mejor 0.7934 en época 27
+2026-11-19T19:47:36 Época 180/400 (45%) | F1 macro 0.7754 | mejor 0.7934 en época 27
+2026-11-19T19:47:36 CRNN · 180/400 épocas
+2026-11-19T19:47:48 Época 181/400 (45%) | F1 macro 0.7775 | mejor 0.7934 en época 27
+2026-11-19T19:48:00 Época 182/400 (46%) | F1 macro 0.7765 | mejor 0.7934 en época 27
+2026-11-19T19:48:12 Época 183/400 (46%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T19:48:24 Época 184/400 (46%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T19:48:36 Época 185/400 (46%) | F1 macro 0.7754 | mejor 0.7934 en época 27
+2026-11-19T19:48:36 CRNN · 185/400 épocas
+2026-11-19T19:48:48 Época 186/400 (46%) | F1 macro 0.7778 | mejor 0.7934 en época 27
+2026-11-19T19:49:00 Época 187/400 (47%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T19:49:12 Época 188/400 (47%) | F1 macro 0.7773 | mejor 0.7934 en época 27
+2026-11-19T19:49:24 Época 189/400 (47%) | F1 macro 0.7748 | mejor 0.7934 en época 27
+2026-11-19T19:49:36 Época 190/400 (48%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T19:49:36 CRNN · 190/400 épocas
+2026-11-19T19:49:48 Época 191/400 (48%) | F1 macro 0.7728 | mejor 0.7934 en época 27
+2026-11-19T19:50:00 Época 192/400 (48%) | F1 macro 0.7774 | mejor 0.7934 en época 27
+2026-11-19T19:50:12 Época 193/400 (48%) | F1 macro 0.7793 | mejor 0.7934 en época 27
+2026-11-19T19:50:24 Época 194/400 (48%) | F1 macro 0.7773 | mejor 0.7934 en época 27
+2026-11-19T19:50:37 Época 195/400 (49%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T19:50:37 CRNN · 195/400 épocas
+2026-11-19T19:50:49 Época 196/400 (49%) | F1 macro 0.7731 | mejor 0.7934 en época 27
+2026-11-19T19:51:01 Época 197/400 (49%) | F1 macro 0.7769 | mejor 0.7934 en época 27
+2026-11-19T19:51:13 Época 198/400 (50%) | F1 macro 0.7742 | mejor 0.7934 en época 27
+2026-11-19T19:51:25 Época 199/400 (50%) | F1 macro 0.7763 | mejor 0.7934 en época 27
+2026-11-19T19:51:38 Época 200/400 (50%) | F1 macro 0.7774 | mejor 0.7934 en época 27
+2026-11-19T19:51:38 CRNN · 200/400 épocas
+2026-11-19T19:51:50 Época 201/400 (50%) | F1 macro 0.7776 | mejor 0.7934 en época 27
+2026-11-19T19:52:02 Época 202/400 (50%) | F1 macro 0.7731 | mejor 0.7934 en época 27
+2026-11-19T19:52:14 Época 203/400 (51%) | F1 macro 0.7760 | mejor 0.7934 en época 27
+2026-11-19T19:52:26 Época 204/400 (51%) | F1 macro 0.7744 | mejor 0.7934 en época 27
+2026-11-19T19:52:38 Época 205/400 (51%) | F1 macro 0.7739 | mejor 0.7934 en época 27
+2026-11-19T19:52:38 CRNN · 205/400 épocas
+2026-11-19T19:52:50 Época 206/400 (52%) | F1 macro 0.7744 | mejor 0.7934 en época 27
+2026-11-19T19:53:02 Época 207/400 (52%) | F1 macro 0.7768 | mejor 0.7934 en época 27
+2026-11-19T19:53:14 Época 208/400 (52%) | F1 macro 0.7762 | mejor 0.7934 en época 27
+2026-11-19T19:53:27 Época 209/400 (52%) | F1 macro 0.7769 | mejor 0.7934 en época 27
+2026-11-19T19:53:39 Época 210/400 (52%) | F1 macro 0.7755 | mejor 0.7934 en época 27
+2026-11-19T19:53:39 CRNN · 210/400 épocas
+2026-11-19T19:53:51 Época 211/400 (53%) | F1 macro 0.7774 | mejor 0.7934 en época 27
+2026-11-19T19:54:03 Época 212/400 (53%) | F1 macro 0.7777 | mejor 0.7934 en época 27
+2026-11-19T19:54:15 Época 213/400 (53%) | F1 macro 0.7775 | mejor 0.7934 en época 27
+2026-11-19T19:54:27 Época 214/400 (54%) | F1 macro 0.7777 | mejor 0.7934 en época 27
+2026-11-19T19:54:39 Época 215/400 (54%) | F1 macro 0.7733 | mejor 0.7934 en época 27
+2026-11-19T19:54:39 CRNN · 215/400 épocas
+2026-11-19T19:54:51 Época 216/400 (54%) | F1 macro 0.7702 | mejor 0.7934 en época 27
+2026-11-19T19:55:03 Época 217/400 (54%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T19:55:15 Época 218/400 (55%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T19:55:27 Época 219/400 (55%) | F1 macro 0.7779 | mejor 0.7934 en época 27
+2026-11-19T19:55:39 Época 220/400 (55%) | F1 macro 0.7688 | mejor 0.7934 en época 27
+2026-11-19T19:55:39 CRNN · 220/400 épocas
+2026-11-19T19:55:51 Época 221/400 (55%) | F1 macro 0.7773 | mejor 0.7934 en época 27
+2026-11-19T19:56:03 Época 222/400 (56%) | F1 macro 0.7724 | mejor 0.7934 en época 27
+2026-11-19T19:56:15 Época 223/400 (56%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T19:56:27 Época 224/400 (56%) | F1 macro 0.7775 | mejor 0.7934 en época 27
+2026-11-19T19:56:39 Época 225/400 (56%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T19:56:39 CRNN · 225/400 épocas
+2026-11-19T19:56:51 Época 226/400 (56%) | F1 macro 0.7762 | mejor 0.7934 en época 27
+2026-11-19T19:57:03 Época 227/400 (57%) | F1 macro 0.7722 | mejor 0.7934 en época 27
+2026-11-19T19:57:15 Época 228/400 (57%) | F1 macro 0.7745 | mejor 0.7934 en época 27
+2026-11-19T19:57:27 Época 229/400 (57%) | F1 macro 0.7745 | mejor 0.7934 en época 27
+2026-11-19T19:57:39 Época 230/400 (57%) | F1 macro 0.7727 | mejor 0.7934 en época 27
+2026-11-19T19:57:39 CRNN · 230/400 épocas
+2026-11-19T19:57:51 Época 231/400 (58%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T19:58:03 Época 232/400 (58%) | F1 macro 0.7728 | mejor 0.7934 en época 27
+2026-11-19T19:58:15 Época 233/400 (58%) | F1 macro 0.7744 | mejor 0.7934 en época 27
+2026-11-19T19:58:27 Época 234/400 (58%) | F1 macro 0.7760 | mejor 0.7934 en época 27
+2026-11-19T19:58:39 Época 235/400 (59%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T19:58:39 CRNN · 235/400 épocas
+2026-11-19T19:58:51 Época 236/400 (59%) | F1 macro 0.7713 | mejor 0.7934 en época 27
+2026-11-19T19:59:03 Época 237/400 (59%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T19:59:15 Época 238/400 (60%) | F1 macro 0.7730 | mejor 0.7934 en época 27
+2026-11-19T19:59:27 Época 239/400 (60%) | F1 macro 0.7709 | mejor 0.7934 en época 27
+2026-11-19T19:59:39 Época 240/400 (60%) | F1 macro 0.7788 | mejor 0.7934 en época 27
+2026-11-19T19:59:39 CRNN · 240/400 épocas
+2026-11-19T19:59:51 Época 241/400 (60%) | F1 macro 0.7748 | mejor 0.7934 en época 27
+2026-11-19T20:00:03 Época 242/400 (60%) | F1 macro 0.7768 | mejor 0.7934 en época 27
+2026-11-19T20:00:15 Época 243/400 (61%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:00:27 Época 244/400 (61%) | F1 macro 0.7754 | mejor 0.7934 en época 27
+2026-11-19T20:00:39 Época 245/400 (61%) | F1 macro 0.7776 | mejor 0.7934 en época 27
+2026-11-19T20:00:39 CRNN · 245/400 épocas
+2026-11-19T20:00:51 Época 246/400 (62%) | F1 macro 0.7738 | mejor 0.7934 en época 27
+2026-11-19T20:01:03 Época 247/400 (62%) | F1 macro 0.7691 | mejor 0.7934 en época 27
+2026-11-19T20:01:15 Época 248/400 (62%) | F1 macro 0.7731 | mejor 0.7934 en época 27
+2026-11-19T20:01:27 Época 249/400 (62%) | F1 macro 0.7770 | mejor 0.7934 en época 27
+2026-11-19T20:01:39 Época 250/400 (62%) | F1 macro 0.7728 | mejor 0.7934 en época 27
+2026-11-19T20:01:39 CRNN · 250/400 épocas
+2026-11-19T20:01:52 Época 251/400 (63%) | F1 macro 0.7734 | mejor 0.7934 en época 27
+2026-11-19T20:02:04 Época 252/400 (63%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:02:16 Época 253/400 (63%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T20:02:28 Época 254/400 (64%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T20:02:40 Época 255/400 (64%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:02:40 CRNN · 255/400 épocas
+2026-11-19T20:02:52 Época 256/400 (64%) | F1 macro 0.7736 | mejor 0.7934 en época 27
+2026-11-19T20:03:04 Época 257/400 (64%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T20:03:16 Época 258/400 (64%) | F1 macro 0.7705 | mejor 0.7934 en época 27
+2026-11-19T20:03:28 Época 259/400 (65%) | F1 macro 0.7720 | mejor 0.7934 en época 27
+2026-11-19T20:03:40 Época 260/400 (65%) | F1 macro 0.7741 | mejor 0.7934 en época 27
+2026-11-19T20:03:40 CRNN · 260/400 épocas
+2026-11-19T20:03:52 Época 261/400 (65%) | F1 macro 0.7712 | mejor 0.7934 en época 27
+2026-11-19T20:04:04 Época 262/400 (66%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T20:04:16 Época 263/400 (66%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:04:29 Época 264/400 (66%) | F1 macro 0.7728 | mejor 0.7934 en época 27
+2026-11-19T20:04:41 Época 265/400 (66%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T20:04:41 CRNN · 265/400 épocas
+2026-11-19T20:04:53 Época 266/400 (66%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T20:05:05 Época 267/400 (67%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T20:05:17 Época 268/400 (67%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:05:29 Época 269/400 (67%) | F1 macro 0.7747 | mejor 0.7934 en época 27
+2026-11-19T20:05:41 Época 270/400 (68%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T20:05:41 CRNN · 270/400 épocas
+2026-11-19T20:05:53 Época 271/400 (68%) | F1 macro 0.7712 | mejor 0.7934 en época 27
+2026-11-19T20:06:05 Época 272/400 (68%) | F1 macro 0.7672 | mejor 0.7934 en época 27
+2026-11-19T20:06:17 Época 273/400 (68%) | F1 macro 0.7740 | mejor 0.7934 en época 27
+2026-11-19T20:06:29 Época 274/400 (68%) | F1 macro 0.7751 | mejor 0.7934 en época 27
+2026-11-19T20:06:41 Época 275/400 (69%) | F1 macro 0.7739 | mejor 0.7934 en época 27
+2026-11-19T20:06:41 CRNN · 275/400 épocas
+2026-11-19T20:06:53 Época 276/400 (69%) | F1 macro 0.7744 | mejor 0.7934 en época 27
+2026-11-19T20:07:05 Época 277/400 (69%) | F1 macro 0.7695 | mejor 0.7934 en época 27
+2026-11-19T20:07:17 Época 278/400 (70%) | F1 macro 0.7745 | mejor 0.7934 en época 27
+2026-11-19T20:07:29 Época 279/400 (70%) | F1 macro 0.7725 | mejor 0.7934 en época 27
+2026-11-19T20:07:41 Época 280/400 (70%) | F1 macro 0.7763 | mejor 0.7934 en época 27
+2026-11-19T20:07:41 CRNN · 280/400 épocas
+2026-11-19T20:07:53 Época 281/400 (70%) | F1 macro 0.7701 | mejor 0.7934 en época 27
+2026-11-19T20:08:05 Época 282/400 (70%) | F1 macro 0.7736 | mejor 0.7934 en época 27
+2026-11-19T20:08:17 Época 283/400 (71%) | F1 macro 0.7751 | mejor 0.7934 en época 27
+2026-11-19T20:08:29 Época 284/400 (71%) | F1 macro 0.7738 | mejor 0.7934 en época 27
+2026-11-19T20:08:41 Época 285/400 (71%) | F1 macro 0.7737 | mejor 0.7934 en época 27
+2026-11-19T20:08:41 CRNN · 285/400 épocas
+2026-11-19T20:08:53 Época 286/400 (72%) | F1 macro 0.7739 | mejor 0.7934 en época 27
+2026-11-19T20:09:05 Época 287/400 (72%) | F1 macro 0.7690 | mejor 0.7934 en época 27
+2026-11-19T20:09:17 Época 288/400 (72%) | F1 macro 0.7766 | mejor 0.7934 en época 27
+2026-11-19T20:09:29 Época 289/400 (72%) | F1 macro 0.7698 | mejor 0.7934 en época 27
+2026-11-19T20:09:42 Época 290/400 (72%) | F1 macro 0.7723 | mejor 0.7934 en época 27
+2026-11-19T20:09:42 CRNN · 290/400 épocas
+2026-11-19T20:09:54 Época 291/400 (73%) | F1 macro 0.7766 | mejor 0.7934 en época 27
+2026-11-19T20:10:06 Época 292/400 (73%) | F1 macro 0.7747 | mejor 0.7934 en época 27
+2026-11-19T20:10:18 Época 293/400 (73%) | F1 macro 0.7733 | mejor 0.7934 en época 27
+2026-11-19T20:10:30 Época 294/400 (74%) | F1 macro 0.7724 | mejor 0.7934 en época 27
+2026-11-19T20:10:42 Época 295/400 (74%) | F1 macro 0.7687 | mejor 0.7934 en época 27
+2026-11-19T20:10:42 CRNN · 295/400 épocas
+2026-11-19T20:10:54 Época 296/400 (74%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T20:11:06 Época 297/400 (74%) | F1 macro 0.7649 | mejor 0.7934 en época 27
+2026-11-19T20:11:19 Época 298/400 (74%) | F1 macro 0.7727 | mejor 0.7934 en época 27
+2026-11-19T20:11:31 Época 299/400 (75%) | F1 macro 0.7760 | mejor 0.7934 en época 27
+2026-11-19T20:11:43 Época 300/400 (75%) | F1 macro 0.7696 | mejor 0.7934 en época 27
+2026-11-19T20:11:43 CRNN · 300/400 épocas
+2026-11-19T20:11:55 Época 301/400 (75%) | F1 macro 0.7742 | mejor 0.7934 en época 27
+2026-11-19T20:12:07 Época 302/400 (76%) | F1 macro 0.7743 | mejor 0.7934 en época 27
+2026-11-19T20:12:19 Época 303/400 (76%) | F1 macro 0.7724 | mejor 0.7934 en época 27
+2026-11-19T20:12:31 Época 304/400 (76%) | F1 macro 0.7726 | mejor 0.7934 en época 27
+2026-11-19T20:12:43 Época 305/400 (76%) | F1 macro 0.7750 | mejor 0.7934 en época 27
+2026-11-19T20:12:43 CRNN · 305/400 épocas
+2026-11-19T20:12:55 Época 306/400 (76%) | F1 macro 0.7719 | mejor 0.7934 en época 27
+2026-11-19T20:13:07 Época 307/400 (77%) | F1 macro 0.7717 | mejor 0.7934 en época 27
+2026-11-19T20:13:20 Época 308/400 (77%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:13:32 Época 309/400 (77%) | F1 macro 0.7715 | mejor 0.7934 en época 27
+2026-11-19T20:13:44 Época 310/400 (78%) | F1 macro 0.7714 | mejor 0.7934 en época 27
+2026-11-19T20:13:44 CRNN · 310/400 épocas
+2026-11-19T20:13:56 Época 311/400 (78%) | F1 macro 0.7706 | mejor 0.7934 en época 27
+2026-11-19T20:14:08 Época 312/400 (78%) | F1 macro 0.7758 | mejor 0.7934 en época 27
+2026-11-19T20:14:20 Época 313/400 (78%) | F1 macro 0.7722 | mejor 0.7934 en época 27
+2026-11-19T20:14:32 Época 314/400 (78%) | F1 macro 0.7741 | mejor 0.7934 en época 27
+2026-11-19T20:14:44 Época 315/400 (79%) | F1 macro 0.7751 | mejor 0.7934 en época 27
+2026-11-19T20:14:44 CRNN · 315/400 épocas
+2026-11-19T20:14:56 Época 316/400 (79%) | F1 macro 0.7721 | mejor 0.7934 en época 27
+2026-11-19T20:15:08 Época 317/400 (79%) | F1 macro 0.7734 | mejor 0.7934 en época 27
+2026-11-19T20:15:20 Época 318/400 (80%) | F1 macro 0.7768 | mejor 0.7934 en época 27
+2026-11-19T20:15:32 Época 319/400 (80%) | F1 macro 0.7731 | mejor 0.7934 en época 27
+2026-11-19T20:15:44 Época 320/400 (80%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:15:44 CRNN · 320/400 épocas
+2026-11-19T20:15:56 Época 321/400 (80%) | F1 macro 0.7718 | mejor 0.7934 en época 27
+2026-11-19T20:16:08 Época 322/400 (80%) | F1 macro 0.7705 | mejor 0.7934 en época 27
+2026-11-19T20:16:21 Época 323/400 (81%) | F1 macro 0.7648 | mejor 0.7934 en época 27
+2026-11-19T20:16:33 Época 324/400 (81%) | F1 macro 0.7716 | mejor 0.7934 en época 27
+2026-11-19T20:16:45 Época 325/400 (81%) | F1 macro 0.7734 | mejor 0.7934 en época 27
+2026-11-19T20:16:45 CRNN · 325/400 épocas
+2026-11-19T20:16:57 Época 326/400 (82%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T20:17:09 Época 327/400 (82%) | F1 macro 0.7744 | mejor 0.7934 en época 27
+2026-11-19T20:17:21 Época 328/400 (82%) | F1 macro 0.7761 | mejor 0.7934 en época 27
+2026-11-19T20:17:33 Época 329/400 (82%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T20:17:45 Época 330/400 (82%) | F1 macro 0.7685 | mejor 0.7934 en época 27
+2026-11-19T20:17:45 CRNN · 330/400 épocas
+2026-11-19T20:17:57 Época 331/400 (83%) | F1 macro 0.7755 | mejor 0.7934 en época 27
+2026-11-19T20:18:10 Época 332/400 (83%) | F1 macro 0.7708 | mejor 0.7934 en época 27
+2026-11-19T20:18:22 Época 333/400 (83%) | F1 macro 0.7709 | mejor 0.7934 en época 27
+2026-11-19T20:18:34 Época 334/400 (84%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T20:18:46 Época 335/400 (84%) | F1 macro 0.7704 | mejor 0.7934 en época 27
+2026-11-19T20:18:46 CRNN · 335/400 épocas
+2026-11-19T20:18:59 Época 336/400 (84%) | F1 macro 0.7736 | mejor 0.7934 en época 27
+2026-11-19T20:19:11 Época 337/400 (84%) | F1 macro 0.7721 | mejor 0.7934 en época 27
+2026-11-19T20:19:23 Época 338/400 (84%) | F1 macro 0.7685 | mejor 0.7934 en época 27
+2026-11-19T20:19:35 Época 339/400 (85%) | F1 macro 0.7703 | mejor 0.7934 en época 27
+2026-11-19T20:19:47 Época 340/400 (85%) | F1 macro 0.7703 | mejor 0.7934 en época 27
+2026-11-19T20:19:47 CRNN · 340/400 épocas
+2026-11-19T20:19:59 Época 341/400 (85%) | F1 macro 0.7727 | mejor 0.7934 en época 27
+2026-11-19T20:20:11 Época 342/400 (86%) | F1 macro 0.7719 | mejor 0.7934 en época 27
+2026-11-19T20:20:23 Época 343/400 (86%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:20:35 Época 344/400 (86%) | F1 macro 0.7681 | mejor 0.7934 en época 27
+2026-11-19T20:20:47 Época 345/400 (86%) | F1 macro 0.7704 | mejor 0.7934 en época 27
+2026-11-19T20:20:47 CRNN · 345/400 épocas
+2026-11-19T20:20:59 Época 346/400 (86%) | F1 macro 0.7666 | mejor 0.7934 en época 27
+2026-11-19T20:21:11 Época 347/400 (87%) | F1 macro 0.7732 | mejor 0.7934 en época 27
+2026-11-19T20:21:23 Época 348/400 (87%) | F1 macro 0.7725 | mejor 0.7934 en época 27
+2026-11-19T20:21:35 Época 349/400 (87%) | F1 macro 0.7726 | mejor 0.7934 en época 27
+2026-11-19T20:21:47 Época 350/400 (88%) | F1 macro 0.7699 | mejor 0.7934 en época 27
+2026-11-19T20:21:47 CRNN · 350/400 épocas
+2026-11-19T20:21:59 Época 351/400 (88%) | F1 macro 0.7742 | mejor 0.7934 en época 27
+2026-11-19T20:22:11 Época 352/400 (88%) | F1 macro 0.7726 | mejor 0.7934 en época 27
+2026-11-19T20:22:23 Época 353/400 (88%) | F1 macro 0.7686 | mejor 0.7934 en época 27
+2026-11-19T20:22:35 Época 354/400 (88%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T20:22:47 Época 355/400 (89%) | F1 macro 0.7746 | mejor 0.7934 en época 27
+2026-11-19T20:22:47 CRNN · 355/400 épocas
+2026-11-19T20:22:59 Época 356/400 (89%) | F1 macro 0.7741 | mejor 0.7934 en época 27
+2026-11-19T20:23:10 Época 357/400 (89%) | F1 macro 0.7708 | mejor 0.7934 en época 27
+2026-11-19T20:23:22 Época 358/400 (90%) | F1 macro 0.7753 | mejor 0.7934 en época 27
+2026-11-19T20:23:34 Época 359/400 (90%) | F1 macro 0.7710 | mejor 0.7934 en época 27
+2026-11-19T20:23:46 Época 360/400 (90%) | F1 macro 0.7738 | mejor 0.7934 en época 27
+2026-11-19T20:23:46 CRNN · 360/400 épocas
+2026-11-19T20:23:58 Época 361/400 (90%) | F1 macro 0.7726 | mejor 0.7934 en época 27
+2026-11-19T20:24:10 Época 362/400 (90%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:24:21 Época 363/400 (91%) | F1 macro 0.7740 | mejor 0.7934 en época 27
+2026-11-19T20:24:33 Época 364/400 (91%) | F1 macro 0.7757 | mejor 0.7934 en época 27
+2026-11-19T20:24:45 Época 365/400 (91%) | F1 macro 0.7727 | mejor 0.7934 en época 27
+2026-11-19T20:24:45 CRNN · 365/400 épocas
+2026-11-19T20:24:57 Época 366/400 (92%) | F1 macro 0.7723 | mejor 0.7934 en época 27
+2026-11-19T20:25:09 Época 367/400 (92%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:25:21 Época 368/400 (92%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T20:25:33 Época 369/400 (92%) | F1 macro 0.7708 | mejor 0.7934 en época 27
+2026-11-19T20:25:45 Época 370/400 (92%) | F1 macro 0.7713 | mejor 0.7934 en época 27
+2026-11-19T20:25:45 CRNN · 370/400 épocas
+2026-11-19T20:25:57 Época 371/400 (93%) | F1 macro 0.7719 | mejor 0.7934 en época 27
+2026-11-19T20:26:09 Época 372/400 (93%) | F1 macro 0.7662 | mejor 0.7934 en época 27
+2026-11-19T20:26:21 Época 373/400 (93%) | F1 macro 0.7695 | mejor 0.7934 en época 27
+2026-11-19T20:26:33 Época 374/400 (94%) | F1 macro 0.7703 | mejor 0.7934 en época 27
+2026-11-19T20:26:45 Época 375/400 (94%) | F1 macro 0.7755 | mejor 0.7934 en época 27
+2026-11-19T20:26:45 CRNN · 375/400 épocas
+2026-11-19T20:26:57 Época 376/400 (94%) | F1 macro 0.7749 | mejor 0.7934 en época 27
+2026-11-19T20:27:08 Época 377/400 (94%) | F1 macro 0.7701 | mejor 0.7934 en época 27
+2026-11-19T20:27:20 Época 378/400 (94%) | F1 macro 0.7685 | mejor 0.7934 en época 27
+2026-11-19T20:27:32 Época 379/400 (95%) | F1 macro 0.7761 | mejor 0.7934 en época 27
+2026-11-19T20:27:44 Época 380/400 (95%) | F1 macro 0.7684 | mejor 0.7934 en época 27
+2026-11-19T20:27:44 CRNN · 380/400 épocas
+2026-11-19T20:27:56 Época 381/400 (95%) | F1 macro 0.7711 | mejor 0.7934 en época 27
+2026-11-19T20:28:08 Época 382/400 (96%) | F1 macro 0.7736 | mejor 0.7934 en época 27
+2026-11-19T20:28:20 Época 383/400 (96%) | F1 macro 0.7715 | mejor 0.7934 en época 27
+2026-11-19T20:28:32 Época 384/400 (96%) | F1 macro 0.7678 | mejor 0.7934 en época 27
+2026-11-19T20:28:44 Época 385/400 (96%) | F1 macro 0.7735 | mejor 0.7934 en época 27
+2026-11-19T20:28:44 CRNN · 385/400 épocas
+2026-11-19T20:28:56 Época 386/400 (96%) | F1 macro 0.7687 | mejor 0.7934 en época 27
+2026-11-19T20:29:08 Época 387/400 (97%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:29:20 Época 388/400 (97%) | F1 macro 0.7737 | mejor 0.7934 en época 27
+2026-11-19T20:29:31 Época 389/400 (97%) | F1 macro 0.7738 | mejor 0.7934 en época 27
+2026-11-19T20:29:43 Época 390/400 (98%) | F1 macro 0.7706 | mejor 0.7934 en época 27
+2026-11-19T20:29:43 CRNN · 390/400 épocas
+2026-11-19T20:29:55 Época 391/400 (98%) | F1 macro 0.7757 | mejor 0.7934 en época 27
+2026-11-19T20:30:07 Época 392/400 (98%) | F1 macro 0.7728 | mejor 0.7934 en época 27
+2026-11-19T20:30:19 Época 393/400 (98%) | F1 macro 0.7730 | mejor 0.7934 en época 27
+2026-11-19T20:30:30 Época 394/400 (98%) | F1 macro 0.7730 | mejor 0.7934 en época 27
+2026-11-19T20:30:42 Época 395/400 (99%) | F1 macro 0.7687 | mejor 0.7934 en época 27
+2026-11-19T20:30:42 CRNN · 395/400 épocas
+2026-11-19T20:30:54 Época 396/400 (99%) | F1 macro 0.7729 | mejor 0.7934 en época 27
+2026-11-19T20:31:06 Época 397/400 (99%) | F1 macro 0.7717 | mejor 0.7934 en época 27
+2026-11-19T20:31:18 Época 398/400 (100%) | F1 macro 0.7683 | mejor 0.7934 en época 27
+2026-11-19T20:31:30 Época 399/400 (100%) | F1 macro 0.7697 | mejor 0.7934 en época 27
+2026-11-19T20:31:42 Época 400/400 (100%) | F1 macro 0.7767 | mejor 0.7934 en época 27
+2026-11-19T20:31:42 CRNN · 400/400 épocas
+2026-11-19T20:31:42 FIN celda 7
+2026-11-19T20:31:42 INICIO celda 9 b4574bd3
+2026-11-19T20:31:45 Épocas completadas: 400. Mejor época: 27. F1 macro 0.7934.
+Diferencia frente a 27 épocas: +0.00 puntos porcentuales.
+Notebooks\auxiliares_dart_crnn\resultados_crnn_400\20261119_191036_303071
+2026-11-19T20:31:45 FIN celda 9
+2026-11-19T20:31:46 EJECUCION COMPLETA
