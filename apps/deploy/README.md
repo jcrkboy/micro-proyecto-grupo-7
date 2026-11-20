@@ -12,7 +12,7 @@ codigo: descarga las imagenes que GitHub Actions publica en GHCR desde `main`.
 
 Imagenes publicadas:
 
-- `ghcr.io/jcrkboy/micro-proyecto-grupo-7-api` — FastAPI + LightGBM (`apps/api/Dockerfile`)
+- `ghcr.io/jcrkboy/micro-proyecto-grupo-7-api` — FastAPI + LightGBM + TensorFlow (`apps/api/Dockerfile`)
 - `ghcr.io/jcrkboy/micro-proyecto-grupo-7-web` — bundle Angular servido por nginx (`apps/web/Dockerfile`)
 
 Cada una recibe dos etiquetas por build: `latest` y `sha-<commit>`. Para
@@ -56,7 +56,7 @@ Ambos aceptan ejecucion manual con `workflow_dispatch`.
    ```bash
    sudo mkdir -p /opt/sleep-edfx/model
    # desde la maquina de desarrollo:
-   scp data/models/sleep_staging_lightgbm_eeg_v2/{manifest.json,model.txt} \
+   scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart-*.txt,crnn-*.keras} \
      usuario@vm:/opt/sleep-edfx/model/
    ```
 

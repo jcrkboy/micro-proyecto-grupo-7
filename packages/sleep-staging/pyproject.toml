@@ -18,6 +18,8 @@ dependencies = [
 [project.optional-dependencies]
 inference = [
     "lightgbm==4.7.0",
+    "tensorflow==2.21.0",
+    "keras==3.12.4",
 ]
 training = [
     "lightgbm==4.7.0",

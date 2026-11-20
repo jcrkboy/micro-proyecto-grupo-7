@@ -29,11 +29,12 @@ def main() -> None:
         + rng.normal(0.0, 4e-6, samples)
     )
     info = mne.create_info(
-        ch_names=["EEG Fpz-Cz", "EEG Pz-Oz"],
+        ch_names=["EEG Fpz-Cz", "EEG Pz-Oz", "EOG horizontal"],
         sfreq=sfreq,
-        ch_types=["eeg", "eeg"],
+        ch_types=["eeg", "eeg", "eog"],
     )
-    raw = mne.io.RawArray(np.vstack([fpz_cz, pz_oz]), info, verbose="ERROR")
+    eog = 45e-6 * np.sin(2 * np.pi * 0.5 * time)
+    raw = mne.io.RawArray(np.vstack([fpz_cz, pz_oz, eog]), info, verbose="ERROR")
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     raw.export(OUTPUT_PATH, fmt="edf", overwrite=True, verbose="ERROR")
     print(f"EDF sintético creado: {OUTPUT_PATH} ({OUTPUT_PATH.stat().st_size} bytes)")

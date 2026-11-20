@@ -4,13 +4,13 @@ El proyecto clasifica el sueño por épocas de 30 segundos. Cuenta con 44 noches
 
 ## Del EDF al hipnograma
 
-En entrenamiento, el paquete Python extrae características del PSG y usa el hipnograma para asignar la etiqueta a cada época. La división se hace por sujeto para que sus dos noches queden en el mismo grupo. En la aplicación, el usuario carga un PSG desde Angular. La API llama al mismo preprocesamiento y al predictor LightGBM, y devuelve las etapas que la interfaz representa en el hipnograma.
+En entrenamiento, el paquete Python extrae características del PSG y usa el hipnograma para asignar la etiqueta a cada época. La división se hace por sujeto para que sus dos noches queden en el mismo grupo. En la aplicación, el usuario carga un PSG desde Angular. La API llama al mismo preprocesamiento y al predictor DART + CRNN, y devuelve las etapas que la interfaz representa en el hipnograma.
 
 ## Datos, investigación y materiales
 
 | Carpeta | Qué contiene y cuándo consultarla |
 | --- | --- |
-| `data/` | Datos gestionados con DVC. `ST-subjects.xls` contiene metadatos de los sujetos, `sleep-telemetry/` contiene los pares de EDF, `processed/` guarda características precalculadas y `models/` aloja artefactos como `sleep_staging_lightgbm_eeg_v2/`, el modelo que consume la API. |
+| `data/` | Datos gestionados con DVC. `ST-subjects.xls` contiene metadatos de los sujetos, `sleep-telemetry/` contiene los pares de EDF, `processed/` guarda características precalculadas y `models/` aloja los ajustes `dart_crnn_mixto/evaluacion_80_20/` y `dart_crnn_mixto/final_100/`. La API consume el segundo. |
 | `.dvc/` | Configuración del remoto R2. Git guarda el puntero `data.dvc` en la raíz. Usa `dvc pull` para recuperar los datos y `dvc remote modify --local` para escribir las credenciales en `.dvc/config.local`. |
 | `EDA/` | Análisis exploratorio. `EDA_Sleep_EEG_ST7242J0_individual/` estudia una noche y `EDA_Sleep_EEG_ST7242J0_datset/` recorre las 44. Cada uno tiene su notebook y una carpeta `img/` con figuras. `EDA_Sleep_EEG_ST7242J0/` conserva el informe individual en Markdown con sus gráficos. |
 | `data/sleep-cassette/` y `data/referencias/` | EDF de la entrega parcial de Cassette y predicciones por época de la CRNN de Telemetry. El adaptador de Cassette empareja por sujeto y noche. |

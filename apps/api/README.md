@@ -1,14 +1,16 @@
 # Sleep-EDFx API
 
 Backend FastAPI para cargar un PSG EDF y generar un hipnograma preliminar con
-el bundle exportado por `Notebooks/experiments/historicos/model_jhoan_saavedra_preprocessing_v2.ipynb`.
+el bundle exportado por `Notebooks/dart_crnn_mixto_final_100.ipynb`.
 
 ## Preparación inicial
 
 Todos los comandos deben ejecutarse desde la raíz de
 `micro-proyecto-grupo-7`. La configuración del backend se encuentra en
 `apps/api/.env`; puede crearse inicialmente copiando `apps/api/.env.example`.
-El bundle configurado debe contener `manifest.json` y `model.txt`.
+El bundle configurado debe contener `manifest.json`, `dart-*.txt` y `crnn-*.keras`.
+
+El servicio combina DART (59 %) y CRNN (41 %) en paralelo. Requiere dos EEG (Fpz-Cz y Pz-Oz) y EOG horizontal a 100 Hz. El EMG es opcional. Los archivos del experimento y las etiquetas se usan solo en entrenamiento.
 
 ### Windows
 
@@ -101,7 +103,7 @@ El contexto de construcción es la raíz del repositorio:
 ```bash
 docker build -f apps/api/Dockerfile -t sleep-edfx-api .
 docker run --rm -p 8080:8080 \
-  -v "$PWD/data/models/sleep_staging_lightgbm_eeg_v2:/artifacts/model:ro" \
+  -v "$PWD/data/models/dart_crnn_mixto/final_100:/artifacts/model:ro" \
   -v "sleep-uploads:/app/storage/uploads" \
   sleep-edfx-api
 ```
