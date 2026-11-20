@@ -2,8 +2,33 @@
 
 import hashlib
 import json
+from contextlib import contextmanager
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from uuid import uuid4
+
+
+@contextmanager
+def stage_mixed_bundle(destination):
+    """Prepara ambos pesos y su manifiesto juntos antes de reemplazar el ajuste anterior."""
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=destination.parent) as temporary:
+        work = Path(temporary)
+        ready = work / "nuevo"
+        ready.mkdir()
+        yield ready
+        if set(file.name for file in ready.iterdir()) != {"dart.txt", "crnn.keras", "manifest.json"}:
+            raise ValueError("La exportación del modelo mixto está incompleta.")
+        previous = work / "anterior"
+        if destination.exists():
+            destination.rename(previous)
+        try:
+            ready.rename(destination)
+        except OSError:
+            if previous.exists() and not destination.exists():
+                previous.rename(destination)
+            raise
 
 
 def compact_manifest(info, training_hash):

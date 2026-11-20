@@ -77,10 +77,10 @@ Cree el directorio donde se almacenará el modelo:
 sudo mkdir -p /opt/sleep-edfx/model
 ```
 
-Copie los archivos `manifest.json`, `dart-*.txt` y `crnn-*.keras` desde la máquina de desarrollo:
+Copie los archivos `manifest.json`, `dart.txt` y `crnn.keras` desde la máquina de desarrollo:
 
 ```bash
-scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart-*.txt,crnn-*.keras} \
+scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart.txt,crnn.keras} \
   usuario@vm:/opt/sleep-edfx/model/
 ```
 
@@ -121,7 +121,7 @@ SLEEP_API_CORS_ORIGINS=["http://localhost"]
 Aspectos importantes:
 
 - `API_IMAGE` y `WEB_IMAGE` indican las imágenes que descargará Docker Compose.
-- `HOST_MODEL_DIR` debe apuntar al directorio del host que contiene `manifest.json`, `dart-*.txt` y `crnn-*.keras`.
+- `HOST_MODEL_DIR` debe apuntar al directorio del host que contiene `manifest.json`, `dart.txt` y `crnn.keras`.
 - `WEB_HOST_PORT` es el puerto que se expondrá hacia el exterior. Su valor predeterminado es `80`.
 - `SLEEP_API_MAX_UPLOAD_BYTES=52428800` limita los archivos cargados a 50 MB.
 - Las rutas `SLEEP_API_MODEL_DIR` y `SLEEP_API_UPLOAD_DIR` son rutas internas de los contenedores y deben permanecer absolutas.
@@ -197,7 +197,7 @@ Esto permite que el contenedor utilice el modelo sin modificar sus archivos.
 
 Para reemplazar el modelo:
 
-1. Sustituya `manifest.json`, `dart-*.txt` y `crnn-*.keras` en el directorio configurado en `HOST_MODEL_DIR`.
+1. Sustituya `manifest.json`, `dart.txt` y `crnn.keras` en el directorio configurado en `HOST_MODEL_DIR`.
 2. Reinicie el backend:
 
 ```bash

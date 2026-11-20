@@ -8,7 +8,7 @@ el bundle exportado por `Notebooks/dart_crnn_mixto_final_100.ipynb`.
 Todos los comandos deben ejecutarse desde la raíz de
 `micro-proyecto-grupo-7`. La configuración del backend se encuentra en
 `apps/api/.env`; puede crearse inicialmente copiando `apps/api/.env.example`.
-El bundle configurado debe contener `manifest.json`, `dart-*.txt` y `crnn-*.keras`.
+El bundle configurado debe contener `manifest.json`, `dart.txt` y `crnn.keras`.
 
 El servicio combina DART (59 %) y CRNN (41 %) en paralelo. Requiere dos EEG (Fpz-Cz y Pz-Oz) y EOG horizontal a 100 Hz. El EMG es opcional. Los archivos del experimento y las etiquetas se usan solo en entrenamiento.
 

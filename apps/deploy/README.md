@@ -56,7 +56,7 @@ Ambos aceptan ejecucion manual con `workflow_dispatch`.
    ```bash
    sudo mkdir -p /opt/sleep-edfx/model
    # desde la maquina de desarrollo:
-   scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart-*.txt,crnn-*.keras} \
+   scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart.txt,crnn.keras} \
      usuario@vm:/opt/sleep-edfx/model/
    ```
 
