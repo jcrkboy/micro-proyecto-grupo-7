@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Sleep-EDFx API"
     api_version: str = "0.1.0"
-    model_dir: Path = Path("../../data/models/sleep_staging_lightgbm_eeg_v2")
+    model_dir: Path = Path("../../data/models/dart_crnn_mixto/final_100")
     upload_dir: Path = Path("storage/uploads")
     max_upload_bytes: int = Field(default=50 * 1024 * 1024, gt=0)
     cors_origins: list[str] = ["http://localhost:4200"]
