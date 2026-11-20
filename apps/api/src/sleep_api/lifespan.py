@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from fastapi import FastAPI
-from sleep_staging.inference import SleepStagePredictor
+from sleep_staging.inference.mixed import MixedSleepStagePredictor
 
 from sleep_api.infrastructure.uploads import LocalUploadRepository
 
@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     app.state.predictor = None
     app.state.model_error = None
     try:
-        app.state.predictor = SleepStagePredictor(settings.model_dir)
+        app.state.predictor = MixedSleepStagePredictor(settings.model_dir, require_final=True)
     except Exception as exc:  # La API queda viva para exponer health degradado.
         app.state.model_error = str(exc)
         logger.exception("No fue posible cargar el bundle de inferencia")
