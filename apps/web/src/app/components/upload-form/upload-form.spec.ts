@@ -17,11 +17,11 @@ describe('UploadFormComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('debe tener extensión .edf');
   });
 
-  it('rechaza archivos que superan 50 MB antes de enviar', () => {
+  it('rechaza un archivo que supera los 70 MiB por un byte', () => {
     const file = new File(['contenido'], 'registro.edf');
-    Object.defineProperty(file, 'size', { value: 51 * 1024 * 1024 });
+    Object.defineProperty(file, 'size', { value: 70 * 1024 * 1024 + 1 });
     selectFile(file);
-    expect(fixture.nativeElement.textContent).toContain('supera el límite de 50 MB');
+    expect(fixture.nativeElement.textContent).toContain('supera el límite de 70 MiB');
   });
 
   it('emite el EEG del archivo y el nombre normalizado', async () => {

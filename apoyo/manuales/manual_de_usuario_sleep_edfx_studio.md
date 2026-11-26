@@ -50,7 +50,7 @@ Al ingresar a la plataforma, se encontrará con la pantalla de "Nuevo Estudio".
 *   **Carga del archivo.** Haga clic en el recuadro punteado y elija el estudio polisomnográfico en su computadora.
 *   **Requisitos del archivo:** 
     *   Debe estar en formato `.edf`.
-    *   No superar los 50 MB de tamaño.
+    *   No superar los 70 MiB de tamaño.
     *   Contener al menos 30 segundos y una de las derivaciones `EEG Fpz-Cz` o `EEG Pz-Oz` a 100 Hz.
 *   **Selección de canales.** El panel muestra las señales que contiene el EDF y marca las compatibles. Deje seleccionado al menos un EEG. También puede incluir el EOG horizontal a 100 Hz y el EMG submental a 1 o 100 Hz. Las señales adicionales aparecen deshabilitadas.
 *   **Procesamiento.** Haga clic en **Analizar registro** para enviar el EDF. El resumen del paciente y la descarga JSON indican los canales utilizados.

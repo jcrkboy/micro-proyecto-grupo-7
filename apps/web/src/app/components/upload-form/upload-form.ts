@@ -11,7 +11,7 @@ import {
 import type { WorkflowState } from '../../app';
 import { EdfChannel, hasEeg, readEdfChannels } from '../../core/utils/edf-channels';
 
-export const MAX_EDF_BYTES = 50 * 1024 * 1024;
+export const MAX_EDF_BYTES = 70 * 1024 * 1024;
 
 export interface AnalysisRequest {
   patientName: string;
@@ -39,6 +39,7 @@ function nonBlank(control: AbstractControl<string>): ValidationErrors | null {
   styleUrl: './upload-form.css',
 })
 export class UploadFormComponent {
+  protected readonly maxSizeMiB = MAX_EDF_BYTES / (1024 * 1024);
   readonly state = input.required<WorkflowState>();
   readonly modal = input(false);
   readonly analyzeRequest = output<AnalysisRequest>();
@@ -104,6 +105,6 @@ export class UploadFormComponent {
   }
 
   protected formatSize(bytes: number): string {
-    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
   }
 }

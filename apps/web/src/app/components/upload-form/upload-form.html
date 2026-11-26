@@ -14,7 +14,7 @@
     <span
       class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500"
       [class.mr-12]="modal()"
-      >EDF · máx. 50 MB</span
+      >EDF · máx. {{ maxSizeMiB }} MiB</span
     >
   </div>
 
@@ -86,7 +86,7 @@
         <p class="mt-2 text-xs font-medium text-red-600">El archivo está vacío.</p>
       }
       @if (file.touched && file.hasError('maxSize')) {
-        <p class="mt-2 text-xs font-medium text-red-600">El archivo supera el límite de 50 MB.</p>
+        <p class="mt-2 text-xs font-medium text-red-600">El archivo supera el límite de {{ maxSizeMiB }} MiB.</p>
       }
       @if (file.touched && file.hasError('required')) {
         <p class="mt-2 text-xs font-medium text-red-600">Selecciona un archivo EDF.</p>

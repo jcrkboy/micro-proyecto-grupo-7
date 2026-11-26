@@ -94,7 +94,7 @@ WEB_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
 WEB_HOST_PORT=80
 SLEEP_API_MODEL_DIR=/artifacts/model
 SLEEP_API_UPLOAD_DIR=/app/storage/uploads
-SLEEP_API_MAX_UPLOAD_BYTES=52428800
+SLEEP_API_MAX_UPLOAD_BYTES=73400320
 SLEEP_API_CORS_ORIGINS=["http://localhost"]
 ```
 
@@ -102,7 +102,7 @@ Aspectos importantes:
 
 - `API_IMAGE` y `WEB_IMAGE` indican las imágenes que descargará Docker Compose.
 - `WEB_HOST_PORT` es el puerto que se expondrá hacia el exterior. Su valor predeterminado es `80`.
-- `SLEEP_API_MAX_UPLOAD_BYTES=52428800` limita los archivos cargados a 50 MB.
+- `SLEEP_API_MAX_UPLOAD_BYTES=73400320` limita los archivos cargados a 70 MiB.
 - Las rutas `SLEEP_API_MODEL_DIR` y `SLEEP_API_UPLOAD_DIR` son rutas internas de los contenedores y deben permanecer absolutas.
 
 Para producción, se recomienda sustituir la etiqueta `latest` por una etiqueta `sha-<commit>` previamente publicada en GHCR.
