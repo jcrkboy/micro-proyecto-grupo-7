@@ -23,7 +23,7 @@ reproducibilidad se recomienda fijar `sha-<commit>` en produccion y dejar
 
 Los workflows corren solo sobre `main` y estan separados por ruta:
 
-- `.github/workflows/build-api.yml` se dispara con cambios en `apps/api/**` o `packages/sleep-staging/**`.
+- `.github/workflows/build-api.yml` se dispara con cambios en `apps/api/**`, `packages/sleep-staging/**`, `modelos/**` o `.dockerignore`.
 - `.github/workflows/build-web.yml` se dispara con cambios en `apps/web/**`.
 
 Un cambio que solo toca el frontend no reconstruye el backend, y viceversa.
@@ -50,8 +50,7 @@ Ambos aceptan ejecucion manual con `workflow_dispatch`.
    echo "$GHCR_TOKEN" | docker login ghcr.io -u <usuario-github> --password-stdin
    ```
 
-3. Clonar el repositorio en la VM. Git incluye el manifiesto y los dos archivos
-   de pesos que Compose monta en la API.
+3. Clonar el repositorio en la VM para obtener la configuración de Compose. La imagen de la API incluye el manifiesto y los pesos de la misma revisión de Git.
 
    ```bash
    git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
@@ -98,11 +97,19 @@ docker build -f apps/api/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-ap
 docker build -f apps/web/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest apps/web
 
 cd apps/deploy
-docker compose up -d
-curl http://localhost:${WEB_HOST_PORT:-80}/api/v1/model
+docker compose up -d --wait
+docker compose port web 4200
 ```
 
-La plantilla monta `../../modelos` desde `apps/deploy/`. Para usar otro puerto local, ajuste `WEB_HOST_PORT`, por ejemplo a 8081.
+Para usar el puerto local 8081, configure `WEB_HOST_PORT=8081` en `apps/deploy/.env` antes de iniciar Compose y consulte `http://localhost:8081/api/v1/health`.
+
+Con el despliegue en ejecución, pruebe la carga, la inferencia, el hipnograma y las exportaciones desde Chromium. Desde `apps/web/`, con las dependencias de npm y Chromium de Playwright instalados, ejecute:
+
+```bash
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:8081 npm run e2e -- despliegue.spec.ts --workers=1
+```
+
+La prueba usa el EDF sintético incluido en Git. Si descargó `datos/example.edf` con DVC, también procesa una noche completa.
 
 ## Red interna
 
@@ -117,10 +124,9 @@ el camino normal.
 ## Persistencia
 
 - `sleep-uploads`: volumen Docker con los EDF cargados (`/app/storage/uploads`).
-- `${HOST_MODEL_DIR}`: montado como solo lectura en `/artifacts/model`.
+- `/artifacts/model/` contiene `manifest.json`, `dart.txt` y `crnn.keras` dentro de la imagen de la API.
 
-Reemplazar el modelo consiste en actualizar los archivos del host y reiniciar:
-`docker compose restart api`.
+Para actualizar el modelo en la VM, seleccione la etiqueta de la nueva imagen en `API_IMAGE` y ejecute `docker compose pull api` y `docker compose up -d`.
 
 ## Grupo de seguridad en AWS
 
