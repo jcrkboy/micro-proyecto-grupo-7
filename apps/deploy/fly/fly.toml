@@ -1,0 +1,55 @@
+app = "sleepedfx"
+primary_region = "iad"
+
+[build]
+  # Fly asigna esta imagen al contenedor principal, llamado "app".
+  image = "ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:sha-c4fcc34"
+
+[experimental]
+  # Ambos contenedores comparten la red de esta máquina.
+  machine_config = '''{
+    "containers": [
+      {
+        "name": "app",
+        "user": "root",
+        "entrypoint": ["/bin/sh", "-ec"],
+        "cmd": [
+          "mountpoint /app/storage/uploads && chown appuser:appuser /app/storage/uploads && exec setpriv --reuid=appuser --regid=appuser --init-groups uvicorn sleep_api.main:app --host 0.0.0.0 --port 8080"
+        ]
+      },
+      {
+        "name": "web",
+        "image": "ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:sha-c4fcc34",
+        "entrypoint": ["/bin/sh", "-ec"],
+        "cmd": [
+          "sed 's|http://api:8080|http://127.0.0.1:8080|' /etc/nginx/nginx.conf > /tmp/nginx-fly.conf && exec nginx -c /tmp/nginx-fly.conf -g 'daemon off;'"
+        ]
+      }
+    ]
+  }'''
+
+[[mounts]]
+  source = "sleep_uploads"
+  destination = "/app/storage/uploads"
+  initial_size = "5gb"
+
+[http_service]
+  internal_port = 4200
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = "stop"
+  min_machines_running = 0
+
+  [http_service.http_options]
+    idle_timeout = 310
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/api/v1/health"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "60s"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "4gb"

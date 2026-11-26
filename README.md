@@ -7,7 +7,7 @@ El microproyecto de un solo canal EEG fue el antecedente. En el proyecto final, 
 | Acceso | Ubicación |
 |---|---|
 | Repositorio | [Código del proyecto en GitHub](https://github.com/jcrkboy/micro-proyecto-grupo-7) |
-| Aplicación pública | **POR DEFINIR** |
+| Aplicación pública | [Abrir Sleep-EDFx Studio en Fly.io](https://sleepedfx.fly.dev/) |
 | Credenciales de la aplicación | Acceso directo, sin cuenta ni contraseña. |
 
 El Grupo 7 está integrado por Juan Carlos Gamboa Peñaranda, Jhoan Sebastián Saavedra Romero, Juan David Rozo Verástegui y Juan Javier Valera Mejías.
@@ -66,6 +66,21 @@ El comando descarga las imágenes que GitHub Actions publicó en GHCR y espera a
 **El servidor debe tener los pesos en su propio disco.** Por defecto se usa `modelos/` en la raíz del clon. Si están en `/modelos` en la VM, configura `MODELOS_HOST_DIR=/modelos` en `apps/deploy/.env`. La carpeta debe contener `crnn.keras`, `dart.txt` y `manifest.json`. Compose la monta en modo de solo lectura y la API comprueba que los pesos correspondan al manifiesto.
 
 Con los valores predeterminados basta el comando de Compose. Si quieres cambiar el puerto, las imágenes o la ruta de modelos, copia la plantilla a `apps/deploy/.env`, edita sus valores y vuelve a ejecutar el mismo comando. [Plantilla de configuración](apps/deploy/.env.example)
+
+### Despliegue con Fly.io
+
+Elegimos Fly.io para esta demo porque un solo comando despliega la web y la API juntas. La máquina arranca bajo demanda cuando alguien visita la aplicación y se detiene tras un período sin tráfico. Así, durante las dos semanas de la demo, solo pagamos CPU y memoria mientras la máquina está encendida.
+
+La máquina está en Virginia. El archivo [fly.toml](apps/deploy/fly/fly.toml) fija las versiones de las dos imágenes que publica GitHub Actions. La API carga el modelo incluido en su imagen y guarda los EDF en un volumen persistente de 5 GB, que se factura también mientras la máquina está detenida.
+
+Para actualizar la aplicación desplegada, inicia sesión con `flyctl auth login`. Si cambió un componente, actualiza su etiqueta en `fly.toml` después de que GitHub Actions publique la imagen. Ejecuta estos comandos desde la raíz del repositorio.
+
+~~~bash
+flyctl config validate --strict --config apps/deploy/fly/fly.toml
+flyctl deploy --config apps/deploy/fly/fly.toml --ha=false
+~~~
+
+En la primera visita tras una parada, el modelo tarda unos instantes en cargar. El [estado de la API](https://sleepedfx.fly.dev/api/v1/health) indica `model_ready: true` cuando está listo.
 
 ### Configurar, comprobar y actualizar
 
