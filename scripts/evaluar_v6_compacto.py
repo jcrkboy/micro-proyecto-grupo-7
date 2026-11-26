@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score, cohen_kappa_score, f1_score
 ROOT = Path(__file__).resolve().parents[1]
 JUSTA = ROOT / ".sleep-cv/8f83a22b1d3a65d3"
 FUSION = ROOT / ".sleep-cv/fusion-crnn/663d52206f296fcc"
-SPEC = json.loads((ROOT / "data/experimentos/lightgbm_st_sc/experimento.json").read_text("utf8"))
+SPEC = json.loads((ROOT / "datos/experimentos/lightgbm_st_sc/experimento.json").read_text("utf8"))
 CLASES = np.array(SPEC["classes"])
 PASOS = 15
 PESO_DART = .75
@@ -35,7 +35,7 @@ def preparar():
                            for i in range(1, 6)], ignore_index=True)
     keys = ["record_id", "epoch_index"]
     assert not controles.duplicated(keys).any() and controles.groupby("subject_id").ronda.nunique().eq(1).all()
-    dsdir = ROOT / "data"
+    dsdir = ROOT / "datos"
     st = discover_sleep_telemetry_records(dsdir / "sleep-telemetry")
     sc = discover_sleep_cassette_records(dsdir / "sleep-cassette")
     grupos = [(st, "telemetry", dsdir / "processed/supervised")]
@@ -112,7 +112,9 @@ def evaluar(ronda, controles, p_dart, noches):
     train = controles.loc[controles.ronda.ne(ronda)]
     test = controles.loc[controles.ronda.eq(ronda)]
     assert set(train.subject_id).isdisjoint(test.subject_id)
-    firma = hashlib.sha256(Path(__file__).read_bytes() + (ROOT / "data.dvc").read_bytes())
+    firma = hashlib.sha256(Path(__file__).read_bytes())
+    for puntero in sorted((ROOT / "datos").glob("*.dvc")):
+        firma.update(puntero.read_bytes())
     firma.update(pd.util.hash_pandas_object(controles, index=True).values.tobytes())
     firma.update(np.ascontiguousarray(p_dart).tobytes())
     out = ROOT / ".sleep-cv/v6-compacto" / firma.hexdigest()[:16] / str(ronda)

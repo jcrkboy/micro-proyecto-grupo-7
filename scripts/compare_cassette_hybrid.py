@@ -70,14 +70,14 @@ def decode_night(probabilities, transitions, prior):
 
 
 def compare():
-    model_dir = ROOT / "data/experimentos/lightgbm_st_sc"
-    ref = ROOT / "data/referencias/hibrido_v6"
+    model_dir = ROOT / "datos/experimentos/lightgbm_st_sc"
+    ref = ROOT / "datos/referencias/hibrido_v6"
     spec = json.loads((model_dir / "experimento.json").read_text("utf-8"))
     hmm = json.loads((ref / "hmm.json").read_text("utf-8"))
     classes = np.array(hmm["classes"])
     trained = {r[:5] for r in hmm["training_records"] if r.startswith("SC")}
     reserved = set(spec["validation_subjects"]) - set(spec["train_subjects"]) - trained
-    records = [r for r in discover_sleep_cassette_records(ROOT / "data/sleep-cassette") if r.subject_id in reserved]
+    records = [r for r in discover_sleep_cassette_records(ROOT / "datos/sleep-cassette") if r.subject_id in reserved]
     if not records:
         raise ValueError("No hay noches de validación ajenas a ambos entrenamientos.")
 

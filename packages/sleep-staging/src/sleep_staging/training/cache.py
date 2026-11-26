@@ -82,7 +82,7 @@ def load_or_build_supervised_dataset(
 ) -> SupervisedDataset:
     """Carga un dataset compatible del caché o lo construye y persiste.
 
-    ``cache_root`` puede vivir en ``data/processed`` y compartirse mediante DVC.
+    ``cache_root`` puede vivir en ``datos/processed`` y compartirse mediante DVC.
     Hay que incrementar ``CACHE_SCHEMA_VERSION`` cuando cambie la lógica de
     construcción o extracción de features de una forma no expresada en la
     configuración de preprocesamiento.

@@ -20,7 +20,9 @@ CLAVES = ["record_id", "epoch_index"]
 
 
 def directorio(meta):
-    h = hashlib.sha256((ROOT/"data.dvc").read_bytes() + Path(__file__).read_bytes())
+    h = hashlib.sha256(Path(__file__).read_bytes())
+    for puntero in sorted((ROOT / "datos").glob("*.dvc")):
+        h.update(puntero.read_bytes())
     h.update(json.dumps(SPEC, sort_keys=True).encode())
     h.update(lgb.__version__.encode())
     h.update(pd.util.hash_pandas_object(meta[CLAVES+["subject_id", "real", "ronda"]], index=True).values.tobytes())
@@ -44,7 +46,7 @@ def preparar_dart_interno(meta):
     from sleep_staging.datasets import discover_sleep_cassette_records, discover_sleep_telemetry_records
     from sleep_staging.training import load_or_build_supervised_dataset
 
-    data = ROOT/"data"
+    data = ROOT/"datos"
     partes = [(discover_sleep_telemetry_records(data/"sleep-telemetry"), "telemetry", data/"processed/supervised")]
     partes.extend(([r], "cassette", Path(gettempdir())/"sleep-edfx-sc-features-v1")
                   for r in discover_sleep_cassette_records(data/"sleep-cassette"))

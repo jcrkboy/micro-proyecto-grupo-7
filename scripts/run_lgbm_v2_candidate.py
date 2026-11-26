@@ -84,11 +84,11 @@ def main() -> None:
         include_signal_quality_features=True,
         temporal_difference_offsets=(1, 2),
     )
-    records = discover_sleep_telemetry_records(REPO_ROOT / "data" / "sleep-telemetry")
+    records = discover_sleep_telemetry_records(REPO_ROOT / "datos" / "sleep-telemetry")
     dataset = load_or_build_supervised_dataset(
         records,
         PreprocessingPipeline(preprocessing),
-        REPO_ROOT / "data" / "processed" / "supervised",
+        REPO_ROOT / "datos" / "processed" / "supervised",
         verbose=False,
     )
     split = split_by_subject(dataset, validation_size=0.20, random_state=42)
