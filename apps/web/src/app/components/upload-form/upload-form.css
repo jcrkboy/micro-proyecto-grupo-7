@@ -69,6 +69,7 @@
   animation: progress-spin 1s linear infinite;
 }
 [data-status=done] .step-marker { border-color: #047857; background: #047857; color: white; }
+[data-status=paused] .step-marker { border-color: #64748b; color: #475569; }
 .upload-progress { display: block; width: 100%; height: 0.45rem; margin-top: 0.65rem; accent-color: #047857; }
 @keyframes progress-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {

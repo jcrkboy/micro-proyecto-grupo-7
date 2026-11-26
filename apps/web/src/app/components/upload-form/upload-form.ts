@@ -71,6 +71,9 @@ export class UploadFormComponent {
   protected readonly steps = computed(() => {
     const state = this.state();
     const inferencePaused = (state === 'processing' || state === 'waiting') && this.elapsed()?.inference != null;
+    const waitingDetail = state === 'processing'
+      ? 'Un modelo ya hizo su predicción. El otro sigue preparando sus señales.'
+      : 'Esperando el siguiente cálculo.';
     return [
       {
         label: 'Subiendo archivo',
@@ -88,7 +91,7 @@ export class UploadFormComponent {
         label: 'Clasificando etapas del sueño',
         duration: this.elapsed()?.inference ?? null,
         status: ['overlap', 'inferring'].includes(state) ? 'active' : inferencePaused ? 'paused' : state === 'finalizing' ? 'done' : 'pending',
-        detail: inferencePaused ? 'En espera. El contador se reanuda cuando el modelo vuelve a clasificar.' : 'Estimando el estadio de cada época de 30 segundos.',
+        detail: inferencePaused ? waitingDetail : 'Estimando el estadio de cada época de 30 segundos.',
       },
     ];
   });

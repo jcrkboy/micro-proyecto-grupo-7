@@ -76,6 +76,9 @@ describe('App', () => {
     inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
     fixture.detectChanges();
     expect(stepStatus()).toEqual(['done', 'active', 'paused']);
+    const waitingStep = fixture.nativeElement.querySelector('[data-status="paused"]');
+    expect(waitingStep.querySelector('.step-marker svg')).not.toBeNull();
+    expect(waitingStep.textContent).toContain('El otro sigue preparando sus señales.');
     expect(fixture.nativeElement.querySelector('[data-status="paused"] [role="timer"]').textContent.trim()).toBe('0,4 s');
     partialText += '{"type":"progress","stage":"inferring"}\n';
     inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
