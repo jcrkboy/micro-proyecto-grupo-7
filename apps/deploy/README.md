@@ -50,23 +50,19 @@ Ambos aceptan ejecucion manual con `workflow_dispatch`.
    echo "$GHCR_TOKEN" | docker login ghcr.io -u <usuario-github> --password-stdin
    ```
 
-3. Colocar el artefacto del modelo en el host. Los binarios no viajan dentro de
-   la imagen porque `data/` esta excluido en `.dockerignore`:
+3. Clonar el repositorio en la VM. Git incluye el manifiesto y los dos archivos
+   de pesos que Compose monta en la API.
 
    ```bash
-   sudo mkdir -p /opt/sleep-edfx/model
-   # desde la maquina de desarrollo:
-   scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart.txt,crnn.keras} \
-     usuario@vm:/opt/sleep-edfx/model/
+   git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
+   cd micro-proyecto-grupo-7
    ```
 
-   Si la VM tiene credenciales de DVC configuradas, `dvc pull` es equivalente.
-
-4. Copiar `docker-compose.yml` y crear el `.env`:
+4. Crear el archivo de configuración para Compose.
 
    ```bash
-   cp .env.example .env
-   ${EDITOR:-vi} .env
+   cp apps/deploy/.env.example apps/deploy/.env
+   ${EDITOR:-vi} apps/deploy/.env
    ```
 
 ## Puesta en marcha y actualizacion
@@ -106,8 +102,7 @@ docker compose up -d
 curl http://localhost:${WEB_HOST_PORT:-80}/api/v1/model
 ```
 
-Para la prueba local conviene apuntar `HOST_MODEL_DIR` al directorio del modelo
-del repositorio y usar un `WEB_HOST_PORT` libre, por ejemplo 8081.
+La plantilla monta `../../modelos` desde `apps/deploy/`. Para usar otro puerto local, ajuste `WEB_HOST_PORT`, por ejemplo a 8081.
 
 ## Red interna
 

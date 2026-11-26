@@ -103,7 +103,7 @@ El contexto de construcción es la raíz del repositorio:
 ```bash
 docker build -f apps/api/Dockerfile -t sleep-edfx-api .
 docker run --rm -p 8080:8080 \
-  -v "$PWD/data/models/dart_crnn_mixto/final_100:/artifacts/model:ro" \
+  -v "$PWD/modelos:/artifacts/model:ro" \
   -v "sleep-uploads:/app/storage/uploads" \
   sleep-edfx-api
 ```

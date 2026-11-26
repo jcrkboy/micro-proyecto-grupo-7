@@ -31,7 +31,7 @@ pip install -e ".[inference]"
 ```python
 from sleep_staging.inference.mixed import MixedSleepStagePredictor
 
-predictor = MixedSleepStagePredictor("../../data/models/dart_crnn_mixto/final_100")
+predictor = MixedSleepStagePredictor("../../modelos")
 resultado = predictor.predict_edf("registro-PSG.edf")
 ```
 

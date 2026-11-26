@@ -1,0 +1,4 @@
+# El manifiesto verifica los bytes exactos de los pesos.
+modelos/dart.txt binary
+modelos/crnn.keras binary
+modelos/manifest.json text eol=lf

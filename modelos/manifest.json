@@ -1,0 +1,137 @@
+{
+  "artifact_version": 2,
+  "model_type": "LightGBM DART + CRNN",
+  "version": "dart_666_crnn_27_20261119_191036",
+  "personas": 100,
+  "clases": [
+    "N1",
+    "N2",
+    "N3",
+    "REM",
+    "W"
+  ],
+  "archivos": {
+    "dart": {
+      "nombre": "dart.txt",
+      "sha256": "7ff1456fbce027c255a90cc569bfa5cbed12aca134f2fa2a709999313f04b7f6"
+    },
+    "crnn": {
+      "nombre": "crnn.keras",
+      "sha256": "d1584e03b26409cad410bcb3972b5c8f42dd8305046d7a0742ea1f467c5c1c6c"
+    }
+  },
+  "fusion": {
+    "tipo": "geometrica",
+    "dart": 0.59,
+    "crnn": 0.41,
+    "piso": 1e-07
+  },
+  "canales": [
+    "EEG Fpz-Cz",
+    "EEG Pz-Oz",
+    "EOG horizontal",
+    "EMG submental"
+  ],
+  "preprocesamiento_dart": {
+    "expected_sfreq": 100.0,
+    "epoch_seconds": 30.0,
+    "low_frequency": 0.3,
+    "high_frequency": 35.0,
+    "slow_wave_band": [
+      0.5,
+      2.0
+    ],
+    "spindle_band": [
+      11.0,
+      16.0
+    ],
+    "useful_band": [
+      0.5,
+      30.0
+    ],
+    "bands": {
+      "sw": [
+        0.5,
+        2.0
+      ],
+      "delta": [
+        0.5,
+        4.0
+      ],
+      "theta": [
+        4.0,
+        8.0
+      ],
+      "alpha": [
+        8.0,
+        12.0
+      ],
+      "sigma": [
+        12.0,
+        16.0
+      ],
+      "beta": [
+        16.0,
+        30.0
+      ]
+    },
+    "normalize_per_record": true,
+    "context_neighbors": 2,
+    "rolling_windows": [
+      3,
+      5,
+      11
+    ],
+    "include_subepoch_features": true,
+    "subepoch_seconds": 5.0,
+    "include_signal_quality_features": true,
+    "artifact_amplitude_threshold_uv": 300.0,
+    "artifact_gradient_threshold_uv": 100.0,
+    "flatline_gradient_threshold_uv": 0.1,
+    "temporal_difference_offsets": [
+      1,
+      2
+    ],
+    "temporal_difference_tokens": [
+      "rel_theta",
+      "rel_alpha",
+      "rel_beta",
+      "ratio_theta_alpha",
+      "huso_n_rafagas",
+      "hjorth_actividad"
+    ]
+  },
+  "receta_crnn": "espectral-contextual-v1",
+  "bandas_hz": [
+    [
+      0.3,
+      4
+    ],
+    [
+      4,
+      8
+    ],
+    [
+      8,
+      12
+    ],
+    [
+      12,
+      16
+    ],
+    [
+      16,
+      30
+    ],
+    [
+      30,
+      35
+    ]
+  ],
+  "desfases": [
+    0,
+    5,
+    10
+  ],
+  "entrenamiento_sha256": "cf1aebcbad3b4268be11a785ef2db16dbd3d817e090fb993b3b1a9cb81f7982f"
+}

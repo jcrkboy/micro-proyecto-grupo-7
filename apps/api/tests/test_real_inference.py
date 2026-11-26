@@ -1,4 +1,4 @@
-"""Prueba local real; se omite en CI mientras el bundle no esté versionado."""
+"""Inferencia con el modelo distribuido en Git y un EDF sintético de 60 s."""
 
 from pathlib import Path
 from threading import Barrier
@@ -10,18 +10,13 @@ from sleep_api.core.config import Settings
 from sleep_api.main import create_app
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-MODEL_DIR = REPO_ROOT / "data" / "models" / "dart_crnn_mixto" / "final_100"
 SAMPLE_EDF = Path(__file__).parent / "fixtures" / "sample_eeg_60s.edf"
 
 
-@pytest.mark.skipif(
-    not (MODEL_DIR / "manifest.json").is_file(),
-    reason="El bundle real aún no está disponible en CI",
-)
 def test_real_model_predicts_two_epochs(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("SLEEP_API_MODEL_DIR", raising=False)
     app = create_app(
-        Settings(model_dir=MODEL_DIR, upload_dir=tmp_path / "uploads")
+        Settings(_env_file=None, upload_dir=tmp_path / "uploads")
     )
 
     with TestClient(app) as client, SAMPLE_EDF.open("rb") as stream:
