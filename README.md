@@ -18,22 +18,42 @@ LightGBM DART clasifica cada época a partir de características tabulares de la
 
 ## Despliegue
 
-Necesitas Git, Docker con Compose 2.24 o posterior y acceso a Internet para descargar las imágenes. El script local usa Bash. En Windows, abre **Git Bash** con Docker Desktop en ejecución y configurado para contenedores Linux. En un servidor Linux, usa Docker Engine y Compose. Los contenedores incluyen Python 3.11, FastAPI, LightGBM y TensorFlow para la API, y Angular servido por Nginx para la web.
+Necesitas Git, Docker con Compose 2.24 o posterior y acceso a Internet para la primera instalación. En macOS y Windows, inicia Docker Desktop (en Windows, usa contenedores Linux). En Linux puedes usar Docker Engine con el complemento Compose. Los contenedores incluyen Python 3.11, FastAPI, LightGBM y TensorFlow para la API, y Angular servido por Nginx para la web.
 
-Clona el repositorio en **el equipo donde correrá Docker**. Git descarga también los tres archivos de `modelos/` que necesita la API.
+Clona el repositorio en **el equipo donde correrá Docker**. Git incluye los tres archivos de `modelos/` que necesita la API y un EDF sintético para probarla. Si vas a trabajar con las colecciones de estudio o a reproducir los notebooks, sigue la [guía de descarga con DVC](#descargar-los-datos-con-dvc).
 
-~~~bash
+~~~text
 git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
 cd micro-proyecto-grupo-7
 ~~~
 
 ### En tu computador
 
+**Con Docker, sin Bash.** Usa la terminal de Linux o macOS, o PowerShell en Windows. Desde el editor, crea el archivo `apps/deploy/.env` con estas tres líneas. Si ya existe, actualiza solo esas entradas.
+
+~~~dotenv
+API_IMAGE=sleep-edfx-api:local
+WEB_IMAGE=sleep-edfx-web:local
+WEB_HOST_PORT=127.0.0.1:8081
+~~~
+
+Desde la raíz del repositorio, construye las imágenes e inicia la aplicación. Los comandos son los mismos en las tres plataformas.
+
+~~~text
+docker build -t sleep-edfx-api:local -f apps/api/Dockerfile .
+docker build -t sleep-edfx-web:local apps/web
+docker compose -f apps/deploy/docker-compose.yml up -d --pull never --wait
+~~~
+
+Abre [Sleep-EDFx Studio en tu navegador](http://127.0.0.1:8081). En los siguientes arranques basta con la última línea. Si cambias el código, vuelve a construir la imagen del componente que modificaste.
+
+**Con el script Bash.** En Linux, macOS o Git Bash para Windows, este comando automatiza la construcción y el arranque con el mismo puerto local.
+
 ~~~bash
 bash apps/deploy/desplegar-local.sh
 ~~~
 
-El comando construye las imágenes con el código de tu copia, incluidos tus cambios locales. Cuando termine, abre [Sleep-EDFx Studio en localhost](http://127.0.0.1:8081). Para usar otro puerto, ejecuta, por ejemplo, `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`.
+Para usar otro puerto con el script, ejecuta, por ejemplo, `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`.
 
 ### En un servidor
 
@@ -51,9 +71,9 @@ Con los valores predeterminados basta el comando de Compose. Si quieres cambiar 
 
 | Parámetro | Dónde se cambia | Efecto |
 |---|---|---|
-| `LOCAL_WEB_PORT` | En la terminal al ejecutar el modo local | Puerto de acceso en este equipo. Por defecto, `8081` en `127.0.0.1`. |
-| `WEB_HOST_PORT` | `apps/deploy/.env` | Puerto público del servidor. La plantilla usa `80`. |
-| `API_IMAGE`, `WEB_IMAGE` | `apps/deploy/.env` | Imágenes del modo servidor. Usa `latest` o una etiqueta publicada `sha-…` de cada servicio para repetir una versión. |
+| `LOCAL_WEB_PORT` | En la terminal al ejecutar el script Bash | Puerto de acceso en este equipo. Por defecto, `8081` en `127.0.0.1`. |
+| `WEB_HOST_PORT` | `apps/deploy/.env` | Dirección y puerto publicados por Compose. El ejemplo local usa `127.0.0.1:8081` y la plantilla del servidor usa `80`. |
+| `API_IMAGE`, `WEB_IMAGE` | `apps/deploy/.env` | Etiquetas de las imágenes que usa Compose. En local se usa `:local`. En el servidor se usan las imágenes de GHCR con `latest` o una etiqueta publicada `sha-…` de cada servicio. |
 | `MODELOS_HOST_DIR` | `apps/deploy/.env` | Carpeta del anfitrión con los tres archivos. El valor inicial `../../modelos` es relativo a `apps/deploy/`. |
 | `SLEEP_API_MAX_UPLOAD_BYTES` | `apps/deploy/.env` | Máximo por EDF en la API. Por defecto son `73400320` bytes (70 MiB). Puedes reducirlo. Para ampliarlo, ajusta también el formulario y el límite de Nginx. |
 
@@ -89,16 +109,66 @@ Sleep Telemetry aporta 44 noches de 22 personas y Sleep Cassette aporta 153 noch
 
 Las etiquetas de entrenamiento proceden de los hipnogramas anotados por expertos. Los estadios 3 y 4 de la anotación original se agrupan en N3. La propuesta también contempla una clase de movimiento (`M`). El modelo clasifica cinco estadios y excluye del entrenamiento las épocas anotadas como movimiento o sin clasificar (`?`). [Correspondencia de etiquetas](packages/sleep-staging/src/sleep_staging/datasets/sleep_edfx.py)
 
-### Reproducir los notebooks
+### Qué contiene la carpeta `datos/`
 
-Este entorno es opcional para quienes trabajan con los datos de entrenamiento. Desde la raíz, crea un entorno de Python con `python -m venv .venv`, actívalo e instala `python -m pip install -r requirements.txt`. Para activar el entorno usa `source .venv/bin/activate` en Linux o macOS, `source .venv/Scripts/activate` en Git Bash o `.\.venv\Scripts\Activate.ps1` en PowerShell.
+Git guarda un archivo `.dvc` por cada colección o archivo versionado. Por ejemplo, `datos/sleep-cassette.dvc` identifica la versión de las noches de Sleep Cassette que corresponde a este código. Al ejecutar `dvc pull`, DVC lee esos punteros, recupera los archivos de **Cloudflare R2** y reconstruye esta estructura en tu equipo.
 
-Sustituye los valores de ejemplo por las credenciales de R2 que te facilite el administrador. La opción `--local` las guarda en la configuración privada de DVC.
+~~~text
+datos/
+├── sleep-cassette/       Registros de sueño e hipnogramas de 153 noches de 78 personas.
+├── sleep-telemetry/      Registros de sueño e hipnogramas de 44 noches de 22 personas.
+├── sleep-anphy/          Registros y anotaciones para pruebas externas.
+├── ST-subjects.xls       Metadatos de los participantes de Sleep Telemetry.
+├── example.edf           Una noche de Sleep Telemetry para probar la aplicación.
+├── processed/            Características por época, potencias espectrales y datos preprocesados.
+├── experimentos/         Configuraciones, resultados y artefactos de los experimentos.
+├── referencias/          Predicciones guardadas para comparar modelos sobre las mismas épocas.
+└── evaluacion_80_20/     Pesos DART y CRNN y manifiesto del ajuste de evaluación por persona.
+~~~
 
-~~~bash
+Los pesos que carga la API se encuentran en `modelos/`, en la raíz del repositorio. La carpeta `datos/evaluacion_80_20/` sirve para reproducir la evaluación. [Inventario de los datos](datos/README.md)
+
+### Descargar los datos con DVC
+
+**1. Solicita acceso a Cloudflare R2.** Pide a quien administra el bucket `proyecto-maestria-ia` que te comparta por privado un **Access Key ID** y una **Secret Access Key** con permiso de lectura. Los nueve punteros de esta revisión suman **28,25 GiB (unos 30,34 GB)** de datos. Para una descarga completa, prevé también espacio para la caché local de DVC.
+
+**2. Instala DVC con soporte para S3**, el protocolo que usa R2. Desde la raíz del clon, crea un entorno virtual con `python -m venv .venv` (en Linux o macOS puedes usar `python3`). Si ya tienes el entorno, actívalo directamente.
+
+| Terminal | Comando de activación |
+|---|---|
+| Linux o macOS (Bash o Zsh) | `source .venv/bin/activate` |
+| Windows PowerShell | `.\.venv\Scripts\Activate.ps1` |
+| Git Bash en Windows | `source .venv/Scripts/activate` |
+
+~~~text
+python -m pip install "dvc[s3]==3.67.1"
+dvc remote list
+~~~
+
+Deberías ver `r2` junto a `s3://proyecto-maestria-ia`. El repositorio ya define el remoto y el endpoint de Cloudflare. [Configuración de DVC](.dvc/config)
+
+**3. Configura tus credenciales.** Sustituye ambos valores de ejemplo por las claves que recibiste. La opción `--local` las guarda en `.dvc/config.local`, un archivo excluido de Git.
+
+~~~text
 dvc remote modify --local r2 access_key_id TU_ACCESS_KEY_ID
 dvc remote modify --local r2 secret_access_key TU_SECRET_ACCESS_KEY
+~~~
+
+**4. Descarga lo que necesites.** Para probar una noche real, descarga únicamente el EDF de ejemplo (unos 29 MB). Después podrás seleccionarlo en el formulario de la aplicación desde `datos/example.edf`.
+
+~~~text
 dvc pull datos/example.edf.dvc
 ~~~
 
-Esto recupera una noche de ejemplo para la aplicación. Para reproducir los análisis completos, ejecuta `dvc pull` y abre `jupyter lab`. Si regeneras una colección como `datos/processed/`, usa `dvc status` para revisar los cambios, `dvc add datos/processed` para actualizar el puntero y `dvc push` para subir los datos. Registra el puntero actualizado en Git. [Estructura y origen de los datos](datos/README.md) · [EDA de Sleep Telemetry](Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb)
+Para recuperar **todo el contenido** de `datos/` y verificarlo, ejecuta estos comandos desde la raíz del repositorio.
+
+~~~text
+dvc pull
+dvc status
+~~~
+
+`dvc status` permite comprobar que los datos locales coinciden con los punteros del clon. Si la descarga devuelve `AccessDenied`, comprueba con quien administra R2 que las claves correspondan a este bucket y tengan permiso de lectura.
+
+### Reproducir los notebooks
+
+Con los datos descargados y el entorno virtual activo, instala las dependencias con `python -m pip install -r requirements.txt` y abre `jupyter lab`. Si regeneras una colección como `datos/processed/`, revisa los cambios con `dvc status`. Quienes tengan acceso de escritura a R2 pueden registrar la colección con `dvc add datos/processed`, subir los datos con `dvc push` y guardar el puntero actualizado en Git. [EDA de Sleep Telemetry](Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb)
