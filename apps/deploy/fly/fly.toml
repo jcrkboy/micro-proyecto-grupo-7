@@ -3,7 +3,7 @@ primary_region = "iad"
 
 [build]
   # Fly asigna esta imagen al contenedor principal, llamado "app".
-  image = "ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:sha-c4fcc34"
+  image = "ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest"
 
 [experimental]
   # Ambos contenedores comparten la red de esta máquina.
@@ -12,6 +12,7 @@ primary_region = "iad"
       {
         "name": "app",
         "user": "root",
+        "env": {"HOME": "/home/appuser"},
         "entrypoint": ["/bin/sh", "-ec"],
         "cmd": [
           "mountpoint /app/storage/uploads && chown appuser:appuser /app/storage/uploads && exec setpriv --reuid=appuser --regid=appuser --init-groups uvicorn sleep_api.main:app --host 0.0.0.0 --port 8080"
@@ -19,7 +20,7 @@ primary_region = "iad"
       },
       {
         "name": "web",
-        "image": "ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:sha-c4fcc34",
+        "image": "ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest",
         "entrypoint": ["/bin/sh", "-ec"],
         "cmd": [
           "sed 's|http://api:8080|http://127.0.0.1:8080|' /etc/nginx/nginx.conf > /tmp/nginx-fly.conf && exec nginx -c /tmp/nginx-fly.conf -g 'daemon off;'"
@@ -38,7 +39,7 @@ primary_region = "iad"
   force_https = true
   auto_start_machines = true
   auto_stop_machines = "stop"
-  min_machines_running = 0
+  min_machines_running = 1
 
   [http_service.http_options]
     idle_timeout = 310

@@ -69,18 +69,18 @@ Con los valores predeterminados basta el comando de Compose. Si quieres cambiar 
 
 ### Despliegue con Fly.io
 
-Elegimos Fly.io para esta demo porque un solo comando despliega la web y la API juntas. La máquina arranca bajo demanda cuando alguien visita la aplicación y se detiene tras un período sin tráfico. Así, durante las dos semanas de la demo, solo pagamos CPU y memoria mientras la máquina está encendida.
+Fly.io despliega la web y la API juntas. Durante la demo mantenemos una máquina encendida en Virginia para que el modelo esté listo en la primera visita, incluso después de varias horas sin tráfico. Fly factura la CPU y la memoria también durante esos períodos.
 
-La máquina está en Virginia. El archivo [fly.toml](apps/deploy/fly/fly.toml) fija las versiones de las dos imágenes que publica GitHub Actions. La API carga el modelo incluido en su imagen y guarda los EDF en un volumen persistente de 5 GB, que se factura también mientras la máquina está detenida.
+El archivo [fly.toml](apps/deploy/fly/fly.toml) usa la etiqueta `latest` de cada imagen publicada por GitHub Actions. La API carga el modelo incluido en su imagen y guarda los EDF en un volumen persistente de 5 GB que se factura por separado.
 
-Para actualizar la aplicación desplegada, inicia sesión con `flyctl auth login`. Si cambió un componente, actualiza su etiqueta en `fly.toml` después de que GitHub Actions publique la imagen. Ejecuta estos comandos desde la raíz del repositorio.
+Para actualizar la aplicación desplegada, espera a que GitHub Actions publique las imágenes de los componentes que cambiaron. Con la sesión de Fly iniciada (`flyctl auth login`), ejecuta estos comandos desde la raíz del repositorio.
 
 ~~~bash
 flyctl config validate --strict --config apps/deploy/fly/fly.toml
 flyctl deploy --config apps/deploy/fly/fly.toml --ha=false
 ~~~
 
-En la primera visita tras una parada, el modelo tarda unos instantes en cargar. El [estado de la API](https://sleepedfx.fly.dev/api/v1/health) indica `model_ready: true` cuando está listo.
+Tras un despliegue o reinicio, la API vuelve a cargar el modelo. El [estado de la API](https://sleepedfx.fly.dev/api/v1/health) indica `model_ready: true` cuando está listo.
 
 ### Configurar, comprobar y actualizar
 
