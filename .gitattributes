@@ -2,3 +2,4 @@
 modelos/dart.txt binary
 modelos/crnn.keras binary
 modelos/manifest.json text eol=lf
+apps/deploy/*.sh text eol=lf

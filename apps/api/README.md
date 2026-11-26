@@ -117,3 +117,5 @@ docker run --rm -p 8080:8080 \
 ```
 
 La imagen incluye el manifiesto y los pesos de `modelos/` en `/artifacts/model/`. El volumen `sleep-uploads` conserva los estudios cargados entre reinicios.
+
+En los despliegues local y servidor con Compose, esa ruta se monta desde la carpeta de modelos del anfitrión. Los dos modos requieren los tres archivos en el equipo donde corre Docker. [Guía de despliegue](../deploy/README.md)

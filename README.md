@@ -1,195 +1,104 @@
 # Sleep-EDFx Studio · Grupo 7
 
-La aplicación genera un hipnograma a partir de un registro polisomnográfico EDF. La API usa el modelo DART + CRNN incluido en Git. [Despliegue con Docker Compose](apps/deploy/README.md) · [Manual de usuario](apoyo/manuales/manual_de_usuario_sleep_edfx_studio.md) · [EDF sintético de prueba](apps/api/tests/fixtures/sample_eeg_60s.edf)
+Sleep-EDFx Studio convierte un registro de sueño en formato EDF en un hipnograma preliminar. El usuario elige los canales de la polisomnografía y el modelo estima un estadio por cada 30 segundos de señal. El resultado permite explorar la noche, consultar la confianza de cada predicción y exportar los datos para revisión profesional.
 
-**Integrantes** · Juan Carlos Gamboa Peñaranda, Jhoan Sebastián Saavedra Romero, Juan David Rozo Verástegui y Juan Javier Valera Mejías.
-
-EEG polisomnografico del subset **Sleep Telemetry** de
-[Sleep-EDFx](https://physionet.org/content/sleep-edfx/): 22 sujetos, 2 noches
-cada uno (44 pares PSG + hipnograma, ~8 h a 100 Hz, epocas de 30 s).
-
-**Sleep Cassette** aporta 153 noches de 78 personas, cada una con su PSG e
-hipnograma. Junto con Telemetry hay 197 noches de 100 personas. El
-[notebook mixto](Notebooks/dart_crnn_mixto.ipynb) entrena con 80 personas
-(158 noches) y evalúa con 20 (39 noches). El
-[ajuste final con las 100 personas](Notebooks/dart_crnn_mixto_final_100.ipynb)
-se ejecuta aparte. Las características preprocesadas se conservan en
-`datos/processed/`. Los punteros de [datos/](datos/) identifican la versión del dataset y del ajuste de evaluación. El [modelo final](modelos/) se obtiene al clonar el repositorio.
-
-El experimento anterior comparó los dos modelos en las mismas épocas de la
-entrega parcial, que incluía 12 noches completas de Cassette.
-[Resultados y protocolo de evaluación](agent.md#comparación-directa-con-el-híbrido-v6).
-
----
-
-## Setup
-
-**1.** Crea el entorno virtual
-
-```bash
-python -m venv .venv
-```
-
-**2.** Activalo segun tu terminal
-
-```bash
-.venv\Scripts\activate           # PowerShell / cmd
-source .venv/Scripts/activate    # Git Bash
-source .venv/bin/activate        # Linux / macOS
-```
-
-**3.** Instala las dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-**4.** Configura las credenciales de R2 (pedirselas a quien administra el bucket)
-
-```bash
-dvc remote modify --local r2 access_key_id 'TU_ACCESS_KEY_ID'
-dvc remote modify --local r2 secret_access_key 'TU_SECRET_ACCESS_KEY'
-```
-
-> **`--local` es obligatorio.** Escribe en `.dvc/config.local`, que esta
-> ignorado. Sin esa bandera las credenciales se commitean al repositorio.
-
-**5.** Descarga los datos y el ajuste de evaluación desde R2
-
-```bash
-dvc pull
-```
-
-**6.** Abre los notebooks de EDA, este paso ya opcional
-
-```bash
-jupyter lab
-```
-
-| Notebook | Alcance |
+| Acceso | Ubicación |
 |---|---|
-| `Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb` | **Los 44 registros** (22 sujetos x 2 noches) |
-| `Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_individual/EDA_Sleep_EEG_ST7242J0.ipynb` | Un unico registro (`ST7242J0`), analisis de referencia |
+| Repositorio | [GitHub · micro-proyecto-grupo-7](https://github.com/jcrkboy/micro-proyecto-grupo-7) |
+| Aplicación pública | **POR DEFINIR** |
+| Demostración | [Video de presentación del proyecto](https://drive.google.com/file/d/1NIcqw7noABbsWgwwZVIIpzwrwPM_Cwm5/view) |
+| Credenciales de la aplicación | Acceso directo, sin cuenta ni contraseña. |
 
-El notebook de dataset completo recorre los 44 EDF (~75 s) y cachea las features en
-`datos/processed/`; las ejecuciones siguientes cargan de ahi (~18 s).
+El Grupo 7 está integrado por Juan Carlos Gamboa Peñaranda, Jhoan Sebastián Saavedra Romero, Juan David Rozo Verástegui y Juan Javier Valera Mejías.
 
----
+## Despliegue
 
-## Estructura
+Necesitas Git, Docker con Compose 2.24 o posterior y acceso a Internet para descargar las imágenes. El script local usa Bash. En Windows, abre **Git Bash** con Docker Desktop en ejecución y configurado para contenedores Linux. En un servidor Linux, usa Docker Engine y Compose. Los contenedores incluyen Python 3.11, FastAPI, LightGBM y TensorFlow para la API, y Angular servido por Nginx para la web.
 
-```
-.
-├── apps/                           # Aplicaciones (backend, frontend, despliegue)
-│   ├── api/                        # Backend FastAPI + LightGBM
-│   │   ├── Dockerfile             # Imagen para la API
-│   │   ├── .env.example            # Plantilla de configuracion
-│   │   ├── run.sh                  # Script para ejecutar la API
-│   │   ├── README.md               # Documentacion del backend
-│   │   └── tests/
-│   ├── web/                        # Frontend Angular
-│   │   ├── Dockerfile             # Imagen para el frontend
-│   │   └── ...                     # Codigo Angular
-│   └── deploy/                     # Stack Docker Compose para producion
-│       ├── docker-compose.yml      # Orquestacion de servicios (api + web)
-│       ├── .env.example            # Variables de entorno para despliegue
-│       └── README.md               # Guia de despliegue en VM
-├── packages/                       # Librerias reutilizables
-│   └── sleep-staging/              # Libreria de preprocesamiento e inferencia de sueno
-│       ├── setup.py                # Configuracion del paquete
-│       └── src/                    # Codigo fuente del paquete
-├── Notebooks/
-│   ├── dart_crnn_mixto.ipynb       # Evaluación por persona y ajuste final de DART + CRNN
-│   └── experiments/                # Comparaciones y búsquedas en Telemetry y Cassette
-│       ├── model_jhoan_saavedra_all_channels.ipynb   # Control LightGBM multicanal
-│       ├── model_v6.ipynb           # Experimento CRNN + LightGBM + HMM de Colab
-│       └── historicos/              # Modelos y búsquedas iniciales
-├── Notebooks/EDA/                  # Análisis exploratorio de datos
-│   ├── EDA_Sleep_EEG_ST7242J0/             # Export Markdown del EDA individual
-│   ├── EDA_Sleep_EEG_ST7242J0_datset/      # EDA de los 44 registros
-│   │   ├── EDA_Sleep_EEG_dataset.ipynb
-│   │   └── img/*.png                       # Figuras exportadas
-│   └── EDA_Sleep_EEG_ST7242J0_individual/  # EDA de un solo registro
-│       ├── EDA_Sleep_EEG_ST7242J0.ipynb
-│       └── img/*.png
-├── scripts/                        # Scripts utilitarios
-│   ├── generate_sample_edf.py      # Genera EDF de ejemplo para testing
-│   └── run_lgbm_v2_candidate.py    # Script para entrenar candidato LightGBM v2
-├── apoyo/
-│   ├── manuales/                   # Instalación, uso y presentación
-│   ├── matlab/                     # Script y figura de referencia
-│   └── mlruns/                     # Ejecuciones locales de MLflow (ignoradas por Git)
-├── docs/                           # Documentacion (MLOps Stack Canvas, reportes)
-├── modelos/                        # Ajuste final de 100 personas, versionado en Git
-│   ├── crnn.keras
-│   ├── dart.txt
-│   └── manifest.json
-├── datos/                          # Estructura y punteros .dvc de cada colección
-│   ├── evaluacion_80_20/           # Ajuste de evaluación recuperado con DVC
-│   ├── ST-subjects.xls             # Metadatos de los 22 sujetos
-│   ├── sleep-telemetry/            # 88 archivos EDF
-│   │   ├── ST70xxJ0-PSG.edf        #   44 registros polisomnograficos
-│   │   └── ST70xxJx-Hypnogram.edf  #   44 hipnogramas
-│   ├── sleep-cassette/             # 153 PSG y 153 hipnogramas
-│   ├── referencias/                # Predicciones LOSO de Telemetry para comparar por época
-│   ├── experimentos/lightgbm_st_sc/ # Modelo mixto, hiperparámetros y esquema de características
-│   └── processed/                  # Cache generado por EDA
-│       ├── epochs_features.parquet
-│       └── psd_record_stage.parquet
-├── .dvc/
-│   ├── config                      # Bucket y endpoint de R2 (versionado)
-│   └── config.local                # Credenciales (ignorado)
-├── .github/workflows/              # GitHub Actions CI/CD
-├── .gitignore
-├── .dockerignore
-├── requirements.txt
-└── README.md
-```
+Clona el repositorio en **el equipo donde correrá Docker**. Git descarga también los tres archivos de `modelos/` que necesita la API.
 
----
+~~~bash
+git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
+cd micro-proyecto-grupo-7
+~~~
 
-## Trabajar con los datos
+### En tu computador
 
-### Agregar datos nuevos
+~~~bash
+bash apps/deploy/desplegar-local.sh
+~~~
 
-```bash
-cp <archivo-nuevo> datos/sleep-telemetry/
-dvc add datos/sleep-telemetry       # actualiza el puntero de la colección
-git add datos/sleep-telemetry.dvc
-git commit -m "data: describir que se agrego"
-dvc push
-```
+El comando construye las imágenes con el código de tu copia, incluidos tus cambios locales. Cuando termine, abre [Sleep-EDFx Studio en localhost](http://127.0.0.1:8081). Para usar otro puerto, ejecuta, por ejemplo, `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`.
 
-DVC es content-addressable: solo se suben los archivos nuevos, no el dataset
-completo.
+### En un servidor
 
-> El notebook de EDA de dataset completo escribe su cache en `datos/processed/`, que
-> esta dentro del directorio que rastrea DVC. Tras ejecutarlo, `dvc status` aparecera
-> sucio: hay que registrarlo con el mismo flujo de arriba (`dvc add datos/processed` y `dvc push`).
+~~~bash
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait
+~~~
 
-### Traer cambios de datos hechos por otro
+El comando descarga las imágenes que GitHub Actions publicó en GHCR y espera a que la web pueda consultar la salud de la API. Con la configuración inicial, abre `http://IP_DEL_SERVIDOR` y permite el acceso al puerto 80 en el firewall de la VM. Solo la web publica un puerto. Nginx reenvía las rutas `/api/` al backend.
 
-```bash
-git pull
-dvc pull                           # sincroniza las colecciones según sus punteros
-```
+**El servidor debe tener los pesos en su propio disco.** Por defecto se usa `modelos/` en la raíz del clon. Si están en `/modelos` en la VM, configura `MODELOS_HOST_DIR=/modelos` en `apps/deploy/.env`. La carpeta debe contener `crnn.keras`, `dart.txt` y `manifest.json`. Compose la monta en modo de solo lectura y la API comprueba que los pesos correspondan al manifiesto.
 
-### Comandos utiles
+Con los valores predeterminados basta el comando de Compose. Si quieres cambiar el puerto, las imágenes o la ruta de modelos, copia la plantilla a `apps/deploy/.env`, edita sus valores y vuelve a ejecutar el mismo comando. [Plantilla de configuración](apps/deploy/.env.example)
 
-| Comando | Que hace |
+### Configurar, comprobar y actualizar
+
+| Parámetro | Dónde se cambia | Efecto |
+|---|---|---|
+| `LOCAL_WEB_PORT` | En la terminal al ejecutar el modo local | Puerto de acceso en este equipo. Por defecto, `8081` en `127.0.0.1`. |
+| `WEB_HOST_PORT` | `apps/deploy/.env` | Puerto público del servidor. La plantilla usa `80`. |
+| `API_IMAGE`, `WEB_IMAGE` | `apps/deploy/.env` | Imágenes del modo servidor. Usa `latest` o una etiqueta publicada `sha-…` de cada servicio para repetir una versión. |
+| `MODELOS_HOST_DIR` | `apps/deploy/.env` | Carpeta del anfitrión con los tres archivos. El valor inicial `../../modelos` es relativo a `apps/deploy/`. |
+| `SLEEP_API_MAX_UPLOAD_BYTES` | `apps/deploy/.env` | Máximo por EDF en la API. Por defecto son `73400320` bytes (70 MiB). Puedes reducirlo. Para ampliarlo, ajusta también el formulario y el límite de Nginx. |
+
+Comprueba el servicio con `docker compose -f apps/deploy/docker-compose.yml ps`. En local, la [salud de la API](http://127.0.0.1:8081/api/v1/health) debe indicar `model_ready: true`. Para detener ambos servicios y conservar los EDF cargados, ejecuta `docker compose -f apps/deploy/docker-compose.yml stop`.
+
+GitHub Actions publica las imágenes al cambiar los componentes correspondientes en `main`. Para actualizar el servidor, sincroniza el clon con `git pull --ff-only`, espera a que termine la publicación y vuelve a ejecutar el comando de Docker Compose. Si fijaste etiquetas por commit, selecciona las nuevas en el `.env`. [Guía de operación y diagnóstico](apps/deploy/README.md)
+
+## Probar e interpretar un estudio
+
+1. Abre la aplicación, escribe `Prueba 01` como identificador y elige el [EDF sintético de 60 segundos incluido en Git](apps/api/tests/fixtures/sample_eeg_60s.edf).
+2. El panel lee la cabecera y muestra los canales antes de subir el archivo. Selecciona al menos un EEG a 100 Hz, **EEG Fpz-Cz** o **EEG Pz-Oz**. Puedes elegir ambos y añadir EOG horizontal a 100 Hz o EMG submental a 1 o 100 Hz si están presentes.
+3. Pulsa **Analizar registro**. Con el ejemplo aparecen **2 épocas**. En el resumen verás qué canales se usaron y cuánto tiempo y porcentaje correspondieron a cada estadio.
+4. En el hipnograma, el eje horizontal representa el tiempo y el vertical identifica vigilia (W), sueño N1, N2, N3 y REM. Pasa el cursor sobre una época para consultar el estadio y sus probabilidades. Usa **Descargar CSV** para obtener una fila por época o **Descargar JSON** para conservar también los canales, la versión del modelo y el resumen.
+
+El resultado es preliminar y requiere revisión profesional. El modelo combina DART (59 %) y una red CRNN (41 %). Las entradas de los canales desmarcados quedan en cero. [Manual de usuario](apoyo/manuales/manual_de_usuario_sleep_edfx_studio.md) · [Contrato de la API y ejemplo con curl](apps/api/README.md)
+
+## Cómo verificar la entrega
+
+| Criterio de la rúbrica | Comprobación reproducible |
 |---|---|
-| `dvc status` | Cambios locales en `datos/` sin registrar |
-| `dvc status -c` | Diferencias entre la cache local y R2 |
-| `dvc remote list` | Remotes configurados |
-| `dvc checkout` | Restaura `datos/` desde la caché local |
+| Funcionamiento (35 %) | Carga el EDF de ejemplo, elige un EEG y comprueba que aparecen dos épocas y que el CSV contiene dos filas de datos. [Prueba de despliegue con Playwright](apps/web/e2e/despliegue.spec.ts) |
+| Documentación del despliegue (15 %) | Sigue uno de los dos procedimientos desde un clon nuevo y consulta la salud de la API. La dirección pública se completará al desplegar la VM. |
+| Parametrización (15 %) | Arranca en otro puerto con `LOCAL_WEB_PORT=8090` o cambia un valor del servidor en el archivo de entorno y vuelve a desplegar. [Plantilla con valores iniciales](apps/deploy/.env.example) |
+| Usabilidad y presentación (35 %) | Comprueba que el formulario impide analizar sin EEG, que la leyenda permite identificar los cinco estadios y que el cursor muestra la confianza por época. [Prueba de interacción del hipnograma](apps/web/e2e/hypnogram.spec.ts) |
 
----
+La [guía de pruebas en Chromium](apps/deploy/README.md#prueba-con-navegador) incluye el comando para repetir las verificaciones de interfaz.
 
-## Problemas frecuentes
+## Datos, modelos y análisis
 
-| Sintoma | Causa |
+| Carpeta | Contenido |
 |---|---|
-| `AccessDenied` en `push` | Token de R2 sin permiso de escritura |
-| `AccessDenied` en `pull` | Credenciales ausentes o en `.dvc/config` en vez de `.dvc/config.local` |
-| El notebook no encuentra los `.edf` | Falta `dvc pull` |
-| `dvc: command not found` | Entorno virtual sin activar |
+| [Notebooks/](Notebooks/) | Análisis exploratorio, entrenamiento, comparaciones y evaluación por persona. |
+| [modelos/](modelos/) | Los pesos finales de DART y CRNN y su manifiesto, versionados en Git. |
+| [datos/](datos/) | Estructura y punteros DVC a las colecciones, características procesadas y ajuste de evaluación 80/20. |
+| [apps/](apps/) | Frontend, API y despliegue con Docker Compose. |
+| [packages/sleep-staging/](packages/sleep-staging/) | Preprocesamiento, extracción de características e inferencia. |
+| [docs/](docs/) y [apoyo/](apoyo/) | Informes, material de presentación, manuales y análisis de apoyo. |
+
+Sleep Telemetry aporta 44 noches de 22 personas y Sleep Cassette aporta 153 noches de 78 personas. La evaluación separa a las personas entre entrenamiento (80 personas, 158 noches) y prueba (20 personas, 39 noches). El ajuste final distribuido con la aplicación utiliza las 100 personas. [Evaluación por persona](Notebooks/dart_crnn_mixto.ipynb) · [Entrenamiento final](Notebooks/dart_crnn_mixto_final_100.ipynb)
+
+### Reproducir los notebooks
+
+Este entorno es opcional para quienes trabajan con los datos de entrenamiento. Desde la raíz, crea un entorno de Python con `python -m venv .venv`, actívalo e instala `python -m pip install -r requirements.txt`. Para activar el entorno usa `source .venv/bin/activate` en Linux o macOS, `source .venv/Scripts/activate` en Git Bash o `.\.venv\Scripts\Activate.ps1` en PowerShell.
+
+Sustituye los valores de ejemplo por las credenciales de R2 que te facilite el administrador. La opción `--local` las guarda en la configuración privada de DVC.
+
+~~~bash
+dvc remote modify --local r2 access_key_id TU_ACCESS_KEY_ID
+dvc remote modify --local r2 secret_access_key TU_SECRET_ACCESS_KEY
+dvc pull datos/example.edf.dvc
+~~~
+
+Esto recupera una noche de ejemplo para la aplicación. Para reproducir los análisis completos, ejecuta `dvc pull` y abre `jupyter lab`. Si regeneras una colección como `datos/processed/`, usa `dvc status` para revisar los cambios, `dvc add datos/processed` para actualizar el puntero y `dvc push` para subir los datos. Registra el puntero actualizado en Git. [Estructura y origen de los datos](datos/README.md) · [EDA de Sleep Telemetry](Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb)

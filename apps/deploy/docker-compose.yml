@@ -1,20 +1,30 @@
-# Stack de despliegue para la VM: consume las imagenes publicadas por GitHub
-# Actions en GHCR. No construye nada; solo descarga y ejecuta.
+# En el servidor, Compose descarga las imágenes de GHCR. El script local utiliza sus propias etiquetas.
 name: sleep-edfx
 
 services:
   api:
-    image: ${API_IMAGE:?falta API_IMAGE en apps/deploy/.env}
+    image: ${API_IMAGE:-ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest}
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.example
+      - path: .env
+        required: false
+    environment:
+      SLEEP_API_MODEL_DIR: ${SLEEP_API_MODEL_DIR:-/artifacts/model}
+      SLEEP_API_UPLOAD_DIR: ${SLEEP_API_UPLOAD_DIR:-/app/storage/uploads}
     volumes:
-      - sleep-uploads:/app/storage/uploads
+      - type: bind
+        source: ${MODELOS_HOST_DIR:-../../modelos}
+        target: ${SLEEP_API_MODEL_DIR:-/artifacts/model}
+        read_only: true
+        bind:
+          create_host_path: false
+      - sleep-uploads:${SLEEP_API_UPLOAD_DIR:-/app/storage/uploads}
     expose:
       - "8080"
 
   web:
-    image: ${WEB_IMAGE:?falta WEB_IMAGE en apps/deploy/.env}
+    image: ${WEB_IMAGE:-ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest}
     restart: unless-stopped
     ports:
       # nginx sirve el bundle estatico y hace proxy de /api/ hacia el servicio api.
@@ -22,6 +32,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4200/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
 volumes:
   sleep-uploads:

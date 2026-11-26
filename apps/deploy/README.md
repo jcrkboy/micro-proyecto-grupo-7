@@ -1,134 +1,66 @@
-# Despliegue en VM
+# Operación de Sleep-EDFx Studio
 
-Stack de ejecucion para una maquina virtual Linux (por ejemplo EC2). No compila
-codigo: descarga las imagenes que GitHub Actions publica en GHCR desde `main`.
- 
-## Piezas
+Desde la raíz del repositorio, elige el comando correspondiente. El servidor arranca directamente con Docker Compose 2.24 o posterior. Con los valores predeterminados basta un clon con `modelos/`. El archivo `.env` es opcional y permite personalizar la instalación. [Archivos de entorno opcionales en Docker Compose](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/#use-the-env_file-attribute)
 
-| Archivo | Rol |
-| --- | --- |
-| `docker-compose.yml` | Define los servicios `api` y `web` apuntando a las imagenes publicadas |
-| `.env.example` | Plantilla de configuracion; copiar a `.env` en la VM |
+| Entorno | Comando | Imágenes y acceso |
+|---|---|---|
+| Desarrollo local | `bash apps/deploy/desplegar-local.sh` | Construye las imágenes `sleep-edfx-api:local` y `sleep-edfx-web:local`. La web escucha en `127.0.0.1:8081`. |
+| Servidor | `docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait` | Descarga `API_IMAGE` y `WEB_IMAGE` de GHCR. La plantilla expone la web en el puerto 80. |
 
-Imagenes publicadas:
+La guía principal incluye la instalación desde un clon nuevo, los parámetros de puerto e imágenes y el primer análisis con un EDF de ejemplo. [Despliegue paso a paso](../../README.md#despliegue)
 
-- `ghcr.io/jcrkboy/micro-proyecto-grupo-7-api` — FastAPI + LightGBM + TensorFlow (`apps/api/Dockerfile`)
-- `ghcr.io/jcrkboy/micro-proyecto-grupo-7-web` — bundle Angular servido por nginx (`apps/web/Dockerfile`)
+## Modelos y archivos persistentes
 
-Cada una recibe dos etiquetas por build: `latest` y `sha-<commit>`. Para
-reproducibilidad se recomienda fijar `sha-<commit>` en produccion y dejar
-`latest` solo para entornos de prueba.
+La API necesita `manifest.json`, `dart.txt` y `crnn.keras` en la carpeta del anfitrión indicada por `MODELOS_HOST_DIR`. La ruta predeterminada apunta a [modelos/](../../modelos/) en la raíz del clon. Para usar un directorio administrado por separado en la VM, coloca los tres archivos de la misma versión en `/modelos` y establece `MODELOS_HOST_DIR=/modelos` en `.env`. El usuario del contenedor necesita acceso de lectura a los archivos y acceso de paso al directorio.
 
-## Flujo de construccion
+| Recurso | Ubicación en la API | Configuración |
+|---|---|---|
+| Modelo activo | `/artifacts/model` | Carpeta del anfitrión montada en modo de solo lectura. `SLEEP_API_MODEL_DIR` define el destino dentro del contenedor. |
+| Registros EDF cargados | `/app/storage/uploads` | Volumen Docker `sleep-uploads`. `SLEEP_API_UPLOAD_DIR` define el destino dentro del contenedor. |
 
-Los workflows corren solo sobre `main` y estan separados por ruta:
+La aplicación web y la API comparten origen a través de Nginx. Si se habilita otro cliente web de distinto origen para la API, `SLEEP_API_CORS_ORIGINS` acepta una lista JSON de orígenes. [Plantilla de configuración](.env.example)
 
-- `.github/workflows/build-api.yml` se dispara con cambios en `apps/api/**`, `packages/sleep-staging/**`, `modelos/**` o `.dockerignore`.
-- `.github/workflows/build-web.yml` se dispara con cambios en `apps/web/**`.
+## Publicación y actualización
 
-Un cambio que solo toca el frontend no reconstruye el backend, y viceversa.
-Ambos aceptan ejecucion manual con `workflow_dispatch`.
+Los workflows de GitHub Actions se ejecutan al subir a `main` cambios en cada componente. El de la API también observa los cambios en `modelos/` y en el paquete de inferencia. Las imágenes reciben `latest` y una etiqueta por commit. Cada servicio puede tener una etiqueta distinta. Para repetir un despliegue, guarda las dos etiquetas y la revisión de Git de los pesos. [Build de la API](../../.github/workflows/build-api.yml) · [Build de la web](../../.github/workflows/build-web.yml)
 
-## Preparacion de la VM (una sola vez)
+En la VM, actualiza el clon y las etiquetas que hayas fijado en `.env`, y ejecuta Compose. Los EDF se mantienen en el volumen. Si solo reemplazaste los pesos en disco y las imágenes siguen siendo las mismas, añade `--force-recreate` al comando `up` para que la API vuelva a leerlos.
 
-1. Instalar Docker Engine y el plugin Compose.
+~~~bash
+git pull --ff-only
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait
+~~~
 
-2. Autenticacion contra GHCR: no hace falta. Los paquetes son publicos porque
-   el repositorio lo es, asi que `docker compose pull` funciona sin login.
+## Verificar y diagnosticar
 
-   Para comprobarlo desde una maquina sin sesion en GHCR, si el comando
-   devuelve el manifiesto la imagen es publica:
+Desde la raíz, consulta el estado de los servicios, las últimas líneas del registro y el puerto de acceso.
 
-   ```bash
-   docker manifest inspect ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
-   ```
+~~~bash
+docker compose -f apps/deploy/docker-compose.yml ps
+docker compose -f apps/deploy/docker-compose.yml logs --tail 80 api web
+docker compose -f apps/deploy/docker-compose.yml port web 4200
+~~~
 
-   Si algun dia se vuelven privados, hace falta un Personal Access Token con
-   alcance `read:packages`:
+En local se puede consultar `curl -fsS http://127.0.0.1:8081/api/v1/health`. La respuesta debe indicar `status: ok` y `model_ready: true`. En el servidor usa el mismo sufijo `/api/v1/health` con el host y puerto de la instalación.
 
-   ```bash
-   echo "$GHCR_TOKEN" | docker login ghcr.io -u <usuario-github> --password-stdin
-   ```
+| Síntoma | Qué revisar |
+|---|---|
+| Falta un archivo del modelo | Comprueba los tres nombres, su tamaño y la ruta `MODELOS_HOST_DIR`. Las rutas relativas parten de `apps/deploy/`. |
+| La API queda como `unhealthy` | Consulta sus logs. Si falla la comprobación de integridad, restaura los tres archivos de una misma revisión. |
+| El puerto está ocupado | Para local usa `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`. En el servidor cambia `WEB_HOST_PORT` en `.env`. |
+| Funciona en la VM pero no desde el navegador remoto | Comprueba el puerto que publica Compose y la regla de entrada del firewall o del grupo de seguridad de la VM. |
 
-3. Clonar el repositorio en la VM para obtener la configuración de Compose. La imagen de la API incluye el manifiesto y los pesos de la misma revisión de Git.
+Para detener los servicios conservando las cargas, usa `docker compose -f apps/deploy/docker-compose.yml stop`.
 
-   ```bash
-   git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
-   cd micro-proyecto-grupo-7
-   ```
+### Prueba con navegador
 
-4. Crear el archivo de configuración para Compose.
+Con el modo local en ejecución, esta prueba usa Chromium para cargar un EDF, analizarlo, abrir el hipnograma y descargar el resultado. Para ejecutar las pruebas de desarrollo se necesita Node.js 24 y npm en el equipo.
 
-   ```bash
-   cp apps/deploy/.env.example apps/deploy/.env
-   ${EDITOR:-vi} apps/deploy/.env
-   ```
+~~~bash
+cd apps/web
+npm ci
+npx playwright install chromium
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:8081 npm run e2e
+~~~
 
-## Puesta en marcha y actualizacion
-
-```bash
-cd apps/deploy
-docker compose pull
-docker compose up -d
-```
-
-El mismo par de comandos actualiza el despliegue cuando Actions publica una
-imagen nueva. El `pull` explicito no es opcional: `up` por si solo reutiliza la
-capa `latest` que ya esta en el cache local y el despliegue quedaria en la
-version anterior sin ningun error visible.
-
-Verificacion:
-
-```bash
-docker compose ps
-docker compose logs -f api
-curl -f http://localhost/api/v1/model
-```
-
-## Prueba local antes de desplegar
-
-El mismo archivo sirve para un smoke test en la maquina de desarrollo, sin pasar
-por GHCR. Se construyen las imagenes con los nombres que declara el `.env` y
-Compose las encuentra localmente:
-
-```bash
-# desde la raiz del repositorio
-docker build -f apps/api/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest .
-docker build -f apps/web/Dockerfile -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest apps/web
-
-cd apps/deploy
-docker compose up -d --wait
-docker compose port web 4200
-```
-
-Para usar el puerto local 8081, configure `WEB_HOST_PORT=8081` en `apps/deploy/.env` antes de iniciar Compose y consulte `http://localhost:8081/api/v1/health`.
-
-Con el despliegue en ejecución, pruebe la carga, la inferencia, el hipnograma y las exportaciones desde Chromium. Desde `apps/web/`, con las dependencias de npm y Chromium de Playwright instalados, ejecute:
-
-```bash
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:8081 npm run e2e -- despliegue.spec.ts --workers=1
-```
-
-La prueba usa el EDF sintético incluido en Git. Si descargó `datos/example.edf` con DVC, también procesa una noche completa.
-
-## Red interna
-
-El contenedor `web` publica el puerto 4200 y el host lo mapea a `WEB_HOST_PORT`
-(80 por defecto). nginx sirve el bundle estatico y hace proxy de `/api/` hacia
-`http://api:8080` dentro de la red de Compose. Por eso el servicio de backend
-debe llamarse exactamente `api` y no necesita puerto publicado en el host.
-
-Como el navegador consulta la API por el mismo origen, no hay CORS en juego en
-el camino normal.
-
-## Persistencia
-
-- `sleep-uploads`: volumen Docker con los EDF cargados (`/app/storage/uploads`).
-- `/artifacts/model/` contiene `manifest.json`, `dart.txt` y `crnn.keras` dentro de la imagen de la API.
-
-Para actualizar el modelo en la VM, seleccione la etiqueta de la nueva imagen en `API_IMAGE` y ejecute `docker compose pull api` y `docker compose up -d`.
-
-## Grupo de seguridad en AWS
-
-Abrir unicamente el puerto de `WEB_HOST_PORT` (80) hacia internet. El backend no
-expone puertos al host, asi que no requiere reglas de entrada.
+La suite incluye un EDF sintético versionado en Git de 60 segundos (2 épocas). También prueba una noche de 1.196 épocas cuando está presente `datos/example.edf`. Puedes recuperar ese segundo registro con `dvc pull datos/example.edf.dvc` desde la raíz.

@@ -28,7 +28,8 @@ Los archivos principales del despliegue se encuentran en `apps/deploy`:
 | Archivo | Función |
 | --- | --- |
 | `docker-compose.yml` | Define los servicios `api` y `web`, sus volúmenes, puertos y dependencia. |
-| `.env.example` | Plantilla de variables de entorno; debe copiarse como `.env`. |
+| `desplegar-local.sh` | Construye las imágenes de desarrollo e inicia la aplicación en el computador local. |
+| `.env.example` | Valores de referencia. Copie la plantilla a `.env` si desea personalizarlos. |
 | `README.md` | Documentación del procedimiento de despliegue y mantenimiento. |
 
 ## 2. Prerrequisitos del sistema
@@ -37,7 +38,7 @@ La máquina anfitriona debe contar con:
 
 - Git.
 - Docker Engine.
-- Plugin Docker Compose.
+- Docker Compose 2.24 o posterior.
 - Acceso a Internet para descargar las imágenes desde GHCR.
 
 Se recomienda utilizar Linux, por ejemplo Ubuntu 22.04 LTS. También es posible realizar una prueba local en macOS o Windows mediante WSL2.
@@ -69,21 +70,20 @@ cd micro-proyecto-grupo-7
 
 ### 3.2. Modelo predictivo
 
-La imagen de la API incluye `manifest.json`, `dart.txt` y `crnn.keras` de `modelos/`. Durante el arranque, la API carga los archivos desde `/artifacts/model/`.
+La VM debe disponer de `manifest.json`, `dart.txt` y `crnn.keras`. El clon ya los incluye en `modelos/`. Compose monta esa carpeta en modo de solo lectura en `/artifacts/model/`. Si los archivos están en `/modelos` en la VM, configure `MODELOS_HOST_DIR=/modelos` en el siguiente paso.
 
 ### 3.3. Configurar las variables de entorno
 
-Acceda a la carpeta de despliegue y copie la plantilla:
+Compose arranca con los valores predeterminados. Si desea cambiarlos antes del primer arranque, copie la plantilla desde la raíz del proyecto.
 
 ```bash
-cd apps/deploy
-cp .env.example .env
+test -f apps/deploy/.env || cp apps/deploy/.env.example apps/deploy/.env
 ```
 
 Edite `.env` y revise los valores correspondientes al entorno:
 
 ```bash
-${EDITOR:-vi} .env
+${EDITOR:-vi} apps/deploy/.env
 ```
 
 La configuración de ejemplo incluye:
@@ -92,6 +92,7 @@ La configuración de ejemplo incluye:
 API_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest
 WEB_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
 WEB_HOST_PORT=80
+MODELOS_HOST_DIR=../../modelos
 SLEEP_API_MODEL_DIR=/artifacts/model
 SLEEP_API_UPLOAD_DIR=/app/storage/uploads
 SLEEP_API_MAX_UPLOAD_BYTES=73400320
@@ -109,15 +110,13 @@ Para producción, se recomienda sustituir la etiqueta `latest` por una etiqueta 
 
 ## 4. Puesta en marcha
 
-Desde `apps/deploy`, descargue las imágenes y levante los servicios:
+Desde la raíz del clon en la VM, inicie el modo servidor:
 
 ```bash
-cd apps/deploy
-docker compose pull
-docker compose up -d
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait
 ```
 
-El comando `docker compose pull` es necesario cuando se utiliza `latest`, ya que descarga la versión actualizada de GHCR. Si se omite, Docker Compose puede reutilizar una imagen antigua almacenada en la caché local sin mostrar un error.
+Compose consulta las imágenes publicadas con `--pull always` y espera a que la API y la web estén saludables con `--wait`.
 
 Durante el arranque:
 
@@ -166,18 +165,18 @@ Los estudios cargados se guardan en el volumen Docker `sleep-uploads`, montado e
 
 ### Modelo de IA
 
-Cada imagen de la API contiene los pesos entrenados de su revisión. Para instalar un nuevo modelo, seleccione la etiqueta publicada en `API_IMAGE` y vuelva a crear el servicio con estos comandos.
+Para instalar un nuevo modelo, actualice los tres archivos de la carpeta montada a una misma revisión y seleccione una imagen compatible en `API_IMAGE`. Si solo cambiaron los pesos del disco, vuelva a crear la API desde la raíz del clon.
 
 ```bash
-docker compose pull api
-docker compose up -d
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --force-recreate --wait
 ```
 
 ## 7. Verificación del despliegue
 
-Compruebe el estado de los contenedores:
+Desde la raíz, entre en `apps/deploy` para ejecutar los comandos directos de Compose de esta sección:
 
 ```bash
+cd apps/deploy
 docker compose ps
 ```
 
@@ -212,12 +211,11 @@ Para acceder al tablero desde un navegador:
 
 ## 8. Actualización de la aplicación
 
-Cuando GitHub Actions publique una nueva imagen, actualice el despliegue con:
+Cuando GitHub Actions publique una nueva imagen, actualice la copia del proyecto y el despliegue desde la raíz. Si fijó etiquetas de imagen en `.env`, actualícelas a las versiones deseadas.
 
 ```bash
-cd apps/deploy
-docker compose pull
-docker compose up -d
+git pull --ff-only
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait
 ```
 
 El mismo procedimiento sirve para actualizar el frontend, el backend o ambos, según las imágenes que hayan cambiado.
@@ -231,33 +229,17 @@ Por ello, un cambio exclusivo en el frontend no reconstruye el backend, y viceve
 
 ## 9. Prueba local antes de desplegar
 
-Antes de utilizar GHCR, es posible realizar una prueba local construyendo las imágenes desde la raíz del repositorio:
+En su computador, ejecute desde la raíz del repositorio:
 
 ```bash
-docker build -f apps/api/Dockerfile \
-  -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest .
-
-docker build -f apps/web/Dockerfile \
-  -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest apps/web
+bash apps/deploy/desplegar-local.sh
 ```
 
-Configure un puerto libre para la prueba local.
-
-```dotenv
-WEB_HOST_PORT=8081
-```
-
-Después, inicie los servicios:
-
-```bash
-cd apps/deploy
-docker compose up -d
-curl http://localhost:8081/api/v1/model
-```
+El script construye las dos imágenes y utiliza los modelos del anfitrión. Abra [la aplicación local](http://127.0.0.1:8081). Para elegir otro puerto puede ejecutar `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`.
 
 ## 10. Administración y mantenimiento
 
-Detener temporalmente los servicios sin eliminar la configuración:
+Ejecute estos comandos desde `apps/deploy/`. Para detener temporalmente los servicios:
 
 ```bash
 docker compose stop
@@ -293,4 +275,4 @@ Abra hacia Internet únicamente el puerto configurado en `WEB_HOST_PORT`:
 No es necesario abrir el puerto `8080`, porque la API no se publica directamente en el host y solo es accesible internamente desde el contenedor `web`.
 
 > 📌 **Nota para los evaluadores:**
-> El proyecto puede ejecutarse en la instancia AWS EC2 asignada, siempre que estén disponibles Docker, Docker Compose, el archivo `.env`, las imágenes de la versión y las reglas de red indicadas en este manual.
+> El proyecto puede ejecutarse en la instancia AWS EC2 asignada, siempre que estén disponibles Docker, Docker Compose, los archivos de `modelos/`, las imágenes de la versión y las reglas de red indicadas en este manual.

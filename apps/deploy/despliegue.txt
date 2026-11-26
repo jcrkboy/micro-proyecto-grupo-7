@@ -1,4 +1,9 @@
-cd apps/deploy  
-docker compose up -d
-docker compose ps
-curl http://localhost:8081/api/v1/model
+Desde la raíz del repositorio, ejecutar un comando según el entorno.
+
+Local (construye imágenes y usa los modelos del anfitrión)
+bash apps/deploy/desplegar-local.sh
+
+Servidor (descarga las imágenes publicadas y usa los modelos del anfitrión)
+docker compose -f apps/deploy/docker-compose.yml up -d --pull always --wait
+
+Configuración y verificación en apps/deploy/README.md.

@@ -77,7 +77,7 @@ docker run --rm -p 4200:4200 sleep-edfx-web
 
 El contenedor sirve la interfaz de forma independiente. Para analizar archivos,
 Nginx espera resolver un servicio llamado `api` en el puerto 8080; el
-`compose.yaml` de la siguiente fase establecerá esa red y dependencia.
+[archivo Compose del proyecto](../deploy/docker-compose.yml) establece esa red y dependencia.
 
 ## Alcance clínico
 

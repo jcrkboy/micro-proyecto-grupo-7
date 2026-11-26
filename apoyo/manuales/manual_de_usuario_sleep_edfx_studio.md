@@ -31,7 +31,7 @@
 
 ## 1. Acceso a la Plataforma
 
-Abra su navegador web (se recomienda Google Chrome o Mozilla Firefox) e ingrese a la dirección web proporcionada por el administrador del sistema (Ejemplo: `http://98.89.35.132`).
+Abra [la aplicación local](http://127.0.0.1:8081) después del despliegue en su computador. Para la instalación del servidor, consulte el enlace de la aplicación pública en el [README del proyecto](../../README.md).
 
 <img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/06fed007-8c32-448f-9581-ed32fbd2f9fb" />
 
@@ -74,12 +74,11 @@ La sección central contiene la **Secuencia Temporal (Hipnograma)**, la cual gr�
 
 *   **Navegación:** Deslice la barra inferior o utilice la rueda del ratón para explorar las diferentes horas del estudio.
 *   **Nivel de Confianza:** Al pasar el cursor sobre cualquier época (bloque de 30 segundos), un panel flotante le indicará el estadio predicho y el porcentaje de confianza de la IA para esa decisión.
-*   **Revisión de Alertas (Zonas Amarillas/Naranjas):** Preste especial atención a las épocas marcadas con alertas visuales de baja confianza. El sistema le sugiere auditar manualmente estas áreas de transición complejas (generalmente estadios N1 o REM).
-*   **Visor de Ondas:** *(Si está habilitado en su vista)*, al hacer clic sobre una época dudosa, podrá observar las trazas crudas de las señales de EEG para emitir su propio juicio clínico.
+*   **Interpretación del color.** La leyenda asigna un color a cada estadio. Para revisar una transición, compare las probabilidades que aparecen al pasar el cursor por las épocas vecinas.
 
 ### Paso 4: Exportación de Resultados
 
-Una vez que haya revisado el hipnograma y validado las alertas generadas por la IA:
+Después de revisar el hipnograma, puede exportar los resultados.
 
 <img style="max-width:100%;height:auto;" alt="image" src="https://github.com/user-attachments/assets/5aaa1406-fc33-4f5a-8087-c11b3a7fad41" />
 
