@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+from asyncio import Lock
 from collections.abc import Callable
 from typing import Protocol
 from uuid import uuid4
 
 import numpy as np
+from starlette.concurrency import run_in_threadpool
 
 from sleep_staging.inference import ModelManifest, PredictionResult
 
 from sleep_api.core.exceptions import ModelUnavailableError
-from sleep_api.infrastructure.uploads import LocalUploadRepository
+from sleep_api.infrastructure.uploads import LocalUploadRepository, StoredUpload
 from sleep_api.schemas.predictions import (
     EpochPrediction,
     InferenceResponse,
@@ -35,24 +37,32 @@ class PredictionService:
         self,
         uploads: LocalUploadRepository,
         predictor: Predictor | None,
+        inference_slot: Lock,
         model_error: str | None = None,
     ) -> None:
         self.uploads = uploads
         self.predictor = predictor
+        self.inference_slot = inference_slot
         self.model_error = model_error
 
-    def predict(
+    async def predict(
         self, upload_id: str, channels: list[str] | None = None, *,
         on_progress: Callable[[str], None] | None = None,
         check_cancelled: Callable[[], None] | None = None,
     ) -> InferenceResponse:
-        if self.predictor is None:
-            detail = self.model_error or "El modelo no está cargado"
-            raise ModelUnavailableError(detail)
+        with self.uploads.consume(upload_id) as stored:
+            async with self.inference_slot:
+                return await run_in_threadpool(self._predict, stored, channels, on_progress, check_cancelled)
 
-        stored = self.uploads.get(upload_id)
+    def _predict(
+        self, stored: StoredUpload, channels: list[str] | None,
+        on_progress: Callable[[str], None] | None, check_cancelled: Callable[[], None] | None,
+    ) -> InferenceResponse:
+        if self.predictor is None:
+            raise ModelUnavailableError(self.model_error or "El modelo no está cargado")
         options = {"on_progress": on_progress} if on_progress is not None else {}
         if check_cancelled is not None:
+            check_cancelled()
             options["check_cancelled"] = check_cancelled
         result = self.predictor.predict_edf(str(stored.file_path), channels=channels, **options)
         classes = tuple(self.predictor.manifest.classes)

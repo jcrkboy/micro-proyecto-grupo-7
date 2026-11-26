@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     model_dir: Path = Path("../../modelos")
     upload_dir: Path = Path("storage/uploads")
     max_upload_bytes: int = Field(default=70 * 1024 * 1024, gt=0)
+    upload_ttl_seconds: int = Field(default=600, gt=0)
     cors_origins: list[str] = ["http://localhost:4200"]
 
     model_config = SettingsConfigDict(

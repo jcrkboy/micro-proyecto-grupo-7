@@ -9,6 +9,10 @@ class UploadValidationError(ValueError):
     """El archivo no cumple el contrato de carga."""
 
 
+class UploadInUseError(RuntimeError):
+    """Otra solicitud ya está analizando esta carga."""
+
+
 class ModelUnavailableError(RuntimeError):
     """No hay un bundle cargado para ejecutar inferencia."""
 

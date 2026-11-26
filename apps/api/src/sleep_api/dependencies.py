@@ -12,6 +12,7 @@ def get_prediction_service(request: Request) -> PredictionService:
     return PredictionService(
         uploads=request.app.state.upload_repository,
         predictor=request.app.state.predictor,
+        inference_slot=request.app.state.inference_slot,
         model_error=request.app.state.model_error,
     )
 

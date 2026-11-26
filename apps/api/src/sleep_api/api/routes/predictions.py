@@ -2,16 +2,15 @@ import asyncio
 import json
 import logging
 from concurrent.futures import CancelledError
-from contextlib import suppress
 from threading import Event
 from time import monotonic
 from typing import Annotated
 
+from anyio import CancelScope
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from starlette.concurrency import run_in_threadpool
 
-from sleep_api.core.exceptions import ModelUnavailableError, UploadNotFoundError
+from sleep_api.core.exceptions import ModelUnavailableError, UploadInUseError, UploadNotFoundError
 from sleep_api.dependencies import get_prediction_service
 from sleep_api.schemas.predictions import InferenceRequest, InferenceResponse
 from sleep_api.services.prediction_service import PredictionService
@@ -47,12 +46,14 @@ class _StageTimes:
 
 
 @router.post("/inferencia", response_model=InferenceResponse)
-def infer(
+async def infer(
     payload: InferenceRequest,
     service: Annotated[PredictionService, Depends(get_prediction_service)],
 ) -> InferenceResponse:
     try:
-        return service.predict(payload.upload_id, payload.channels)
+        return await service.predict(payload.upload_id, payload.channels)
+    except UploadInUseError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except UploadNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ModelUnavailableError as exc:
@@ -73,6 +74,7 @@ async def infer_with_progress(
         times = _StageTimes()
         messages = asyncio.Queue()
         disconnected = Event()
+        work_scope = CancelScope()
 
         def publish(message):
             if not disconnected.is_set():
@@ -85,34 +87,41 @@ async def infer_with_progress(
             if disconnected.is_set():
                 raise CancelledError()
 
-        def predict():
+        async def predict():
             try:
-                prediction = service.predict(
-                    payload.upload_id, payload.channels,
-                    on_progress=lambda stage: publish({"type": "progress", "stage": stage}),
-                    check_cancelled=check_cancelled,
-                )
-                publish({"type": "result", "prediction": prediction.model_dump(mode="json")})
+                with work_scope:
+                    prediction = await service.predict(
+                        payload.upload_id, payload.channels,
+                        on_progress=lambda stage: publish({"type": "progress", "stage": stage}),
+                        check_cancelled=check_cancelled,
+                    )
+                    publish({"type": "result", "prediction": prediction.model_dump(mode="json")})
             except CancelledError:
                 logging.getLogger(__name__).info("Inferencia cancelada por el cliente")
-            except (UploadNotFoundError, ModelUnavailableError, FileNotFoundError, ValueError) as exc:
+            except (UploadInUseError, UploadNotFoundError, ModelUnavailableError, FileNotFoundError, ValueError) as exc:
                 publish({"type": "error", "detail": str(exc)})
             except Exception:
                 logging.getLogger(__name__).exception("Falló la inferencia con progreso")
                 publish({"type": "error", "detail": "No fue posible completar el análisis."})
 
-        worker = asyncio.create_task(run_in_threadpool(predict))
+        worker = asyncio.create_task(predict())
         try:
             while True:
-                message = await messages.get()
+                try:
+                    message = await asyncio.wait_for(messages.get(), timeout=30)
+                except asyncio.TimeoutError:
+                    # Espacio JSON antes del siguiente evento para mantener abierta la conexión.
+                    yield " "
+                    continue
                 yield json.dumps(message, ensure_ascii=False, separators=(",", ":")) + "\n"
                 if message["type"] != "progress":
                     break
         finally:
             disconnected.set()
-            worker.cancel()
-            with suppress(asyncio.CancelledError):
-                await worker
+            work_scope.cancel()
+            # La cola se cancela enseguida. Un cálculo en curso debe soltar el EDF primero.
+            with CancelScope(shield=True):
+                await asyncio.shield(worker)
 
     return StreamingResponse(
         events(), media_type="application/x-ndjson",

@@ -24,7 +24,7 @@ La aplicación web y la API comparten origen a través de Nginx. Si se habilita 
 
 Los workflows de GitHub Actions se ejecutan al subir a `main` cambios en cada componente. El de la API también observa los cambios en `modelos/` y en el paquete de inferencia. Las imágenes reciben `latest` y una etiqueta por commit. Cada servicio puede tener una etiqueta distinta. Para repetir un despliegue, guarda las dos etiquetas y la revisión de Git de los pesos. [Build de la API](../../.github/workflows/build-api.yml) · [Build de la web](../../.github/workflows/build-web.yml)
 
-En la VM, actualiza el clon y las etiquetas que hayas fijado en `.env`, y ejecuta Compose. Los EDF se mantienen en el volumen. Si solo reemplazaste los pesos en disco y las imágenes siguen siendo las mismas, añade `--force-recreate` al comando `up` para que la API vuelva a leerlos.
+En la VM, actualiza el clon y las etiquetas que hayas fijado en `.env`, y ejecuta Compose. La API elimina los EDF y sus metadatos al finalizar el análisis. Si solo reemplazaste los pesos en disco y las imágenes siguen siendo las mismas, añade `--force-recreate` al comando `up` para que la API vuelva a leerlos.
 
 ~~~bash
 git pull --ff-only
@@ -50,7 +50,7 @@ En local se puede consultar `curl -fsS http://127.0.0.1:8081/api/v1/health`. La 
 | El puerto está ocupado | Para local usa `LOCAL_WEB_PORT=8090 bash apps/deploy/desplegar-local.sh`. En el servidor cambia `WEB_HOST_PORT` en `.env`. |
 | Funciona en la VM pero no desde el navegador remoto | Comprueba el puerto que publica Compose y la regla de entrada del firewall o del grupo de seguridad de la VM. |
 
-Para detener los servicios conservando las cargas, usa `docker compose -f apps/deploy/docker-compose.yml stop`.
+Para detener los servicios, usa `docker compose -f apps/deploy/docker-compose.yml stop`.
 
 ### Prueba con navegador
 

@@ -105,6 +105,8 @@ También están disponibles `GET /health`, `GET /api/v1/health` y
 `GET /api/v1/model`. La respuesta de inferencia incluye tiempos, estadio,
 confianza y probabilidades por época, lista para graficar un hipnograma.
 
+Cada `upload_id` sirve para un análisis. La API reserva el EDF al solicitar la inferencia, lo protege mientras espera y lo elimina junto con sus metadatos al terminar, fallar o cancelar el cálculo. Para repetir un análisis, vuelve a subir el EDF. Las cargas sin solicitud de inferencia caducan a los 600 segundos, configurables con `SLEEP_API_UPLOAD_TTL_SECONDS`. Un proceso de limpieza revisa el volumen al arrancar, tras las subidas y al menos una vez por minuto mientras la API está activa.
+
 ## Docker
 
 El contexto de construcción es la raíz del repositorio:
@@ -116,6 +118,6 @@ docker run --rm -p 8080:8080 \
   sleep-edfx-api
 ```
 
-La imagen incluye el manifiesto y los pesos de `modelos/` en `/artifacts/model/`. El volumen `sleep-uploads` conserva los estudios cargados entre reinicios.
+La imagen incluye el manifiesto y los pesos de `modelos/` en `/artifacts/model/`. La API utiliza el volumen `sleep-uploads` como espacio temporal para los estudios.
 
 En los despliegues local y servidor con Compose, esa ruta se monta desde la carpeta de modelos del anfitrión. Los dos modos requieren los tres archivos en el equipo donde corre Docker. [Guía de despliegue](../deploy/README.md)

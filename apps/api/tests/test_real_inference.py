@@ -45,19 +45,22 @@ def test_real_model_predicts_two_epochs(tmp_path, monkeypatch) -> None:
             json={"upload_id": uploaded.json()["upload_id"]},
         )
         without_eog = SAMPLE_EDF.read_bytes().replace(b"EOG horizontal", b"AUX horizontal", 1)
-        missing = client.post(
-            "/api/v1/uploads", data={"patient_name": "Prueba"},
-            files={"file": ("solo_eeg.edf", without_eog, "application/octet-stream")},
-        )
-        upload_id = missing.json()["upload_id"]
-        eeg_only = client.post("/inferencia", json={"upload_id": upload_id})
+        def upload_record(content):
+            response = client.post(
+                "/api/v1/uploads", data={"patient_name": "Prueba"},
+                files={"file": ("registro.edf", content, "application/octet-stream")},
+            )
+            assert response.status_code == 201
+            return response.json()["upload_id"]
+
+        eeg_only = client.post("/inferencia", json={"upload_id": upload_record(without_eog)})
         assert eeg_only.status_code == 200, eeg_only.text
         assert eeg_only.json()["channels"] == ["EEG Fpz-Cz", "EEG Pz-Oz"]
         for channels in ([], ["EMG submental"], ["Marker"], ["EEG Pz-Oz", "EEG Pz-Oz"]):
-            invalid = client.post("/inferencia", json={"upload_id": upload_id, "channels": channels})
+            invalid = client.post("/inferencia", json={"upload_id": upload_record(without_eog), "channels": channels})
             assert invalid.status_code == 422
         no_eeg = client.post("/inferencia", json={
-            "upload_id": uploaded.json()["upload_id"], "channels": ["EOG horizontal"],
+            "upload_id": upload_record(SAMPLE_EDF.read_bytes()), "channels": ["EOG horizontal"],
         })
         assert no_eeg.status_code == 422
         assert "al menos un EEG" in no_eeg.json()["detail"]

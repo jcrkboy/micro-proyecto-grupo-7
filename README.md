@@ -69,9 +69,9 @@ Con los valores predeterminados basta el comando de Compose. Si quieres cambiar 
 
 ### Despliegue con Fly.io
 
-Fly.io despliega la web y la API en una máquina en Virginia. Con `min_machines_running = 0`, Fly la detiene tras un período sin tráfico y la enciende con la siguiente visita. Esa primera visita puede tardar cerca de un minuto mientras la API carga el modelo. Para mantenerla encendida durante la entrega, cambia el mínimo a `1` y vuelve a desplegar.
+Fly.io despliega la web y la API en una máquina en Virginia. Con `min_machines_running = 1`, Fly mantiene una máquina encendida en la región principal incluso cuando no hay tráfico.
 
-El archivo [fly.toml](apps/deploy/fly/fly.toml) usa la etiqueta `latest` de cada imagen publicada por GitHub Actions. La API carga el modelo incluido en su imagen y guarda los EDF en un volumen persistente de 5 GB que se factura por separado.
+El archivo [fly.toml](apps/deploy/fly/fly.toml) usa la etiqueta `latest` de cada imagen publicada por GitHub Actions. La API carga el modelo incluido en su imagen y utiliza un volumen de 5 GB para los EDF temporales. Cada archivo y sus metadatos se borran al terminar su análisis. Las cargas pendientes de iniciar caducan a los 10 minutos.
 
 Para actualizar la aplicación desplegada, espera a que GitHub Actions publique las imágenes de los componentes que cambiaron. Con la sesión de Fly iniciada (`flyctl auth login`), ejecuta estos comandos desde la raíz del repositorio.
 
@@ -92,7 +92,7 @@ Tras un despliegue o reinicio, la API vuelve a cargar el modelo. El [estado de l
 | `MODELOS_HOST_DIR` | `apps/deploy/.env` | Carpeta del anfitrión con los tres archivos. El valor inicial `../../modelos` es relativo a `apps/deploy/`. |
 | `SLEEP_API_MAX_UPLOAD_BYTES` | `apps/deploy/.env` | Máximo por EDF en la API. Por defecto son `73400320` bytes (70 MiB). Puedes reducirlo. Para ampliarlo, ajusta también el formulario y el límite de Nginx. |
 
-Comprueba el servicio con `docker compose -f apps/deploy/docker-compose.yml ps`. En local, la [salud de la API](http://127.0.0.1:8081/api/v1/health) debe indicar `model_ready: true`. Para detener ambos servicios y conservar los EDF cargados, ejecuta `docker compose -f apps/deploy/docker-compose.yml stop`.
+Comprueba el servicio con `docker compose -f apps/deploy/docker-compose.yml ps`. En local, la [salud de la API](http://127.0.0.1:8081/api/v1/health) debe indicar `model_ready: true`. Para detener ambos servicios, ejecuta `docker compose -f apps/deploy/docker-compose.yml stop`.
 
 GitHub Actions publica las imágenes al cambiar los componentes correspondientes en `main`. Para actualizar el servidor, sincroniza el clon con `git pull --ff-only`, espera a que termine la publicación y vuelve a ejecutar el comando de Docker Compose. Si fijaste etiquetas por commit, selecciona las nuevas en el `.env`. [Guía de operación y diagnóstico](apps/deploy/README.md)
 
