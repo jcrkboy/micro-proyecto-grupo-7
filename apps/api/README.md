@@ -103,10 +103,8 @@ El contexto de construcción es la raíz del repositorio:
 ```bash
 docker build -f apps/api/Dockerfile -t sleep-edfx-api .
 docker run --rm -p 8080:8080 \
-  -v "$PWD/modelos:/artifacts/model:ro" \
   -v "sleep-uploads:/app/storage/uploads" \
   sleep-edfx-api
 ```
 
-Los binarios del modelo no se incorporan en la imagen. En Linux deben montarse
-en `/artifacts/model` o cambiar `SLEEP_API_MODEL_DIR` a una ruta persistente.
+La imagen incluye el manifiesto y los pesos de `modelos/` en `/artifacts/model/`. El volumen `sleep-uploads` conserva los estudios cargados entre reinicios.

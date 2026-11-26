@@ -16,8 +16,10 @@ RUN python -m pip install --no-cache-dir ./packages/sleep-staging[inference] \
     && python -m pip install --no-cache-dir ./apps/api
 
 RUN useradd --create-home --uid 10001 appuser \
-    && mkdir -p /app/storage/uploads /artifacts/model \
-    && chown -R appuser:appuser /app /artifacts
+    && mkdir -p /app/storage/uploads \
+    && chown -R appuser:appuser /app
+
+COPY modelos/manifest.json modelos/dart.txt modelos/crnn.keras /artifacts/model/
 
 USER appuser
 WORKDIR /app

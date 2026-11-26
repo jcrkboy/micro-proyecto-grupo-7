@@ -7,7 +7,7 @@
 **/*.pyc
 **/.env
 datos
-modelos
+apps/api/storage/uploads
 apoyo
 Notebooks
 .pytest_tmp_*

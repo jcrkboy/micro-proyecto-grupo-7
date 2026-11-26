@@ -67,13 +67,9 @@ git clone https://github.com/jcrkboy/micro-proyecto-grupo-7.git
 cd micro-proyecto-grupo-7
 ```
 
-### 3.2. Instalar el modelo predictivo
+### 3.2. Modelo predictivo
 
-Al clonar el repositorio, Git descarga `manifest.json`, `dart.txt` y `crnn.keras` en `modelos/`. Compose monta esa carpeta en la API como volumen de solo lectura. El siguiente comando muestra los tres archivos desde la raíz del proyecto.
-
-```bash
-ls modelos/
-```
+La imagen de la API incluye `manifest.json`, `dart.txt` y `crnn.keras` de `modelos/`. Durante el arranque, la API carga los archivos desde `/artifacts/model/`.
 
 ### 3.3. Configurar las variables de entorno
 
@@ -95,7 +91,6 @@ La configuración de ejemplo incluye:
 ```dotenv
 API_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest
 WEB_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
-HOST_MODEL_DIR=../../modelos
 WEB_HOST_PORT=80
 SLEEP_API_MODEL_DIR=/artifacts/model
 SLEEP_API_UPLOAD_DIR=/app/storage/uploads
@@ -106,7 +101,6 @@ SLEEP_API_CORS_ORIGINS=["http://localhost"]
 Aspectos importantes:
 
 - `API_IMAGE` y `WEB_IMAGE` indican las imágenes que descargará Docker Compose.
-- `HOST_MODEL_DIR` debe apuntar al directorio del host que contiene `manifest.json`, `dart.txt` y `crnn.keras`.
 - `WEB_HOST_PORT` es el puerto que se expondrá hacia el exterior. Su valor predeterminado es `80`.
 - `SLEEP_API_MAX_UPLOAD_BYTES=52428800` limita los archivos cargados a 50 MB.
 - Las rutas `SLEEP_API_MODEL_DIR` y `SLEEP_API_UPLOAD_DIR` son rutas internas de los contenedores y deben permanecer absolutas.
@@ -172,21 +166,11 @@ Los estudios cargados se guardan en el volumen Docker `sleep-uploads`, montado e
 
 ### Modelo de IA
 
-El directorio del host definido en `HOST_MODEL_DIR` se monta como solo lectura en:
-
-```text
-/artifacts/model
-```
-
-Esto permite que el contenedor utilice el modelo sin modificar sus archivos.
-
-Para reemplazar el modelo:
-
-1. Sustituya `manifest.json`, `dart.txt` y `crnn.keras` en el directorio configurado en `HOST_MODEL_DIR`.
-2. Reinicie el backend:
+Cada imagen de la API contiene los pesos entrenados de su revisión. Para instalar un nuevo modelo, seleccione la etiqueta publicada en `API_IMAGE` y vuelva a crear el servicio con estos comandos.
 
 ```bash
-docker compose restart api
+docker compose pull api
+docker compose up -d
 ```
 
 ## 7. Verificación del despliegue
@@ -240,7 +224,7 @@ El mismo procedimiento sirve para actualizar el frontend, el backend o ambos, se
 
 Los workflows de construcción se ejecutan sobre la rama `main` y están separados por ruta:
 
-- `build-api.yml` se activa con cambios en `apps/api/**` o `packages/sleep-staging/**`.
+- `build-api.yml` se activa con cambios en `apps/api/**`, `packages/sleep-staging/**`, `modelos/**` o `.dockerignore`.
 - `build-web.yml` se activa con cambios en `apps/web/**`.
 
 Por ello, un cambio exclusivo en el frontend no reconstruye el backend, y viceversa. Ambos workflows también pueden ejecutarse manualmente mediante `workflow_dispatch`.
@@ -257,7 +241,7 @@ docker build -f apps/web/Dockerfile \
   -t ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest apps/web
 ```
 
-Configure `HOST_MODEL_DIR` para que apunte al directorio local que contiene el modelo y utilice un puerto libre, por ejemplo:
+Configure un puerto libre para la prueba local.
 
 ```dotenv
 WEB_HOST_PORT=8081
@@ -309,4 +293,4 @@ Abra hacia Internet únicamente el puerto configurado en `WEB_HOST_PORT`:
 No es necesario abrir el puerto `8080`, porque la API no se publica directamente en el host y solo es accesible internamente desde el contenedor `web`.
 
 > 📌 **Nota para los evaluadores:**
-> El proyecto puede ejecutarse en la instancia AWS EC2 asignada, siempre que estén disponibles Docker, Docker Compose, el archivo `.env`, el modelo predictivo y las reglas de red indicadas en este manual.
+> El proyecto puede ejecutarse en la instancia AWS EC2 asignada, siempre que estén disponibles Docker, Docker Compose, el archivo `.env`, las imágenes de la versión y las reglas de red indicadas en este manual.

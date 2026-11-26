@@ -9,8 +9,6 @@ services:
     env_file:
       - .env
     volumes:
-      # El host monta la versión del modelo guardada en Git.
-      - ${HOST_MODEL_DIR:?falta HOST_MODEL_DIR en apps/deploy/.env}:/artifacts/model:ro
       - sleep-uploads:/app/storage/uploads
     expose:
       - "8080"

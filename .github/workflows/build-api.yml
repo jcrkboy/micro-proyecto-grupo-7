@@ -6,6 +6,8 @@ on:
     paths:
       - "apps/api/**"
       - "packages/sleep-staging/**"
+      - "modelos/**"
+      - ".dockerignore"
       - ".github/workflows/build-api.yml"
   workflow_dispatch:
 
