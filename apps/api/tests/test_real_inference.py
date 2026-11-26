@@ -1,7 +1,7 @@
 """Inferencia con el modelo distribuido en Git y un EDF sintético de 60 s."""
 
 from pathlib import Path
-from threading import Barrier
+from threading import Barrier, Event
 
 import edfio
 import numpy as np
@@ -71,6 +71,34 @@ def test_real_model_predicts_two_epochs(tmp_path, monkeypatch) -> None:
     for epoch in body["epochs"]:
         assert sum(epoch["probabilities"].values()) == pytest.approx(1.0)
         assert epoch["confidence"] == epoch["probabilities"][epoch["stage"]]
+
+
+def test_progress_pauses_after_crnn_finishes_while_dart_prepares_features(tmp_path, monkeypatch):
+    app = create_app(Settings(_env_file=None, upload_dir=tmp_path))
+    with TestClient(app):
+        predictor = app.state.predictor
+        tabular_started, inference_paused = Event(), Event()
+        tabular, neural = predictor._tabular, predictor._neural
+        stages = []
+
+        def wait_for_tabular(*args):
+            assert tabular_started.wait(10)
+            return neural(*args)
+
+        def wait_for_crnn_to_finish(*args):
+            tabular_started.set()
+            assert inference_paused.wait(10)
+            return tabular(*args)
+
+        def record(stage):
+            if stage == "processing" and stages[-1:] == ["overlap"]:
+                inference_paused.set()
+            stages.append(stage)
+
+        monkeypatch.setattr(predictor, "_tabular", wait_for_crnn_to_finish)
+        monkeypatch.setattr(predictor, "_neural", wait_for_tabular)
+        predictor.predict_edf(SAMPLE_EDF, on_progress=record)
+        assert stages == ["processing", "overlap", "processing", "inferring", "waiting", "inferring", "finalizing"]
 
 
 def test_channel_masks_keep_model_slots_and_ignore_unselected_signals(tmp_path, monkeypatch):

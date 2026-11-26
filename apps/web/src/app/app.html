@@ -81,9 +81,18 @@
               <dl class="result-timings" aria-label="Tiempos del análisis">
                 <div><dt>Tiempo total</dt><dd>{{ formatElapsed(times.total) }}</dd></div>
                 <div><dt>Carga</dt><dd>{{ formatElapsed(times.upload) }}</dd></div>
-                <div><dt>Procesamiento</dt><dd>{{ formatElapsed(times.processing) }}</dd></div>
-                <div><dt>Análisis</dt><dd>{{ formatElapsed(times.inference) }}</dd></div>
+                @if (times.processing !== null) {
+                  <div><dt>Procesamiento</dt><dd>{{ formatElapsed(times.processing) }}</dd></div>
+                }
+                @if (times.inference !== null) {
+                  <div><dt>Inferencia</dt><dd>{{ formatElapsed(times.inference) }}</dd></div>
+                }
               </dl>
+              @if (times.overlap > 0) {
+                <p class="mt-1 text-xs text-slate-600">
+                  Procesamiento e inferencia coincidieron durante {{ formatElapsed(times.overlap) }}.
+                </p>
+              }
             }
             <p class="mt-2 text-sm text-slate-500">
               {{ result.summary.total_epochs }} épocas · {{ result.model_version }} ·

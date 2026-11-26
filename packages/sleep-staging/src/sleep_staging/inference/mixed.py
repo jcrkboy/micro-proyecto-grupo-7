@@ -153,32 +153,56 @@ class MixedSleepStagePredictor:
         return tuple(selected), replace(config, channels=tuple(tabular))
 
     def predict_edf(self, path, channels=None, *, on_progress=None, check_cancelled=None):
-        prepared_branches = 0
+        active = {}
+        last_stage = None
         progress_lock = Lock()
 
-        def features_ready():
-            nonlocal prepared_branches
-            if check_cancelled:
-                check_cancelled()
-            if on_progress is not None:
-                with progress_lock:
-                    prepared_branches += 1
-                    on_progress("overlap" if prepared_branches == 1 else "inferring")
+        def set_stage(branch, phase):
+            nonlocal last_stage
+            if on_progress is None:
+                return
+            with progress_lock:
+                if phase is None:
+                    del active[branch]
+                else:
+                    active[branch] = phase
+                phases = set(active.values())
+                if len(phases) == 2:
+                    stage = "overlap"
+                elif phases:
+                    stage = phases.pop()
+                else:
+                    stage = "finalizing" if branch == "fusion" else "waiting"
+                if stage != last_stage:
+                    last_stage = stage
+                    on_progress(stage)
+
+        def run_branch(branch, predict, *args):
+            def features_ready():
+                if check_cancelled:
+                    check_cancelled()
+                set_stage(branch, "inferring")
+
+            set_stage(branch, "processing")
+            try:
+                return predict(*args, features_ready, check_cancelled)
+            finally:
+                # La rama deja de contar al retornar, aunque la otra siga preparando señales.
+                set_stage(branch, None)
 
         try:
             selected, config = self._select_channels(path, channels)
             with self._lock, ThreadPoolExecutor(max_workers=1) as worker:
                 if check_cancelled:
                     check_cancelled()
-                if on_progress is not None:
-                    on_progress("processing")
-                neural = worker.submit(self._neural, path, selected, features_ready, check_cancelled)
-                result, p_dart = self._tabular(path, config, selected, features_ready, check_cancelled)
+                neural = worker.submit(run_branch, "crnn", self._neural, path, selected)
+                result, p_dart = run_branch("dart", self._tabular, path, config, selected)
                 p_crnn = neural.result()
                 if check_cancelled:
                     check_cancelled()
         except (OSError, RuntimeError, EOFError) as exc:
             raise ValueError(f"No fue posible procesar el EDF: {exc}") from exc
+        set_stage("fusion", "inferring")
         if p_dart.shape != p_crnn.shape or p_dart.shape != (
             len(result.metadata),
             len(self.manifest.classes),
@@ -194,7 +218,7 @@ class MixedSleepStagePredictor:
         stages = tuple(
             np.asarray(self.manifest.classes)[probabilities.argmax(axis=1)].tolist()
         )
-        return PredictionResult(
+        prediction = PredictionResult(
             stages,
             probabilities,
             result.metadata.onset_seconds.to_numpy(),
@@ -202,3 +226,5 @@ class MixedSleepStagePredictor:
             result.sfreq,
             selected,
         )
+        set_stage("fusion", None)
+        return prediction

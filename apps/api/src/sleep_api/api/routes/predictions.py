@@ -20,6 +20,32 @@ from sleep_api.services.prediction_service import PredictionService
 router = APIRouter(tags=["inferencia"])
 
 
+class _StageTimes:
+    """Tiempo de pared con al menos una rama activa en cada etapa."""
+
+    _active_stages = {
+        "processing_ms": {"processing", "overlap"},
+        "inference_ms": {"inferring", "overlap"},
+        "overlap_ms": {"overlap"},
+    }
+
+    def __init__(self):
+        self.stage = "waiting"
+        self.last_ms = 0
+        self.totals = {"processing_ms": None, "inference_ms": None, "overlap_ms": 0}
+
+    def advance(self, stage: str, elapsed_ms: int) -> dict:
+        interval = elapsed_ms - self.last_ms
+        for key, stages in self._active_stages.items():
+            if self.stage in stages:
+                self.totals[key] += interval
+            elif stage in stages and self.totals[key] is None:
+                self.totals[key] = 0
+        self.stage = stage
+        self.last_ms = elapsed_ms
+        return self.totals.copy()
+
+
 @router.post("/inferencia", response_model=InferenceResponse)
 def infer(
     payload: InferenceRequest,
@@ -44,12 +70,15 @@ async def infer_with_progress(
     async def events():
         loop = asyncio.get_running_loop()
         started = monotonic()
+        times = _StageTimes()
         messages = asyncio.Queue()
         disconnected = Event()
 
         def publish(message):
             if not disconnected.is_set():
                 message["elapsed_ms"] = round((monotonic() - started) * 1000)
+                if message["type"] in {"progress", "result"}:
+                    message["timings"] = times.advance(message.get("stage", "finalizing"), message["elapsed_ms"])
                 loop.call_soon_threadsafe(messages.put_nowait, message)
 
         def check_cancelled():

@@ -72,6 +72,11 @@ describe('App', () => {
     inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
     fixture.detectChanges();
     expect(stepStatus()).toEqual(['done', 'active', 'active']);
+    partialText += '{"type":"progress","stage":"processing","timings":{"processing_ms":1500,"inference_ms":400,"overlap_ms":400}}\n';
+    inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
+    fixture.detectChanges();
+    expect(stepStatus()).toEqual(['done', 'active', 'paused']);
+    expect(fixture.nativeElement.querySelector('[data-status="paused"] [role="timer"]').textContent.trim()).toBe('0,4 s');
     partialText += '{"type":"progress","stage":"inferring"}\n';
     inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
     fixture.detectChanges();

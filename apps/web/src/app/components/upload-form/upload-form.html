@@ -33,11 +33,12 @@
           <li [attr.data-status]="step.status">
             <span class="step-marker" aria-hidden="true">
               @if (step.status === 'done') { ✓ }
+              @if (step.status === 'paused') { Ⅱ }
             </span>
             <div class="min-w-0 flex-1">
               <div class="flex items-baseline justify-between gap-2">
                 <span class="step-label">{{ step.label }}</span>
-                <span class="sr-only" aria-live="polite">{{ step.label }}: {{ step.status === 'done' ? 'Completado' : step.status === 'active' ? 'En curso' : 'Pendiente' }}</span>
+                <span class="sr-only" aria-live="polite">{{ step.label }}: {{ step.status === 'done' ? 'Completado' : step.status === 'active' ? 'En curso' : step.status === 'paused' ? 'En espera' : 'Pendiente' }}</span>
                 <span class="ml-auto shrink-0 text-sm tabular-nums text-slate-600" role="timer" aria-live="off">
                   {{ step.duration === null ? '' : formatElapsed(step.duration) }}
                 </span>
@@ -45,7 +46,7 @@
                   <span class="text-sm font-semibold tabular-nums text-emerald-800">{{ uploadPercent() }} %</span>
                 }
               </div>
-              @if (step.status === 'active' || (state() === 'queued' && $index === 1)) {
+              @if (step.status === 'active' || step.status === 'paused' || (state() === 'queued' && $index === 1)) {
                 <p class="mt-1 text-sm text-slate-600">{{ step.detail }}</p>
               }
               @if (first && step.status === 'active' && uploadPercent() !== null) {

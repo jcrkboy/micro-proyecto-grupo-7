@@ -3,11 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, defer, filter, map, mergeMap, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { InferenceStage, ModelInfo, PredictionResponse, UploadResponse } from '../models/sleep-api.models';
+import { InferenceStage, ModelInfo, ModelTimings, PredictionResponse, UploadResponse } from '../models/sleep-api.models';
 
 type InferenceUpdate =
-  | { type: 'progress'; stage: InferenceStage; elapsed_ms?: number }
-  | { type: 'result'; prediction: PredictionResponse; elapsed_ms?: number };
+  | { type: 'progress'; stage: InferenceStage; timings?: ModelTimings }
+  | { type: 'result'; prediction: PredictionResponse; timings?: ModelTimings };
 type InferenceEvent = InferenceUpdate | { type: 'error'; detail: string };
 
 @Injectable({ providedIn: 'root' })

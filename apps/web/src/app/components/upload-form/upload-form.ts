@@ -70,6 +70,7 @@ export class UploadFormComponent {
   );
   protected readonly steps = computed(() => {
     const state = this.state();
+    const inferencePaused = (state === 'processing' || state === 'waiting') && this.elapsed()?.inference != null;
     return [
       {
         label: 'Subiendo archivo',
@@ -80,14 +81,14 @@ export class UploadFormComponent {
       {
         label: 'Procesando señales',
         duration: this.elapsed()?.processing ?? null,
-        status: state === 'inferring' ? 'done' : ['processing', 'overlap'].includes(state) ? 'active' : 'pending',
+        status: ['processing', 'overlap'].includes(state) ? 'active' : ['inferring', 'waiting', 'finalizing'].includes(state) ? 'done' : 'pending',
         detail: state === 'queued' ? 'Esperando al modelo.' : 'Filtrando las señales y extrayendo características.',
       },
       {
         label: 'Clasificando etapas del sueño',
         duration: this.elapsed()?.inference ?? null,
-        status: ['overlap', 'inferring'].includes(state) ? 'active' : 'pending',
-        detail: 'Estimando el estadio de cada época de 30 segundos.',
+        status: ['overlap', 'inferring'].includes(state) ? 'active' : inferencePaused ? 'paused' : state === 'finalizing' ? 'done' : 'pending',
+        detail: inferencePaused ? 'En espera. El contador se reanuda cuando el modelo vuelve a clasificar.' : 'Estimando el estadio de cada época de 30 segundos.',
       },
     ];
   });

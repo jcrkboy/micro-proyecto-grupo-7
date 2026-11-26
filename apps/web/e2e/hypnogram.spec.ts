@@ -63,7 +63,8 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
         { type: 'progress', stage: 'processing', elapsed_ms: 1 },
         { type: 'progress', stage: 'overlap', elapsed_ms: 2 },
         { type: 'progress', stage: 'inferring', elapsed_ms: 3 },
-        { type: 'result', elapsed_ms: 4, prediction: inferenceRequestCount === 1 ? prediction : secondPrediction },
+        { type: 'result', elapsed_ms: 4, timings: { processing_ms: 2, inference_ms: 2, overlap_ms: 1 },
+          prediction: inferenceRequestCount === 1 ? prediction : secondPrediction },
       ].map((event) => JSON.stringify(event)).join('\n') + '\n',
     });
   });

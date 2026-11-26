@@ -1,47 +1,44 @@
-import { InferenceStage } from '../models/sleep-api.models';
+import { InferenceStage, ModelTimings } from '../models/sleep-api.models';
 
 export interface AnalysisDurations {
   upload: number;
   processing: number | null;
   inference: number | null;
+  overlap: number;
   total: number;
 }
 
-/** Los hitos del servidor comparten un reloj monotónico, independiente del navegador. */
 export class AnalysisTimer {
   private readonly started = performance.now();
-  private serverOrigin?: number;
   private uploaded?: number;
-  private processing?: number;
-  private inference?: number;
-  private processed?: number;
+  private received = this.started;
+  private stage?: InferenceStage;
+  private timings?: ModelTimings;
 
   uploadComplete(): void {
     this.uploaded = performance.now();
   }
 
-  mark(stage: InferenceStage, serverMs?: number): void {
-    const time = this.eventTime(performance.now(), serverMs);
-    if (stage === 'processing') this.processing ??= time;
-    if (stage === 'overlap' || stage === 'inferring') this.inference ??= time;
-    if (stage === 'inferring') this.processed ??= time;
+  mark(stage: InferenceStage, timings?: ModelTimings): void {
+    this.stage = stage;
+    this.timings = timings;
+    this.received = performance.now();
   }
 
-  read(serverEndMs?: number): AnalysisDurations {
+  read(): AnalysisDurations {
     const now = performance.now();
-    const end = this.eventTime(now, serverEndMs);
+    // Entre avisos, avanza únicamente el contador que sigue activo en el modelo.
+    const delta = now - this.received;
+    const both = this.stage === 'overlap';
+    const processing = this.timings?.processing_ms;
+    const inference = this.timings?.inference_ms;
     return {
       upload: (this.uploaded ?? now) - this.started,
-      processing: this.processing === undefined ? null : Math.max(0, (this.processed ?? end) - this.processing),
-      inference: this.inference === undefined ? null : Math.max(0, end - this.inference),
+      processing: processing == null ? null : processing + (both || this.stage === 'processing' ? delta : 0),
+      inference: inference == null ? null : inference + (both || this.stage === 'inferring' ? delta : 0),
+      overlap: this.timings ? this.timings.overlap_ms + (both ? delta : 0) : 0,
       total: now - this.started,
     };
-  }
-
-  private eventTime(now: number, serverMs?: number): number {
-    if (serverMs === undefined) return now;
-    this.serverOrigin ??= now - serverMs;
-    return this.serverOrigin + serverMs;
   }
 }
 

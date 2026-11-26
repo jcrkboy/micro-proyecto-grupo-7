@@ -96,17 +96,25 @@ for (const { archivo, epocas } of estudios) {
     expect(carga.status()).toBe(201);
     expect(inferencia.status()).toBe(200);
     if (epocas > 2) {
-      await expect(page.locator('.analysis-steps li[data-status="active"]'))
-        .toHaveText([/Procesando señales/, /Clasificando etapas del sueño/], { timeout: 60_000 });
+      await expect(page.locator('.analysis-steps li[data-status="active"]').filter({ hasText: 'Procesando señales' }))
+        .toBeVisible({ timeout: 60_000 });
       await expect(page.getByRole('list', { name: 'Señales elegidas' }).getByRole('listitem')).toHaveText(canales);
     }
     const eventos = (await inferencia.text()).trim().split('\n').map((linea) => JSON.parse(linea));
-    expect(eventos.filter((evento) => evento.type === 'progress').map((evento) => evento.stage))
-      .toEqual(['processing', 'overlap', 'inferring']);
+    const etapas = eventos.filter((evento) => evento.type === 'progress').map((evento) => evento.stage);
+    expect(etapas[0]).toBe('processing');
+    expect(etapas).toContain('inferring');
+    expect(etapas.at(-1)).toBe('finalizing');
     expect(eventos.at(-1).type).toBe('result');
     const hitos = eventos.map((evento) => evento.elapsed_ms);
     expect(hitos.every(Number.isFinite)).toBe(true);
     expect(hitos).toEqual([...hitos].sort((a, b) => a - b));
+    const tiempos = eventos.at(-1).timings;
+    expect(tiempos).toEqual(eventos.at(-2).timings);
+    expect(tiempos.processing_ms).toBeGreaterThan(0);
+    expect(tiempos.inference_ms).toBeGreaterThan(0);
+    expect(tiempos.overlap_ms).toBeLessThanOrEqual(Math.min(tiempos.processing_ms, tiempos.inference_ms));
+    expect(tiempos.processing_ms + tiempos.inference_ms - tiempos.overlap_ms).toBeLessThanOrEqual(hitos.at(-1));
     const resultado = eventos.at(-1).prediction;
     expect(inferencia.request().postDataJSON().channels).toEqual(canales);
     expect(resultado.channels).toEqual(canales);

@@ -65,12 +65,13 @@ export class App implements OnInit {
       .subscribe({
         next: (event) => {
           if (event.type === 'progress') {
-            timer.mark(event.stage, event.elapsed_ms);
+            timer.mark(event.stage, event.timings);
             this.state.set(event.stage);
             refresh();
             return;
           }
-          this.resultDurations.set(timer.read(event.elapsed_ms));
+          timer.mark('finalizing', event.timings);
+          this.resultDurations.set(timer.read());
           this.prediction.set(event.prediction);
           this.state.set('result');
           this.analysisModalOpen.set(false);

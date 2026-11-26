@@ -6,7 +6,7 @@ from threading import Event
 
 from fastapi.testclient import TestClient
 
-from sleep_api.api.routes.predictions import infer_with_progress
+from sleep_api.api.routes.predictions import _StageTimes, infer_with_progress
 from sleep_api.core.config import Settings
 from sleep_api.main import create_app
 from sleep_api.schemas.predictions import InferenceRequest
@@ -126,3 +126,17 @@ def test_disconnecting_progress_stream_stops_server_work():
         assert await asyncio.to_thread(stopped.wait, 5)
 
     asyncio.run(disconnect())
+
+
+def test_stage_times_exclude_idle_gaps_and_count_simultaneous_work_once():
+    times = _StageTimes()
+    times.advance("processing", 1000)
+    times.advance("overlap", 1100)
+    paused = times.advance("processing", 1200)
+    assert paused == {"processing_ms": 200, "inference_ms": 100, "overlap_ms": 100}
+    assert times.advance("inferring", 5500)["inference_ms"] == 100
+    times.advance("waiting", 5600)
+    times.advance("inferring", 5700)
+    final = times.advance("finalizing", 5800)
+    assert final == {"processing_ms": 4500, "inference_ms": 300, "overlap_ms": 100}
+    assert times.advance("finalizing", 9000) == final
