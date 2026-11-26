@@ -8,7 +8,7 @@ from scipy.integrate import trapezoid
 from sleep_staging.config import PreprocessingConfig
 
 
-def _channel_prefix(channel: str) -> str:
+def channel_prefix(channel: str) -> str:
     return channel.replace("EEG ", "").replace("-", "")
 
 
@@ -256,7 +256,7 @@ def extract_epoch_features(
                     slow_wave_epochs[epoch_index, channel_index],
                     spindle_epochs[epoch_index, channel_index],
                     sfreq,
-                    _channel_prefix(channel),
+                    channel_prefix(channel),
                     config,
                 )
             )
@@ -268,7 +268,7 @@ def extract_epoch_features(
     # Seleccionarlas por nombre permite añadir EOG/EMG y cambiar su posición.
     eeg_pair = ("EEG Fpz-Cz", "EEG Pz-Oz")
     if all(channel in channels for channel in eeg_pair):
-        first, second = map(_channel_prefix, eeg_pair)
+        first, second = map(channel_prefix, eeg_pair)
         epsilon = 1e-12
         for band in ("delta", "theta", "alpha", "sigma", "beta"):
             features[f"inter_ratio_{band}"] = (

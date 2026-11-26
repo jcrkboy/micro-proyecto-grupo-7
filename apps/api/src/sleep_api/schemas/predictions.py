@@ -3,6 +3,10 @@ from pydantic import BaseModel, Field
 
 class InferenceRequest(BaseModel):
     upload_id: str = Field(min_length=36, max_length=36)
+    channels: list[str] | None = Field(
+        default=None, min_length=1, max_length=4,
+        description="Canales elegidos. Al omitirlos se usan todos los compatibles del EDF.",
+    )
 
 
 class EpochPrediction(BaseModel):

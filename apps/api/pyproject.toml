@@ -17,11 +17,13 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
+    "edfio>=0.4,<1",
     "httpx>=0.28,<1",
     "pytest>=8,<10",
 ]
 dev = [
     "debugpy>=1.8,<2",
+    "edfio>=0.4,<1",
     "httpx>=0.28,<1",
     "pytest>=8,<10",
 ]

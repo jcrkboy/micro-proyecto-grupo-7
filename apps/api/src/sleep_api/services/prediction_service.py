@@ -22,7 +22,7 @@ class Predictor(Protocol):
     model_version: str
     manifest: ModelManifest
 
-    def predict_edf(self, path: str) -> PredictionResult: ...
+    def predict_edf(self, path: str, channels: list[str] | None = None) -> PredictionResult: ...
 
 
 class PredictionService:
@@ -36,13 +36,13 @@ class PredictionService:
         self.predictor = predictor
         self.model_error = model_error
 
-    def predict(self, upload_id: str) -> InferenceResponse:
+    def predict(self, upload_id: str, channels: list[str] | None = None) -> InferenceResponse:
         if self.predictor is None:
             detail = self.model_error or "El modelo no está cargado"
             raise ModelUnavailableError(detail)
 
         stored = self.uploads.get(upload_id)
-        result = self.predictor.predict_edf(str(stored.file_path))
+        result = self.predictor.predict_edf(str(stored.file_path), channels=channels)
         classes = tuple(self.predictor.manifest.classes)
         epochs = []
         duration_by_stage = {stage: 0.0 for stage in classes}

@@ -21,7 +21,7 @@ class FakePredictor:
         preprocessing=PreprocessingConfig(),
     )
 
-    def predict_edf(self, path: str) -> PredictionResult:
+    def predict_edf(self, path: str, channels: list[str] | None = None) -> PredictionResult:
         assert Path(path).is_file()
         probabilities = np.asarray(
             [

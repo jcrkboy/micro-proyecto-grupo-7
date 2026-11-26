@@ -10,7 +10,13 @@ Todos los comandos deben ejecutarse desde la raíz de
 `apps/api/.env`; puede crearse inicialmente copiando `apps/api/.env.example`.
 El bundle configurado debe contener `manifest.json`, `dart.txt` y `crnn.keras`.
 
-El servicio combina DART (59 %) y CRNN (41 %) en paralelo. Requiere dos EEG (Fpz-Cz y Pz-Oz) y EOG horizontal a 100 Hz. El EMG es opcional. Los archivos del experimento y las etiquetas se usan solo en entrenamiento.
+El servicio combina DART (59 %) y CRNN (41 %) en paralelo. Cada análisis requiere
+al menos una derivación EEG a 100 Hz (`EEG Fpz-Cz` o `EEG Pz-Oz`). También admite
+`EOG horizontal` a 100 Hz y `EMG submental` a 1 o 100 Hz. Los canales omitidos
+aportan ceros en las entradas de ambos modelos. Con un solo EEG, las variables que
+comparan ambas derivaciones también quedan a cero. Cuando se selecciona un EMG
+de 1 Hz, la CRNN aprovecha la envolvente y DART conserva el valor ausente de su
+configuración de entrenamiento para esos registros.
 
 ### Windows
 
@@ -89,9 +95,12 @@ curl -X POST http://localhost:8080/api/v1/uploads \
 ```bash
 curl -X POST http://localhost:8080/api/v1/inferencia \
   -H "Content-Type: application/json" \
-  -d '{"upload_id":"REEMPLAZAR_UUID"}'
+  -d '{"upload_id":"REEMPLAZAR_UUID","channels":["EEG Pz-Oz","EOG horizontal"]}'
 ```
 
+Si se omite `channels`, la API utiliza todos los canales compatibles presentes.
+Con una selección explícita, una combinación inválida devuelve HTTP 422.
+El campo `channels` de la respuesta identifica las señales utilizadas.
 También están disponibles `GET /health`, `GET /api/v1/health` y
 `GET /api/v1/model`. La respuesta de inferencia incluye tiempos, estadio,
 confianza y probabilidades por época, lista para graficar un hipnograma.

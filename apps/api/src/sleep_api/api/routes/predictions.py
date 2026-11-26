@@ -17,7 +17,7 @@ def infer(
     service: Annotated[PredictionService, Depends(get_prediction_service)],
 ) -> InferenceResponse:
     try:
-        return service.predict(payload.upload_id)
+        return service.predict(payload.upload_id, payload.channels)
     except UploadNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ModelUnavailableError as exc:

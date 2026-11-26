@@ -19,7 +19,9 @@ def load_filtered_edf(
     if not edf_path.is_file():
         raise FileNotFoundError(f"No existe el archivo EDF: {edf_path}")
 
-    raw = mne.io.read_raw_edf(edf_path, preload=True, verbose="ERROR")
+    raw = mne.io.read_raw_edf(
+        edf_path, include=list(config.channels), preload=True, verbose="ERROR"
+    )
     missing = [channel for channel in config.channels if channel not in raw.ch_names]
     if missing:
         raise ValueError(
