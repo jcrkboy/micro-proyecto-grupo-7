@@ -69,7 +69,7 @@ Con los valores predeterminados basta el comando de Compose. Si quieres cambiar 
 
 ### Despliegue con Fly.io
 
-Fly.io despliega la web y la API juntas. Durante la demo mantenemos una máquina encendida en Virginia para que el modelo esté listo en la primera visita, incluso después de varias horas sin tráfico. Fly factura la CPU y la memoria también durante esos períodos.
+Fly.io despliega la web y la API en una máquina en Virginia. Con `min_machines_running = 0`, Fly la detiene tras un período sin tráfico y la enciende con la siguiente visita. Esa primera visita puede tardar cerca de un minuto mientras la API carga el modelo. Para mantenerla encendida durante la entrega, cambia el mínimo a `1` y vuelve a desplegar.
 
 El archivo [fly.toml](apps/deploy/fly/fly.toml) usa la etiqueta `latest` de cada imagen publicada por GitHub Actions. La API carga el modelo incluido en su imagen y guarda los EDF en un volumen persistente de 5 GB que se factura por separado.
 
