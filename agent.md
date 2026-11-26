@@ -1,6 +1,6 @@
 # Guía del repositorio Sleep-EDFx
 
-El proyecto clasifica el sueño por épocas de 30 segundos. Cuenta con 44 noches de 22 sujetos de Sleep Telemetry y 12 noches emparejadas de Sleep Cassette. Cada noche utilizable tiene un registro polisomnográfico (PSG) y un hipnograma de referencia. Para preparar el entorno y descargar los datos, sigue el [README principal](README.md).
+El proyecto clasifica el sueño por épocas de 30 segundos. La entrega final usa 44 noches de Sleep Telemetry y 153 de Sleep Cassette, correspondientes a 100 personas. Cada noche utilizable tiene un registro polisomnográfico (PSG) y un hipnograma de referencia. Para preparar el entorno y descargar los datos, sigue el [README principal](README.md).
 
 ## Del EDF al hipnograma
 
@@ -10,17 +10,18 @@ En entrenamiento, el paquete Python extrae características del PSG y usa el hip
 
 | Carpeta | Qué contiene y cuándo consultarla |
 | --- | --- |
-| `data/` | Datos gestionados con DVC. `ST-subjects.xls` contiene metadatos de los sujetos, `sleep-telemetry/` contiene los pares de EDF, `processed/` guarda características precalculadas y `models/` aloja los ajustes `dart_crnn_mixto/evaluacion_80_20/` y `dart_crnn_mixto/final_100/`. La API consume el segundo. |
-| `.dvc/` | Configuración del remoto R2. Git guarda el puntero `data.dvc` en la raíz. Usa `dvc pull` para recuperar los datos y `dvc remote modify --local` para escribir las credenciales en `.dvc/config.local`. |
-| `EDA/` | Análisis exploratorio. `EDA_Sleep_EEG_ST7242J0_individual/` estudia una noche y `EDA_Sleep_EEG_ST7242J0_datset/` recorre las 44. Cada uno tiene su notebook y una carpeta `img/` con figuras. `EDA_Sleep_EEG_ST7242J0/` conserva el informe individual en Markdown con sus gráficos. |
-| `data/sleep-cassette/` y `data/referencias/` | EDF de la entrega parcial de Cassette y predicciones por época de la CRNN de Telemetry. El adaptador de Cassette empareja por sujeto y noche. |
-| `Notebooks/` | Evaluación por persona y entrenamiento final de la combinación geométrica de 70 % DART y 30 % CRNN en Telemetry y Cassette. [Notebook principal](Notebooks/dart_crnn_mixto.ipynb) · [Registro de experimentos](Notebooks/agent.md) |
+| `datos/` | Datos gestionados con DVC. Contiene los metadatos de los sujetos, los EDF, los hipnogramas y las características precalculadas. |
+| `modelos/` | La API carga `dart.txt`, `crnn.keras` y `manifest.json` desde esta carpeta de Git. |
+| `.dvc/` | Configuración del remoto R2. Git guarda los punteros `.dvc` en `datos/`. Usa `dvc pull` para recuperar los datos y `dvc remote modify --local` para escribir las credenciales en `.dvc/config.local`. |
+| `Notebooks/EDA/` | Análisis exploratorio. `EDA_Sleep_EEG_ST7242J0_individual/` estudia una noche y `EDA_Sleep_EEG_ST7242J0_datset/` recorre las 44. Cada uno tiene su notebook y una carpeta `img/` con figuras. `EDA_Sleep_EEG_ST7242J0/` conserva el informe individual en Markdown con sus gráficos. |
+| `datos/sleep-cassette/` y `datos/referencias/` | EDF de la entrega parcial de Cassette y predicciones por época de la CRNN de Telemetry. El adaptador de Cassette empareja por sujeto y noche. |
+| `Notebooks/` | Evaluación por persona y entrenamiento final de la combinación de DART y CRNN en Telemetry y Cassette. [Notebook principal](Notebooks/dart_crnn_mixto.ipynb) · [Registro de experimentos](Notebooks/agent.md) |
 | `Notebooks/experiments/` | `model_jhoan_saavedra_all_channels.ipynb` entrena los controles LightGBM. `model_v6.ipynb` conserva la arquitectura y los resultados originales del compañero. La carpeta también contiene las comparaciones y búsquedas posteriores. |
-| `Notebooks/experiments/historicos/` | Modelos previos y búsquedas de hiperparámetros. `model_jhoan_saavedra_preprocessing_v2.ipynb` exporta el modelo EEG usado por la API. |
+| `Notebooks/experiments/historicos/` | Modelos previos y búsquedas de hiperparámetros. `model_jhoan_saavedra_preprocessing_v2.ipynb` exporta un modelo EEG de una etapa anterior. |
 | `scripts/` | `generate_sample_edf.py` genera un EDF de prueba. `run_lgbm_v2_candidate.py` entrena un candidato LightGBM v2. |
-| `matlab/` | Script MATLAB de referencia y figura del EEG con su hipnograma. |
+| `apoyo/matlab/` | Script MATLAB de referencia y figura del EEG con su hipnograma. |
 | `docs/` | Presentación e informe del MLOps Stack Canvas y maqueta visual de la aplicación. |
-| `manuales/` | Manuales de instalación y de usuario de Sleep-EDFx Studio, y referencia al video de presentación. |
+| `apoyo/manuales/` | Manuales de instalación y de usuario de Sleep-EDFx Studio, y referencia al video de presentación. |
 
 ## Comparación con el experimento del compañero
 
@@ -36,7 +37,7 @@ El corte histórico reserva las noches 41 a 60 en orden de archivo. Sus 20 noche
 | Cassette, 3 sujetos y vigilia completa | 8.449 | 0,3438 | 0,7672 | — |
 | Telemetry, mismas épocas tras el recorte de vigilia del compañero | 9.883 | 0,7927 | 0,7928 | 0,7219 |
 
-El modelo mixto se ajustó con 57.234 épocas de 17 sujetos de Telemetry y 9 de Cassette. La validación reservó a `SC406`, `SC457` y `SC472` en Cassette. Allí solo los dos EEG y el EOG comparten los 100 Hz de Telemetry. Las columnas derivadas del EMG de alta frecuencia se marcan como ausentes para Cassette. El modelo experimental se recupera mediante DVC en `data/experimentos/lightgbm_st_sc/`, con el archivo de pesos y el esquema de ambas cohortes.
+El modelo mixto se ajustó con 57.234 épocas de 17 sujetos de Telemetry y 9 de Cassette. La validación reservó a `SC406`, `SC457` y `SC472` en Cassette. Allí solo los dos EEG y el EOG comparten los 100 Hz de Telemetry. Las columnas derivadas del EMG de alta frecuencia se marcan como ausentes para Cassette. El modelo experimental se recupera mediante DVC en `datos/experimentos/lightgbm_st_sc/`, con el archivo de pesos y el esquema de ambas cohortes.
 
 ### Comparación directa con el híbrido V6
 
@@ -48,7 +49,7 @@ El cruce excluye a SC406, presente en el entrenamiento de V6. Se aplicó el mism
 | SC4722 | 1.130 | 0,5678 | 0,5822 |
 | Ambas noches | 2.225 | 0,5396 | 0,4390 |
 
-Para reproducir el cruce desde la raíz, ejecuta `python scripts/compare_cassette_hybrid.py` después de instalar las dependencias y recuperar los datos con DVC. `data/referencias/hibrido_v6/` contiene la red, el clasificador contextual y las probabilidades iniciales y de transición del HMM. Se conservaron los pesos de Keras y se omitió un campo de cuantización nulo para compatibilidad. El clasificador contextual se guardó en formato de texto nativo de LightGBM.
+Para reproducir el cruce desde la raíz, ejecuta `python scripts/compare_cassette_hybrid.py` después de instalar las dependencias y recuperar los datos con DVC. `datos/referencias/hibrido_v6/` contiene la red, el clasificador contextual y las probabilidades iniciales y de transición del HMM. Se conservaron los pesos de Keras y se omitió un campo de cuantización nulo para compatibilidad. El clasificador contextual se guardó en formato de texto nativo de LightGBM.
 
 ## Paquete Python compartido
 
@@ -80,4 +81,4 @@ La biblioteca está en `packages/sleep-staging/`. Su instalación y dependencias
 
 ## Carpetas locales
 
-En una copia de trabajo también pueden aparecer `.venv/` (entorno Python), `mlruns/` (registros de MLflow), `.pytest_tmp*/` (archivos temporales de pruebas), `.codegraph/` (índice del código) y `.atl/` (registro local de habilidades). En esta copia, `assets/` está vacía.
+En una copia de trabajo también pueden aparecer `.venv/` (entorno Python), `apoyo/mlruns/` (registros de MLflow), `.pytest_tmp*/` (archivos temporales de pruebas), `.codegraph/` (índice del código) y `.atl/` (registro local de habilidades).

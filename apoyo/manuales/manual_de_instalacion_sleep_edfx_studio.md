@@ -69,25 +69,10 @@ cd micro-proyecto-grupo-7
 
 ### 3.2. Instalar el modelo predictivo
 
-Los archivos binarios del modelo no se incluyen dentro de las imágenes Docker, porque la carpeta `data/` está excluida mediante `.dockerignore`. Por tanto, deben estar disponibles en el host de la máquina virtual.
-
-Cree el directorio donde se almacenará el modelo:
+Al clonar el repositorio, Git descarga `manifest.json`, `dart.txt` y `crnn.keras` en `modelos/`. Compose monta esa carpeta en la API como volumen de solo lectura. El siguiente comando muestra los tres archivos desde la raíz del proyecto.
 
 ```bash
-sudo mkdir -p /opt/sleep-edfx/model
-```
-
-Copie los archivos `manifest.json`, `dart.txt` y `crnn.keras` desde la máquina de desarrollo:
-
-```bash
-scp data/models/dart_crnn_mixto/final_100/{manifest.json,dart.txt,crnn.keras} \
-  usuario@vm:/opt/sleep-edfx/model/
-```
-
-Si la máquina virtual tiene configuradas las credenciales de DVC, también puede utilizarse:
-
-```bash
-dvc pull
+ls modelos/
 ```
 
 ### 3.3. Configurar las variables de entorno
@@ -110,7 +95,7 @@ La configuración de ejemplo incluye:
 ```dotenv
 API_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-api:latest
 WEB_IMAGE=ghcr.io/jcrkboy/micro-proyecto-grupo-7-web:latest
-HOST_MODEL_DIR=/opt/sleep-edfx/model
+HOST_MODEL_DIR=../../modelos
 WEB_HOST_PORT=80
 SLEEP_API_MODEL_DIR=/artifacts/model
 SLEEP_API_UPLOAD_DIR=/app/storage/uploads

@@ -1,6 +1,6 @@
 # Experimentos de clasificación de etapas de sueño
 
-El [notebook principal](dart_crnn_mixto.ipynb) usa **70 % DART y 30 % CRNN contextual** en escala logarítmica, sin HMM. Esta combinación obtuvo **81,25 % de F1 macro** en las cinco rondas y **83,48 %** en la reserva del notebook de entrega. El ajuste final usa los 34 participantes y guarda los dos modelos en `data/models/dart_crnn_mixto/`. [Comparación pareada y tareas de la entrega](TASK.md)
+La entrega histórica del [notebook principal](dart_crnn_mixto.ipynb) usó **70 % DART y 30 % CRNN contextual** en escala logarítmica, sin HMM. Esta combinación obtuvo **81,25 % de F1 macro** en las cinco rondas y **83,48 %** en la reserva del notebook de entrega. Aquel ajuste final usó los 34 participantes. La versión actual guarda el modelo final en `modelos/` y la evaluación en `datos/evaluacion_80_20/`. [Comparación pareada y tareas de la entrega](TASK.md)
 
 Los experimentos anteriores y sus salidas están en [experiments/](experiments/). Los primeros modelos de Colab y los cuadernos de la API se conservan en [experiments/historicos/](experiments/historicos/).
 
@@ -34,7 +34,7 @@ Entre las primeras redes pequeñas, la original fue la referencia práctica (86,
 
 ## Cómo se entrenaron
 
-**DART mixto.** LightGBM multiclase sobre 2.280 características tabulares con contexto temporal. Usa 667 iteraciones, tasa de aprendizaje 0,03, profundidad 8, 36 hojas, mínimo 25 ejemplos por hoja, fracción de columnas 0,60 y fracción de filas 0,80 en cada iteración. Regularización L1 0,1 y L2 1,5, `drop_rate=0.1`, `skip_drop=0.5` y semilla 42. Los pesos de clase son N1 2,20, N2 0,41, N3 1,56, REM 1,00 y W 2,01. [Configuración completa y orden de las clases](../data/experimentos/lightgbm_st_sc/experimento.json) · [Notebook de Jhoan](experiments/model_jhoan_saavedra_all_channels.ipynb)
+**DART mixto.** LightGBM multiclase sobre 2.280 características tabulares con contexto temporal. Usa 667 iteraciones, tasa de aprendizaje 0,03, profundidad 8, 36 hojas, mínimo 25 ejemplos por hoja, fracción de columnas 0,60 y fracción de filas 0,80 en cada iteración. Regularización L1 0,1 y L2 1,5, `drop_rate=0.1`, `skip_drop=0.5` y semilla 42. Los pesos de clase son N1 2,20, N2 0,41, N3 1,56, REM 1,00 y W 2,01. [Configuración completa y orden de las clases](../datos/experimentos/lightgbm_st_sc/experimento.json) · [Notebook de Jhoan](experiments/model_jhoan_saavedra_all_channels.ipynb)
 
 **CRNN pequeña original.** Usa las características del segmento actual escaladas con los percentiles 10 y 90 del entrenamiento, con indicador de ausencia del EMG. Lee ventanas de 64 segmentos con paso 32. Aplica Conv1D de 48 filtros y ancho 3 con ReLU, dropout 0,15, GRU bidireccional de 32 unidades por dirección, dropout 0,20 y softmax de cinco clases. Usa Adam a 0,001, lote 32, 12 épocas, ponderación inversa por frecuencia con exponente 0,35 y semilla 42. Se promedian las probabilidades en ventanas solapadas. La fusión por etapa es `0,75 × P(DART) + 0,25 × P(CRNN)`. La residual añade una convolución dilatada, normalización y GRU de 48 unidades por dirección. Entrena 12 épocas a 0,001 y ocho a 0,00035. [Redes y validación](experiments/refinamiento_crnn_pequena.ipynb)
 
@@ -42,7 +42,7 @@ Entre las primeras redes pequeñas, la original fue la referencia práctica (86,
 
 ## Reproducción
 
-Desde la raíz, `dvc pull` recupera los datos que referencia `data.dvc`. Las señales de V6 y los modelos por ronda también usan cachés locales. [Comparación justa](experiments/comparacion_justa_lightgbm_v6.ipynb) prepara las señales en `.sleep-cv/8f83a22b1d3a65d3/` y mide el ajuste DART de la primera ronda. [Validación de la fusión](experiments/lightgbm_transiciones_sueno.ipynb) genera los controles y los modelos DART de las otras rondas en `.sleep-cv/fusion-crnn/663d52206f296fcc/`. Los checkpoints son específicos de su partición. Los notebooks de informes conservan sus salidas. Al reejecutar, las cachés históricas comprueban código, versiones y entradas. Algunos experimentos incluyeron el puntero completo `data.dvc` en su huella. Una revisión posterior de ese puntero puede requerir regenerar la caché incluso cuando el cambio solo añade un modelo entrenado.
+Desde la raíz, `dvc pull` recupera los datos que identifican los punteros de `datos/`. Las señales de V6 y los modelos por ronda también usan cachés locales. [Comparación justa](experiments/comparacion_justa_lightgbm_v6.ipynb) prepara las señales en `.sleep-cv/8f83a22b1d3a65d3/` y mide el ajuste DART de la primera ronda. [Validación de la fusión](experiments/lightgbm_transiciones_sueno.ipynb) genera los controles y los modelos DART de las otras rondas en `.sleep-cv/fusion-crnn/663d52206f296fcc/`. Los checkpoints son específicos de su partición. Los notebooks de informes conservan sus salidas. Al reejecutar, las cachés históricas comprueban código, versiones y entradas. Algunos experimentos incluyeron el puntero completo `data.dvc` en su huella. Una revisión posterior de ese puntero puede requerir regenerar la caché incluso cuando el cambio solo añade un modelo entrenado.
 
 ## Experimento con presupuesto de 20 minutos
 

@@ -54,10 +54,13 @@ STAGE_COLORS = {
     'M':   '#95a5a6',   # Gris
 }
 STAGE_ORDER = ['W', 'N1', 'N2', 'N3', 'REM', 'M']
-BASE = "./data/"
+from pathlib import Path
+
+ROOT = next(p for p in (Path.cwd(), *Path.cwd().parents) if (p / ".dvc/config").is_file())
+BASE = ROOT / "datos" / "sleep-telemetry"
 # Rutas de archivos — ajustar si es necesario
-PSG_PATH  = BASE + 'ST7242J0-PSG.edf'
-HYPO_PATH = BASE + 'ST7242JO-Hypnogram.edf'
+PSG_PATH  = BASE / 'ST7242J0-PSG.edf'
+HYPO_PATH = BASE / 'ST7242JO-Hypnogram.edf'
 
 print('Librerías cargadas correctamente ✓')
 ```

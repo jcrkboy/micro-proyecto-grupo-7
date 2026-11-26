@@ -5,9 +5,9 @@
 
 clear; clc; close all;
 
-BASE = '/Users/juanvalera/Documents/Magister en Inteligencia Artificial/Cuarto Semestre/Cuarto Bimestre/Proyecto - Desarrollo de Soluciones/Proyecto de Grado/Tema 2/micro-proyecto-grupo-7/data/sleep-telemetry/'
-PSG_FILE = [BASE, 'ST7011J0-PSG.edf'];
-HYP_FILE = [BASE, 'ST7011JP-Hypnogram.edf'];
+BASE = fullfile(fileparts(mfilename('fullpath')), '..', '..', 'datos', 'sleep-telemetry');
+PSG_FILE = fullfile(BASE, 'ST7011J0-PSG.edf');
+HYP_FILE = fullfile(BASE, 'ST7011JP-Hypnogram.edf');
 DECIMATE = 5;          % 1 = resolución completa (más lento)
 
 %% ── 1. SEÑALES EEG ───────────────────────────────────────

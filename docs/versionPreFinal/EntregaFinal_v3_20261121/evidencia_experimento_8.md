@@ -16,16 +16,16 @@ El manuscrito de esta entrega es [bare_conf.tex](bare_conf.tex). La numeración 
 | [Contraste adicional con V6 fase C](../../../Notebooks/experiments/comparacion_dart_crnn_vs_v6_holdout.ipynb) | Otras 19 noches de 10 personas de Cassette, 26.653 épocas | Desarrollo de 84 noches. El mixto alcanzó 0.6855 de F1 macro frente a 0.6432 de V6. Diferencia pareada +0.0423, IC 95 % [+0.0148, +0.0645]. |
 | [Exportación final](../../../Notebooks/dart_crnn_mixto_final_100.ipynb) | 100 personas, 197 noches, 457.652 épocas | Ajusta los pesos para inferencia una vez elegida la configuración. |
 
-La documentación histórica de 34 personas y mezcla 70/30 corresponde a una iteración anterior. Las cifras del estudio de 100 personas provienen del notebook mixto actual y de sus manifiestos versionados con DVC.
+La documentación histórica de 34 personas y mezcla 70/30 corresponde a una iteración anterior. Las cifras del estudio de 100 personas provienen del notebook mixto actual y de los manifiestos del ajuste final (Git) y de la evaluación 80/20 (DVC).
 
 ## Reproducir la comparación principal
 
-1. Recuperar los datos de la revisión del repositorio con `dvc pull data.dvc` si faltan los EDF, los hipnogramas o las recetas guardadas.
+1. Recuperar los datos de la revisión del repositorio con `dvc pull` si faltan los EDF, los hipnogramas o las recetas guardadas.
 2. Ejecutar de principio a fin [experimento_8_holdout_datosv4.ipynb](../../../Notebooks/experiments/experimento_8_holdout_datosv4.ipynb) con el entorno Python del proyecto. El cuaderno usa las configuraciones archivadas y reconstruye las cachés que necesite. Los pesos de la evaluación 80/20 y de `final_100` no intervienen en el ajuste de este experimento.
 3. Verificar las 43 personas y 85.796 épocas de desarrollo. La evaluación incluye las dos noches de SC421 a SC430 y comprueba los soportes contra el hipnograma: W 7.393, N1 2.492, N2 9.064, N3 1.600 y REM 3.552.
 4. Leer el F1 global sobre las 24.101 épocas agrupadas. El intervalo de cada diferencia usa 5.000 remuestras de personas con semilla 42. Cambiar la semilla del reparto alteraría el grupo de comparación con V4–V7.
 
-La instantánea de entrada de `data.dvc` tiene huella `ae51fd25be9ee4c6595e91d8748983f4.dir`. Los notebooks históricos corresponden a la revisión `9d04da6`.
+La instantánea histórica de entrada de `data.dvc` tiene huella `ae51fd25be9ee4c6595e91d8748983f4.dir`. Los notebooks históricos corresponden a la revisión `9d04da6`.
 
 Los pesos de este ajuste se aprenden en sujetos disjuntos de la reserva. La reserva ya había guiado decisiones en V4–V7. Además, nueve de estos sujetos pertenecieron al entrenamiento histórico del modelo 80/20, SC429 intervino en la selección de su configuración y SC426 participó en el estudio tabular anterior. Por eso el manuscrito presenta una validación retrospectiva; el contraste con V7 usa sus métricas publicadas sobre las mismas épocas.
 

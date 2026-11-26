@@ -1,4 +1,4 @@
-# Entrega del modelo mixto DART + CRNN
+# Entrega histórica del modelo mixto DART + CRNN
 
 La combinación elegida usa un único LightGBM DART y la CRNN con contexto nocturno. Para cada etapa calcula `0,70 × log P(DART) + 0,30 × log P(CRNN)` y elige la etapa con mayor puntuación. La predicción corresponde a una noche completa. El HMM pertenecía a los experimentos anteriores.
 
@@ -16,12 +16,14 @@ La combinación elegida usa un único LightGBM DART y la CRNN con contexto noctu
 - El resultado histórico de cinco rondas y el resultado de esta reserva 80/20 responden a preguntas distintas. La reserva ya se utilizó durante el desarrollo.
 - Mantener separados los artefactos del 80/20 y los ajustados al 100 %. Los pesos definitivos se destinan a una futura integración. El alcance actual cubre investigación, evaluación y exportación.
 
-## Archivos de la entrega
+## Archivos de la entrega histórica
 
-- [Notebook ejecutado](dart_crnn_mixto.ipynb) con la preparación de datos, evaluación, matrices, ajuste final e inferencia desde un EDF.
-- [Manifiesto de la evaluación](../data/models/dart_crnn_mixto/evaluacion_80_20/manifest.json) con los pesos correspondientes a las 27 personas de entrenamiento. Se recuperaron los pesos de esa partición y se contrastaron con las predicciones históricas antes de guardarlos.
-- [Manifiesto del modelo definitivo](../data/models/dart_crnn_mixto/final_100/manifest.json) con los nombres y SHA-256 de los dos modelos, clases, columnas tabulares, rasgos espectrales, contexto, pesos de mezcla y procedencia. DART tardó 467,86 s y la CRNN 37,23 s en ajustarse con los datos preparados.
-- [Puntero DVC](../data.dvc) con huella `b3df5052590acf14292f499a0b39631e.dir`. La versión contiene los 188 archivos de datos anteriores y seis archivos nuevos de la entrega. Con esta revisión del puntero, `dvc pull data.dvc` recupera el contenido desde R2.
+El puntero DVC de esta sección permite recuperar los pesos originales de la entrega de 34 personas. Los ajustes actuales se distribuyen en [modelos/](../modelos/) y `datos/evaluacion_80_20/`.
+
+- [Notebook ejecutado](https://github.com/jcrkboy/micro-proyecto-grupo-7/blob/976523941c351003f186faf0fb68f321ef77a893/Notebooks/dart_crnn_mixto.ipynb) con la preparación de datos, evaluación, matrices, ajuste final e inferencia desde un EDF.
+- Manifiesto histórico de la evaluación (`evaluacion_80_20/manifest.json`) con los pesos correspondientes a las 27 personas de entrenamiento. Se recuperaron los pesos de esa partición y se contrastaron con las predicciones históricas antes de guardarlos.
+- Manifiesto histórico del modelo definitivo (`final_100/manifest.json`) con los nombres y SHA-256 de los dos modelos, clases, columnas tabulares, rasgos espectrales, contexto, pesos de mezcla y procedencia. DART tardó 467,86 s y la CRNN 37,23 s en ajustarse con los datos preparados.
+- [Puntero DVC](https://github.com/jcrkboy/micro-proyecto-grupo-7/blob/976523941c351003f186faf0fb68f321ef77a893/data.dvc) con huella `b3df5052590acf14292f499a0b39631e.dir`. La versión contiene los 188 archivos de datos anteriores y seis archivos nuevos de la entrega. Con esta revisión del puntero, `dvc pull data.dvc` recupera el contenido desde R2.
 
 ## Evidencia sobre las mismas personas
 

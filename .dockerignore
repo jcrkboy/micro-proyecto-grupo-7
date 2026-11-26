@@ -6,9 +6,8 @@
 **/__pycache__
 **/*.pyc
 **/.env
-data
-EDA
+datos
+modelos
+apoyo
 Notebooks
-matlab
-mlruns
 .pytest_tmp_*
