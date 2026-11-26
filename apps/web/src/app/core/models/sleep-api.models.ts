@@ -1,6 +1,13 @@
 export const SLEEP_STAGES = ['W', 'REM', 'N1', 'N2', 'N3'] as const;
 export type SleepStage = (typeof SLEEP_STAGES)[number];
 
+export type InferenceStage = 'processing' | 'overlap' | 'inferring';
+export type WorkflowState = 'ready' | 'uploading' | 'queued' | InferenceStage | 'result' | 'error';
+
+export function analysisInProgress(state: WorkflowState): boolean {
+  return state !== 'ready' && state !== 'result' && state !== 'error';
+}
+
 export interface ModelInfo {
   model_ready: boolean;
   artifact_version?: number | null;

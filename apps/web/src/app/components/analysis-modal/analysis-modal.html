@@ -22,8 +22,11 @@
 
     <app-upload-form
       [state]="state()"
+      [uploadPercent]="uploadPercent()"
+      [elapsed]="elapsed()"
       [modal]="true"
       (analyzeRequest)="analyzeRequest.emit($event)"
+      (cancelRequest)="cancelRequest.emit()"
     />
 
     @if (errorMessage()) {

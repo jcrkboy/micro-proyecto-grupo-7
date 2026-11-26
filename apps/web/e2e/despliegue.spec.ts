@@ -31,6 +31,31 @@ test('lee la cabecera localmente y reinicia la selección al reemplazar el EDF',
   expect(cargas).toHaveLength(0);
 });
 
+test('cancela una inferencia en curso y permite reutilizar la selección', async ({ page }) => {
+  const ruta = resolve(__dirname, '../../..', estudios[1].archivo);
+  test.skip(!existsSync(ruta), 'El EDF nocturno se obtiene con DVC.');
+  test.setTimeout(120_000);
+  await page.goto('/');
+  await page.getByLabel('Nombre o identificador del paciente').fill('Prueba de cancelación');
+  await page.locator('#edf-file').setInputFiles(ruta);
+  await page.getByRole('checkbox', { name: /EEG Fpz-Cz/ }).uncheck();
+  const button = page.getByRole('button', { name: 'Analizar registro' });
+  await button.click();
+  const signals = page.getByRole('list', { name: 'Señales elegidas' });
+  await expect(signals.getByRole('listitem')).toHaveText(['EEG Pz-Oz', 'EOG horizontal', 'EMG submental']);
+  await expect(page.locator('li[data-status="active"]').filter({ hasText: 'Procesando señales' })).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('.analysis-steps li').nth(1).getByRole('timer')).toContainText(/\d.*s/);
+  const aborted = page.waitForEvent('requestfailed', (request) => request.url().endsWith('/inferencia/progreso'));
+  await page.getByRole('button', { name: 'Cancelar' }).click();
+  await aborted;
+  await expect(button).toBeFocused();
+  await expect(page.getByLabel('Nombre o identificador del paciente')).toHaveValue('Prueba de cancelación');
+  await expect(page.getByText('example.edf', { exact: true })).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: /EEG Fpz-Cz/ })).not.toBeChecked();
+  await expect(page.getByRole('checkbox', { name: /EEG Pz-Oz/ })).toBeChecked();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 for (const { archivo, epocas } of estudios) {
   test(`procesa ${archivo} con el modelo desplegado`, async ({ page }, testInfo) => {
     const ruta = resolve(__dirname, '../../..', archivo);
@@ -57,18 +82,32 @@ for (const { archivo, epocas } of estudios) {
       await eog.uncheck();
       canales = ['EEG Pz-Oz'];
     } else {
+      await page.setViewportSize({ width: 1280, height: 640 });
       await expect(page.getByRole('checkbox', { name: /EMG submental/ })).toBeChecked();
       await expect(page.getByRole('checkbox', { name: /Marker/ })).toBeDisabled();
+      expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(640);
     }
     await page.locator('app-upload-form').screenshot({ path: testInfo.outputPath('seleccion-canales.png') });
     const [carga, inferencia] = await Promise.all([
       page.waitForResponse('**/api/v1/uploads'),
-      page.waitForResponse('**/api/v1/inferencia', { timeout: 310_000 }),
+      page.waitForResponse('**/api/v1/inferencia/progreso', { timeout: 310_000 }),
       page.getByRole('button', { name: 'Analizar registro' }).click(),
     ]);
     expect(carga.status()).toBe(201);
     expect(inferencia.status()).toBe(200);
-    const resultado = await inferencia.json();
+    if (epocas > 2) {
+      await expect(page.locator('.analysis-steps li[data-status="active"]'))
+        .toHaveText([/Procesando señales/, /Clasificando etapas del sueño/], { timeout: 60_000 });
+      await expect(page.getByRole('list', { name: 'Señales elegidas' }).getByRole('listitem')).toHaveText(canales);
+    }
+    const eventos = (await inferencia.text()).trim().split('\n').map((linea) => JSON.parse(linea));
+    expect(eventos.filter((evento) => evento.type === 'progress').map((evento) => evento.stage))
+      .toEqual(['processing', 'overlap', 'inferring']);
+    expect(eventos.at(-1).type).toBe('result');
+    const hitos = eventos.map((evento) => evento.elapsed_ms);
+    expect(hitos.every(Number.isFinite)).toBe(true);
+    expect(hitos).toEqual([...hitos].sort((a, b) => a - b));
+    const resultado = eventos.at(-1).prediction;
     expect(inferencia.request().postDataJSON().channels).toEqual(canales);
     expect(resultado.channels).toEqual(canales);
     expect(resultado.upload_id).toBe((await carga.json()).upload_id);
@@ -76,6 +115,7 @@ for (const { archivo, epocas } of estudios) {
     expect(resultado.summary.total_duration_seconds).toBe(epocas * 30);
 
     await expect(page.getByRole('heading', { name: 'Resumen de Prueba de despliegue' })).toBeVisible();
+    await expect(page.locator('.result-timings dd')).toHaveText([/\d.*s/, /\d.*s/, /\d.*s/, /\d.*s/]);
     await expect(page.getByText(`${epocas} épocas ·`, { exact: false })).toBeVisible();
     await expect(page.locator('app-hypnogram canvas').first()).toBeVisible();
     await page.screenshot({

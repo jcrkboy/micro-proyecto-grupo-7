@@ -1,4 +1,4 @@
-<section
+<section #card [class.showing-progress]="busy()"
   class="rounded-[2rem] border border-white/90 bg-white/88 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur sm:p-7"
   aria-labelledby="upload-title"
 >
@@ -7,18 +7,60 @@
       <p class="text-xs font-semibold tracking-[0.18em] text-emerald-700 uppercase">
         Nuevo estudio
       </p>
-      <h2 id="upload-title" class="mt-2 text-2xl font-semibold tracking-tight">
-        Carga del registro
+      <h2 id="upload-title" tabindex="-1" class="mt-2 text-2xl font-semibold tracking-tight">
+        {{ busy() ? 'Análisis del registro' : 'Carga del registro' }}
       </h2>
     </div>
     <span
       class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500"
       [class.mr-12]="modal()"
-      >EDF · máx. {{ maxSizeMiB }} MiB</span
+      >{{ busy() ? 'En curso' : 'EDF · máx. ' + maxSizeMiB + ' MiB' }}</span
     >
   </div>
 
-  <form class="mt-7 space-y-5" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="panel-content">
+  @if (busy()) {
+    <div class="progress-panel mt-5">
+      <p class="truncate text-sm font-medium text-slate-600">{{ file.value?.name }}</p>
+      <div class="selected-signals">
+        <span>Señales elegidas</span>
+        <ul aria-label="Señales elegidas">
+          @for (channel of selected(); track channel) { <li>{{ channel }}</li> }
+        </ul>
+      </div>
+      <ol class="analysis-steps" aria-label="Progreso del análisis">
+        @for (step of steps(); track step.label; let first = $first) {
+          <li [attr.data-status]="step.status">
+            <span class="step-marker" aria-hidden="true">
+              @if (step.status === 'done') { ✓ }
+            </span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-baseline justify-between gap-2">
+                <span class="step-label">{{ step.label }}</span>
+                <span class="sr-only" aria-live="polite">{{ step.label }}: {{ step.status === 'done' ? 'Completado' : step.status === 'active' ? 'En curso' : 'Pendiente' }}</span>
+                <span class="ml-auto shrink-0 text-sm tabular-nums text-slate-600" role="timer" aria-live="off">
+                  {{ step.duration === null ? '' : formatElapsed(step.duration) }}
+                </span>
+                @if (first && step.status === 'active' && uploadPercent() !== null) {
+                  <span class="text-sm font-semibold tabular-nums text-emerald-800">{{ uploadPercent() }} %</span>
+                }
+              </div>
+              @if (step.status === 'active' || (state() === 'queued' && $index === 1)) {
+                <p class="mt-1 text-sm text-slate-600">{{ step.detail }}</p>
+              }
+              @if (first && step.status === 'active' && uploadPercent() !== null) {
+                <progress class="upload-progress" aria-label="Archivo enviado" max="100" [value]="uploadPercent()"></progress>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+      <div class="mt-5 flex justify-end">
+        <button class="cancel-button" type="button" (click)="cancel()">Cancelar</button>
+      </div>
+    </div>
+  } @else {
+  <form animate.leave="form-exit" class="study-form mt-7 space-y-5" [class.has-file]="!!file.value" [formGroup]="form" (ngSubmit)="submit()">
     <div>
       <label for="patient-name" class="mb-2 block text-sm font-semibold text-slate-700"
         >Nombre o identificador del paciente</label
@@ -43,7 +85,7 @@
       <span class="mb-2 block text-sm font-semibold text-slate-700">Archivo polisomnográfico</span>
       <label
         for="edf-file"
-        class="group flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/80 px-5 text-center transition hover:border-emerald-400 hover:bg-emerald-50/50"
+        class="file-picker group flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/80 px-5 text-center transition hover:border-emerald-400 hover:bg-emerald-50/50"
         [class.border-red-300]="file.touched && file.invalid"
       >
         <input
@@ -56,7 +98,7 @@
           (change)="onFileSelected($event)"
         />
         <span
-          class="grid size-12 place-items-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200 transition group-hover:-translate-y-0.5"
+          class="file-icon grid size-12 shrink-0 place-items-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200 transition group-hover:-translate-y-0.5"
           aria-hidden="true"
         >
           <svg viewBox="0 0 24 24" class="size-6 fill-none stroke-current" stroke-width="1.8">
@@ -64,12 +106,11 @@
           </svg>
         </span>
         @if (file.value; as selected) {
-          <strong class="mt-3 max-w-full truncate text-sm text-slate-800">{{
-            selected.name
-          }}</strong>
-          <span class="mt-1 text-xs text-slate-500"
-            >{{ formatSize(selected.size) }} · Haz clic para reemplazar</span
-          >
+          <span class="min-w-0 flex-1">
+            <strong class="block truncate text-sm text-slate-800" [title]="selected.name">{{ selected.name }}</strong>
+            <span class="block text-xs text-slate-600">{{ formatSize(selected.size) }}</span>
+          </span>
+          <span class="shrink-0 text-xs font-semibold text-emerald-800">Reemplazar</span>
         } @else {
           <strong class="mt-3 text-sm text-slate-800">Selecciona un archivo EDF</strong>
           <span class="mt-1 text-xs text-slate-500">No se carga hasta iniciar el análisis</span>
@@ -102,7 +143,7 @@
     @if (available(); as channels) {
       <fieldset class="space-y-2" [disabled]="busy()">
         <legend class="mb-2 text-sm font-semibold text-slate-700">Canales del registro</legend>
-        <div class="grid gap-2 sm:grid-cols-2">
+        <div class="channel-grid grid gap-2 sm:grid-cols-2">
           @for (channel of channels; track channel.name) {
             <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm"
               [class.cursor-pointer]="channel.selectable" [class.bg-slate-50]="!channel.selectable">
@@ -128,16 +169,10 @@
       class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#113d39] px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/15 transition hover:-translate-y-0.5 hover:bg-[#164b46] disabled:cursor-wait disabled:opacity-65 disabled:hover:translate-y-0"
       type="submit"
       [disabled]="busy() || reading() || (!!file.value && !hasSelectedEeg())"
-      aria-live="polite"
     >
-      @if (busy()) {
-        <span
-          class="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white"
-          aria-hidden="true"
-        ></span>
-      }
-      {{ statusLabel() }}
+      Analizar registro
     </button>
   </form>
-
+  }
+  </div>
 </section>

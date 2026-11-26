@@ -1,6 +1,7 @@
 import { Component, ElementRef, computed, effect, input, output, viewChild } from '@angular/core';
 
-import type { WorkflowState } from '../../app';
+import { WorkflowState, analysisInProgress } from '../../core/models/sleep-api.models';
+import { AnalysisDurations } from '../../core/utils/analysis-timing';
 import { AnalysisRequest, UploadFormComponent } from '../upload-form/upload-form';
 
 @Component({
@@ -12,11 +13,14 @@ import { AnalysisRequest, UploadFormComponent } from '../upload-form/upload-form
 export class AnalysisModalComponent {
   readonly open = input.required<boolean>();
   readonly state = input.required<WorkflowState>();
+  readonly uploadPercent = input<number | null>(null);
+  readonly elapsed = input<AnalysisDurations | null>(null);
   readonly errorMessage = input<string | null>(null);
   readonly analyzeRequest = output<AnalysisRequest>();
+  readonly cancelRequest = output<void>();
   readonly closeRequest = output<void>();
 
-  protected readonly busy = computed(() => ['uploading', 'processing'].includes(this.state()));
+  protected readonly busy = computed(() => analysisInProgress(this.state()));
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');
   private readonly closeButton = viewChild<ElementRef<HTMLButtonElement>>('closeButton');
 

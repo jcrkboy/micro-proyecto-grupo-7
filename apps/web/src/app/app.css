@@ -2,6 +2,13 @@
   display: block;
 }
 
+@media (min-width: 64rem) and (max-height: 60rem) {
+  .study-entry { padding-block: 1.25rem; }
+}
+@media (min-width: 64rem) and (max-height: 46rem) {
+  .study-entry { padding-block: 0.625rem; }
+}
+
 .metric-card {
   display: flex;
   min-width: 0;
@@ -16,6 +23,19 @@
   font-size: 1.1rem;
   letter-spacing: -0.02em;
 }
+
+.result-timings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 1.15rem;
+  margin-top: 0.7rem;
+  color: #475569;
+  font-size: 0.82rem;
+}
+.result-timings div { display: flex; gap: 0.35rem; align-items: baseline; }
+.result-timings dd { font-weight: 600; font-variant-numeric: tabular-nums; }
+.result-timings div:first-child { color: #11584d; font-weight: 650; }
 .metric-card span {
   margin-top: 0.15rem;
   color: #64748b;

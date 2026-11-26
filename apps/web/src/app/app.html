@@ -66,7 +66,7 @@
     </p>
   </dialog>
 
-  <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">
+  <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16" [class.study-entry]="!prediction()">
     @if (prediction(); as result) {
       <section class="space-y-6 animate-reveal" aria-label="Resultado del análisis">
         <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -77,6 +77,14 @@
             <h2 class="mt-2 text-3xl font-semibold tracking-tight">
               Resumen de {{ result.patient_name }}
             </h2>
+            @if (resultDurations(); as times) {
+              <dl class="result-timings" aria-label="Tiempos del análisis">
+                <div><dt>Tiempo total</dt><dd>{{ formatElapsed(times.total) }}</dd></div>
+                <div><dt>Carga</dt><dd>{{ formatElapsed(times.upload) }}</dd></div>
+                <div><dt>Procesamiento</dt><dd>{{ formatElapsed(times.processing) }}</dd></div>
+                <div><dt>Análisis</dt><dd>{{ formatElapsed(times.inference) }}</dd></div>
+              </dl>
+            }
             <p class="mt-2 text-sm text-slate-500">
               {{ result.summary.total_epochs }} épocas · {{ result.model_version }} ·
               {{ result.channels.join(' + ') }}
@@ -149,7 +157,8 @@
           </div>
         </div>
 
-        <app-upload-form [state]="state()" (analyzeRequest)="analyze($event)" />
+        <app-upload-form [state]="state()" [uploadPercent]="uploadPercent()" [elapsed]="elapsed()"
+          (analyzeRequest)="analyze($event)" (cancelRequest)="cancelAnalysis()" />
       </div>
 
       @if (errorMessage()) {
@@ -179,8 +188,11 @@
     <app-analysis-modal
       [open]="true"
       [state]="state()"
+      [uploadPercent]="uploadPercent()"
+      [elapsed]="elapsed()"
       [errorMessage]="errorMessage()"
       (analyzeRequest)="analyze($event)"
+      (cancelRequest)="cancelAnalysis()"
       (closeRequest)="closeNewAnalysis()"
     />
   }

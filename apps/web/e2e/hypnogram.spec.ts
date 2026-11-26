@@ -54,10 +54,18 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
       },
     });
   });
-  await page.route('**/api/v1/inferencia', async (route) => {
+  await page.route('**/api/v1/inferencia/progreso', async (route) => {
     inferenceRequestCount += 1;
     await (inferenceRequestCount === 1 ? inferenceGate : secondInferenceGate);
-    await route.fulfill({ json: inferenceRequestCount === 1 ? prediction : secondPrediction });
+    await route.fulfill({
+      contentType: 'application/x-ndjson',
+      body: [
+        { type: 'progress', stage: 'processing', elapsed_ms: 1 },
+        { type: 'progress', stage: 'overlap', elapsed_ms: 2 },
+        { type: 'progress', stage: 'inferring', elapsed_ms: 3 },
+        { type: 'result', elapsed_ms: 4, prediction: inferenceRequestCount === 1 ? prediction : secondPrediction },
+      ].map((event) => JSON.stringify(event)).join('\n') + '\n',
+    });
   });
 
   await page.goto('/');
@@ -76,9 +84,9 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   });
   await page.getByRole('button', { name: 'Analizar registro' }).click();
 
-  await expect(page.getByRole('button', { name: 'Cargando archivo…' })).toBeVisible();
+  await expect(page.locator('li[data-status="active"]')).toContainText('Subiendo archivo');
   releaseUpload();
-  await expect(page.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
+  await expect(page.getByText('Esperando al modelo.')).toBeVisible();
   const about = page.getByRole('button', { name: 'Acerca de' });
   await about.click();
   const info = page.getByRole('dialog', { name: 'Acerca de Sleep-EDFx Studio' });
@@ -86,11 +94,14 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   await page.keyboard.press('Escape');
   await expect(info).toBeHidden();
   await expect(about).toBeFocused();
+  await expect(page.locator('form.study-form')).toHaveCount(0);
   await expect(page.getByText('registro.edf', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
+  await expect(page.getByText('Esperando al modelo.')).toBeVisible();
   releaseInference();
 
   await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
+  const originalTimes = await page.locator('.result-timings dd').allTextContents();
+  expect(originalTimes.slice(2)).toEqual(['< 0,1 s', '< 0,1 s']);
   await expect(page.getByText('Convierte un estudio de sueño')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Hipnograma' })).toBeVisible();
   await expect(page.locator('app-hypnogram canvas').first()).toBeVisible();
@@ -188,14 +199,15 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   });
   await modal.getByRole('button', { name: 'Analizar registro' }).click();
 
-  await expect(modal.getByRole('button', { name: 'Cargando archivo…' })).toBeVisible();
+  await expect(modal.locator('li[data-status="active"]')).toContainText('Subiendo archivo');
+  expect(await page.locator('.result-timings dd').allTextContents()).toEqual(originalTimes);
   await expect(modal.getByRole('button', { name: 'Cerrar nuevo análisis' })).toBeDisabled();
   await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(modal).toBeVisible();
 
   releaseSecondUpload();
-  await expect(modal.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
+  await expect(modal.getByText('Esperando al modelo.')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
   releaseSecondInference();
 

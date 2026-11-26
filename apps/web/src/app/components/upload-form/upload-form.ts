@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -8,8 +8,9 @@ import {
   Validators,
 } from '@angular/forms';
 
-import type { WorkflowState } from '../../app';
+import { WorkflowState, analysisInProgress } from '../../core/models/sleep-api.models';
 import { EdfChannel, hasEeg, readEdfChannels } from '../../core/utils/edf-channels';
+import { AnalysisDurations, formatElapsed } from '../../core/utils/analysis-timing';
 
 export const MAX_EDF_BYTES = 70 * 1024 * 1024;
 
@@ -41,8 +42,14 @@ function nonBlank(control: AbstractControl<string>): ValidationErrors | null {
 export class UploadFormComponent {
   protected readonly maxSizeMiB = MAX_EDF_BYTES / (1024 * 1024);
   readonly state = input.required<WorkflowState>();
+  readonly uploadPercent = input<number | null>(null);
+  readonly elapsed = input<AnalysisDurations | null>(null);
   readonly modal = input(false);
   readonly analyzeRequest = output<AnalysisRequest>();
+  readonly cancelRequest = output<void>();
+  private readonly card = viewChild.required<ElementRef<HTMLElement>>('card');
+  private readonly injector = inject(Injector);
+  protected readonly formatElapsed = formatElapsed;
 
   protected readonly patientName = new FormControl('', {
     nonNullable: true,
@@ -52,7 +59,7 @@ export class UploadFormComponent {
     validators: [Validators.required, validEdf],
   });
   protected readonly form = new FormGroup({ patientName: this.patientName, file: this.file });
-  protected readonly busy = computed(() => ['uploading', 'processing'].includes(this.state()));
+  protected readonly busy = computed(() => analysisInProgress(this.state()));
   protected readonly reading = signal(false);
   protected readonly readError = signal('');
   protected readonly available = signal<EdfChannel[] | null>(null);
@@ -61,12 +68,28 @@ export class UploadFormComponent {
   protected readonly hasAvailableEeg = computed(() =>
     hasEeg((this.available() ?? []).filter((ch) => ch.selectable).map((ch) => ch.name)),
   );
-  protected readonly statusLabel = computed(() => {
-    const labels: Partial<Record<WorkflowState, string>> = {
-      uploading: 'Cargando archivo…',
-      processing: 'Procesando señal…',
-    };
-    return labels[this.state()] ?? 'Analizar registro';
+  protected readonly steps = computed(() => {
+    const state = this.state();
+    return [
+      {
+        label: 'Subiendo archivo',
+        duration: this.elapsed()?.upload ?? null,
+        status: state === 'uploading' ? 'active' : 'done',
+        detail: this.uploadPercent() === 100 ? 'Esperando confirmación de la carga.' : 'Enviando el EDF.',
+      },
+      {
+        label: 'Procesando señales',
+        duration: this.elapsed()?.processing ?? null,
+        status: state === 'inferring' ? 'done' : ['processing', 'overlap'].includes(state) ? 'active' : 'pending',
+        detail: state === 'queued' ? 'Esperando al modelo.' : 'Filtrando las señales y extrayendo características.',
+      },
+      {
+        label: 'Clasificando etapas del sueño',
+        duration: this.elapsed()?.inference ?? null,
+        status: ['overlap', 'inferring'].includes(state) ? 'active' : 'pending',
+        detail: 'Estimando el estadio de cada época de 30 segundos.',
+      },
+    ];
   });
 
   protected async onFileSelected(event: Event): Promise<void> {
@@ -101,7 +124,29 @@ export class UploadFormComponent {
     this.form.markAllAsTouched();
     const file = this.file.value;
     if (this.form.invalid || !file || this.busy() || !this.hasSelectedEeg()) return;
+    const card = this.card().nativeElement;
+    const previousHeight = card.getBoundingClientRect().height;
     this.analyzeRequest.emit({ patientName: this.patientName.value.trim(), file, channels: this.selected() });
+    afterNextRender(() => {
+      if (!this.busy()) return;
+      card.querySelector('form.form-exit')?.setAttribute('inert', '');
+      card.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
+      if (card.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const target = CSS.supports('interpolate-size', 'allow-keywords') ? 'auto' : card.getBoundingClientRect().height + 'px';
+        card.animate(
+          [{ height: previousHeight + 'px' }, { height: target }],
+          { duration: 360, easing: 'cubic-bezier(.22,.68,.2,1)' },
+        );
+      }
+    }, { injector: this.injector });
+  }
+
+  protected cancel(): void {
+    this.card().nativeElement.getAnimations?.().forEach((animation) => animation.cancel());
+    this.cancelRequest.emit();
+    afterNextRender(() => {
+      this.card().nativeElement.querySelector<HTMLButtonElement>('form:not(.form-exit) button[type=submit]')?.focus();
+    }, { injector: this.injector });
   }
 
   protected formatSize(bytes: number): string {

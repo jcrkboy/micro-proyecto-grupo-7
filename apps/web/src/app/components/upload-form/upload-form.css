@@ -1,3 +1,93 @@
 :host {
   display: block;
+  min-width: 0;
+}
+
+.has-file .file-picker {
+  min-height: 0;
+  flex-direction: row;
+  gap: 0.75rem;
+  padding: 0.65rem 0.875rem;
+  border-radius: 1rem;
+  text-align: left;
+}
+.has-file .file-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+}
+
+.analysis-steps {
+  margin-top: 1.125rem;
+  padding: 0;
+  list-style: none;
+}
+.panel-content { position: relative; display: flow-root; }
+.showing-progress { overflow: clip; interpolate-size: allow-keywords; }
+.selected-signals { margin-top: 0.65rem; color: #475569; font-size: 0.78rem; }
+.selected-signals ul { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+.selected-signals li { padding: 0.15rem 0.55rem; border-radius: 0.5rem; background: #ecf7f3; color: #19594b; }
+.cancel-button { padding: 0.5rem 1.1rem; border: 1px solid #cbd5e1; border-radius: 999px; color: #334155; font-size: 0.875rem; font-weight: 600; }
+.cancel-button:hover { background: #f8fafc; }
+.form-exit { position: absolute; inset: 0 0 auto; pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .form-exit { animation: form-out 150ms ease-out both; }
+  .progress-panel { animation: steps-in 260ms 85ms ease-out both; }
+}
+@keyframes form-out { to { opacity: 0; transform: translateY(-5px); } }
+@keyframes steps-in { from { opacity: 0; transform: translateY(7px); } }
+.analysis-steps li {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding-bottom: 1.25rem;
+}
+.analysis-steps li:last-child { padding-bottom: 0; }
+.analysis-steps li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 1.5rem;
+  bottom: 0;
+  left: 0.7rem;
+  border-left: 2px solid #e2e8f0;
+}
+.step-marker {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  place-items: center;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+}
+.step-label { color: #475569; font-weight: 600; }
+[data-status=active] .step-label { color: #113d39; }
+[data-status=active] .step-marker {
+  border-color: #a7e1ce;
+  border-top-color: #047857;
+  animation: progress-spin 1s linear infinite;
+}
+[data-status=done] .step-marker { border-color: #047857; background: #047857; color: white; }
+.upload-progress { display: block; width: 100%; height: 0.45rem; margin-top: 0.65rem; accent-color: #047857; }
+@keyframes progress-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-status=active] .step-marker { animation: none; }
+}
+@media (min-width: 64rem) and (max-height: 54rem) {
+  .study-form.has-file { margin-top: 1rem; }
+  .has-file > :not(:last-child) { margin-block-end: 0.75rem; }
+  .has-file .channel-grid label { padding-block: 0.3rem; }
+}
+@media (min-width: 64rem) and (max-height: 46rem) {
+  section:has(.study-form.has-file), section.showing-progress { padding-block: 1rem; }
+  .has-file #patient-name { padding-block: 0.5rem; }
+  .has-file #edf-signals { line-height: 1.25rem; }
+  .has-file .channel-grid label > span {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+  }
+  .has-file button[type=submit] { padding-block: 0.625rem; }
 }

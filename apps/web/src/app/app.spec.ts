@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpEventType, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -43,9 +43,14 @@ describe('App', () => {
     });
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Cargando archivo…');
+    const stepStatus = () => Array.from(fixture.nativeElement.querySelectorAll('.analysis-steps li'),
+      (step) => (step as HTMLElement).dataset['status']);
+    expect(stepStatus()).toEqual(['active', 'pending', 'pending']);
     const upload = http.expectOne('/api/v1/uploads');
     expect(upload.request.method).toBe('POST');
+    upload.event({ type: HttpEventType.UploadProgress, loaded: 65, total: 100 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('progress').value).toBe(65);
 
     upload.flush({
       upload_id: '00000000-0000-0000-0000-000000000000',
@@ -57,9 +62,44 @@ describe('App', () => {
     });
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Procesando señal…');
-    http
-      .expectOne('/api/v1/inferencia')
-      .flush({ detail: 'Fin de la prueba' }, { status: 500, statusText: 'Test' });
+    expect(stepStatus()).toEqual(['done', 'pending', 'pending']);
+    const inference = http.expectOne('/api/v1/inferencia/progreso');
+    let partialText = '{"type":"progress","stage":"processing"}\n{"type":"pro';
+    inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
+    fixture.detectChanges();
+    expect(stepStatus()).toEqual(['done', 'active', 'pending']);
+    partialText += 'gress","stage":"overlap"}\n';
+    inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
+    fixture.detectChanges();
+    expect(stepStatus()).toEqual(['done', 'active', 'active']);
+    partialText += '{"type":"progress","stage":"inferring"}\n';
+    inference.event({ type: HttpEventType.DownloadProgress, loaded: partialText.length, partialText });
+    fixture.detectChanges();
+    expect(stepStatus()).toEqual(['done', 'done', 'active']);
+    inference.flush(partialText + '{"type":"error","detail":"Fin de la prueba"}\n');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Fin de la prueba');
+  });
+
+  it.each(['uploading', 'inferring'])('aborta la petición activa al cancelar en %s', (stage) => {
+    const fixture = TestBed.createComponent(App);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    http.expectOne('/api/v1/model').flush({ model_ready: true, channels: [], classes: [] });
+    const form = fixture.debugElement.query(By.directive(UploadFormComponent)).componentInstance;
+    form.analyzeRequest.emit({ patientName: 'Prueba', file: new File(['edf'], 'noche.edf'), channels: ['EEG Pz-Oz'] });
+    let active = http.expectOne('/api/v1/uploads');
+    if (stage === 'inferring') {
+      active.flush({ upload_id: 'id' });
+      active = http.expectOne('/api/v1/inferencia/progreso');
+      active.event({ type: HttpEventType.DownloadProgress, loaded: 45, partialText: '{"type":"progress","stage":"inferring"}\n' });
+    }
+    fixture.detectChanges();
+    form.cancelRequest.emit();
+    fixture.detectChanges();
+    expect(active.cancelled).toBe(true);
+    expect(fixture.nativeElement.querySelector('.analysis-steps')).toBeNull();
+    expect(fixture.nativeElement.querySelector('form')).toBeTruthy();
+    http.verify();
   });
 });

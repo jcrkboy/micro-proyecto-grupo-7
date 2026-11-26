@@ -1,16 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { switchMap } from 'rxjs';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription, finalize, switchMap } from 'rxjs';
 
 import { AnalysisModalComponent } from './components/analysis-modal/analysis-modal';
 import { HypnogramComponent } from './components/hypnogram/hypnogram';
 import { SleepSummaryComponent } from './components/sleep-summary/sleep-summary';
 import { AnalysisRequest, UploadFormComponent } from './components/upload-form/upload-form';
-import { ModelInfo, PredictionResponse } from './core/models/sleep-api.models';
+import { ModelInfo, PredictionResponse, WorkflowState, analysisInProgress } from './core/models/sleep-api.models';
 import { SleepApiService } from './core/services/sleep-api.service';
+import { AnalysisDurations, AnalysisTimer, formatElapsed } from './core/utils/analysis-timing';
 import { predictionToCsv } from './core/utils/result-exporter';
-
-export type WorkflowState = 'ready' | 'uploading' | 'processing' | 'result' | 'error';
 
 @Component({
   selector: 'app-root',
@@ -20,8 +20,14 @@ export type WorkflowState = 'ready' | 'uploading' | 'processing' | 'result' | 'e
 })
 export class App implements OnInit {
   private readonly api = inject(SleepApiService);
+  private readonly destroyRef = inject(DestroyRef);
+  private activeRequest?: Subscription;
 
   protected readonly state = signal<WorkflowState>('ready');
+  protected readonly elapsed = signal<AnalysisDurations | null>(null);
+  protected readonly resultDurations = signal<AnalysisDurations | null>(null);
+  protected readonly formatElapsed = formatElapsed;
+  protected readonly uploadPercent = signal<number | null>(null);
   protected readonly prediction = signal<PredictionResponse | null>(null);
   protected readonly model = signal<ModelInfo | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
@@ -35,20 +41,37 @@ export class App implements OnInit {
   }
 
   protected analyze(request: AnalysisRequest): void {
+    if (analysisInProgress(this.state())) return;
+    const timer = new AnalysisTimer();
+    const refresh = () => this.elapsed.set(timer.read());
+    refresh();
+    const ticker = window.setInterval(refresh, 250);
     this.errorMessage.set(null);
+    this.uploadPercent.set(null);
     this.state.set('uploading');
 
-    this.api
-      .uploadEdf(request.patientName, request.file)
+    this.activeRequest = this.api
+      .uploadEdf(request.patientName, request.file, (percent) => this.uploadPercent.set(percent))
       .pipe(
         switchMap((upload) => {
-          this.state.set('processing');
-          return this.api.runInference(upload.upload_id, request.channels);
+          timer.uploadComplete();
+          refresh();
+          this.state.set('queued');
+          return this.api.streamInference(upload.upload_id, request.channels);
         }),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => window.clearInterval(ticker)),
       )
       .subscribe({
-        next: (prediction) => {
-          this.prediction.set(prediction);
+        next: (event) => {
+          if (event.type === 'progress') {
+            timer.mark(event.stage, event.elapsed_ms);
+            this.state.set(event.stage);
+            refresh();
+            return;
+          }
+          this.resultDurations.set(timer.read(event.elapsed_ms));
+          this.prediction.set(event.prediction);
           this.state.set('result');
           this.analysisModalOpen.set(false);
         },
@@ -59,6 +82,14 @@ export class App implements OnInit {
       });
   }
 
+  protected cancelAnalysis(): void {
+    if (!analysisInProgress(this.state())) return;
+    this.activeRequest?.unsubscribe();
+    this.elapsed.set(null);
+    this.uploadPercent.set(null);
+    this.state.set('ready');
+  }
+
   protected openNewAnalysis(): void {
     this.errorMessage.set(null);
     this.state.set('ready');
@@ -66,7 +97,7 @@ export class App implements OnInit {
   }
 
   protected closeNewAnalysis(): void {
-    if (['uploading', 'processing'].includes(this.state())) return;
+    if (analysisInProgress(this.state())) return;
     this.errorMessage.set(null);
     this.state.set(this.prediction() ? 'result' : 'ready');
     this.analysisModalOpen.set(false);
@@ -110,6 +141,7 @@ export class App implements OnInit {
 
   private describeError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
+      if (error instanceof Error && !(error instanceof SyntaxError)) return error.message;
       return 'No fue posible completar el análisis. Intenta nuevamente.';
     }
     const detail = error.error?.detail;
