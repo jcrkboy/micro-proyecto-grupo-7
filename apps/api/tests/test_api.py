@@ -1,9 +1,15 @@
+import asyncio
+import json
+from concurrent.futures import CancelledError
 from io import BytesIO
+from threading import Event
 
 from fastapi.testclient import TestClient
 
+from sleep_api.api.routes.predictions import infer_with_progress
 from sleep_api.core.config import Settings
 from sleep_api.main import create_app
+from sleep_api.schemas.predictions import InferenceRequest
 
 
 def upload_test_file(client: TestClient) -> str:
@@ -89,3 +95,34 @@ def test_inference_returns_404_for_unknown_upload(client: TestClient) -> None:
     )
 
     assert response.status_code == 404
+
+
+def test_disconnecting_progress_stream_stops_server_work():
+    resume = Event()
+    stopped = Event()
+
+    class PausedService:
+        def predict(self, upload_id, channels, *, on_progress, check_cancelled):
+            on_progress("processing")
+            assert resume.wait(5)
+            try:
+                check_cancelled()
+            except CancelledError:
+                stopped.set()
+                raise
+            raise AssertionError("El modelo continuó después de la desconexión")
+
+    async def disconnect():
+        request = InferenceRequest(upload_id="00000000-0000-0000-0000-000000000000")
+        response = await infer_with_progress(request, PausedService())
+        stream = response.body_iterator
+        try:
+            first = json.loads(await asyncio.wait_for(anext(stream), timeout=5))
+            assert first["stage"] == "processing"
+            assert first["elapsed_ms"] >= 0
+            await stream.aclose()
+        finally:
+            resume.set()
+        assert await asyncio.to_thread(stopped.wait, 5)
+
+    asyncio.run(disconnect())

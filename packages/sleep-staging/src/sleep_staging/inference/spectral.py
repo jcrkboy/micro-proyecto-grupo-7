@@ -70,10 +70,12 @@ def bloques(x, desfase, relleno=0):
     return np.pad(x, pad, constant_values=relleno).reshape(-1, 15, *x.shape[1:])
 
 
-def crnn_probabilities(red, x, offsets, n_classes):
+def crnn_probabilities(red, x, offsets, n_classes, *, check_cancelled=None):
     """Media geométrica de las probabilidades de las tres ventanas solapadas."""
     vistas = []
     for d in offsets:
+        if check_cancelled:
+            check_cancelled()
         v = red.predict(bloques(x, d), batch_size=128, verbose=0).reshape(-1, n_classes)
         vistas.append(v[d : d + len(x)].astype("float64"))
     return softmax(np.log(np.maximum(vistas, 1e-10)).mean(axis=0), axis=1)

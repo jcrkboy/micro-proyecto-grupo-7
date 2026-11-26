@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Protocol
 from uuid import uuid4
 
@@ -22,7 +23,11 @@ class Predictor(Protocol):
     model_version: str
     manifest: ModelManifest
 
-    def predict_edf(self, path: str, channels: list[str] | None = None) -> PredictionResult: ...
+    def predict_edf(
+        self, path: str, channels: list[str] | None = None, *,
+        on_progress: Callable[[str], None] | None = None,
+        check_cancelled: Callable[[], None] | None = None,
+    ) -> PredictionResult: ...
 
 
 class PredictionService:
@@ -36,13 +41,20 @@ class PredictionService:
         self.predictor = predictor
         self.model_error = model_error
 
-    def predict(self, upload_id: str, channels: list[str] | None = None) -> InferenceResponse:
+    def predict(
+        self, upload_id: str, channels: list[str] | None = None, *,
+        on_progress: Callable[[str], None] | None = None,
+        check_cancelled: Callable[[], None] | None = None,
+    ) -> InferenceResponse:
         if self.predictor is None:
             detail = self.model_error or "El modelo no está cargado"
             raise ModelUnavailableError(detail)
 
         stored = self.uploads.get(upload_id)
-        result = self.predictor.predict_edf(str(stored.file_path), channels=channels)
+        options = {"on_progress": on_progress} if on_progress is not None else {}
+        if check_cancelled is not None:
+            options["check_cancelled"] = check_cancelled
+        result = self.predictor.predict_edf(str(stored.file_path), channels=channels, **options)
         classes = tuple(self.predictor.manifest.classes)
         epochs = []
         duration_by_stage = {stage: 0.0 for stage in classes}

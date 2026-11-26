@@ -237,6 +237,7 @@ def extract_epoch_features(
     sfreq: float,
     channels: tuple[str, ...],
     config: PreprocessingConfig,
+    *, check_cancelled=None,
 ) -> pd.DataFrame:
     """Construye una fila de features base por época."""
 
@@ -248,6 +249,8 @@ def extract_epoch_features(
     rows: list[dict[str, float]] = []
     n_epochs = epochs.shape[0]
     for epoch_index in range(n_epochs):
+        if check_cancelled:
+            check_cancelled()
         row: dict[str, float] = {}
         for channel_index, channel in enumerate(channels):
             row.update(

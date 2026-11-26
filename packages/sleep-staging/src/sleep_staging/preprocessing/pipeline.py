@@ -1,6 +1,7 @@
 """Orquestador único de preprocesamiento para entrenamiento e inferencia."""
 
 from pathlib import Path
+from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
@@ -20,14 +21,15 @@ class PreprocessingPipeline:
     def __init__(self, config: PreprocessingConfig | None = None) -> None:
         self.config = config or PreprocessingConfig()
 
-    def transform_edf(self, path: str | Path) -> PreprocessingResult:
+    def transform_edf(self, path: str | Path, *, check_cancelled: Callable[[], None] | None = None) -> PreprocessingResult:
         """Carga un EDF y produce features listas para el modelo."""
 
-        return self.transform_filtered_signals(load_filtered_edf(path, self.config))
+        return self.transform_filtered_signals(load_filtered_edf(path, self.config), check_cancelled=check_cancelled)
 
     def transform_filtered_signals(
         self,
         signals: FilteredSignals,
+        *, check_cancelled: Callable[[], None] | None = None,
     ) -> PreprocessingResult:
         """Transforma señales ya filtradas; útil para pruebas y procesos batch."""
 
@@ -62,6 +64,7 @@ class PreprocessingPipeline:
             signals.sfreq,
             signals.channels,
             self.config,
+            check_cancelled=check_cancelled,
         )
         if self.config.normalize_per_record:
             base_features = robust_normalize_record(base_features)

@@ -95,7 +95,7 @@ def test_channel_masks_keep_model_slots_and_ignore_unselected_signals(tmp_path, 
             inputs["dart"] = frame
             return np.full((len(frame), 5), 0.2)
 
-        def capture_crnn(model, features, offsets, classes):
+        def capture_crnn(model, features, offsets, classes, *, check_cancelled=None):
             inputs["crnn"] = features
             return np.full((len(features), classes), 1 / classes)
 

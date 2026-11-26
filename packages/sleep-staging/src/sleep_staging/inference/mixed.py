@@ -88,8 +88,8 @@ class MixedSleepStagePredictor:
         # Una noche en memoria por proceso; las dos ramas de esa noche sí avanzan en paralelo.
         self._lock = Lock()
 
-    def _tabular(self, path, config, selected):
-        result = PreprocessingPipeline(config).transform_edf(path)
+    def _tabular(self, path, config, selected, features_ready, check_cancelled):
+        result = PreprocessingPipeline(config).transform_edf(path, check_cancelled=check_cancelled)
         # LightGBM sustituye los espacios por guiones bajos al exportar los nombres.
         features = result.features.rename(columns=lambda name: name.replace(" ", "_"))
         missing = set(self.manifest.feature_columns).difference(features.columns)
@@ -109,12 +109,14 @@ class MixedSleepStagePredictor:
             # Para EMG de envolvente a 1 Hz se conserva el valor ausente del entrenamiento DART.
             emg_prefix = channel_prefix(emg).replace(" ", "_") + "_"
             aligned.loc[:, aligned.columns.str.startswith(emg_prefix)] = np.nan
+        features_ready()
         return result, self.dart.predict(aligned, num_threads=4)
 
-    def _neural(self, path, selected):
+    def _neural(self, path, selected, features_ready, check_cancelled):
         features = spectral_input(path, self.channels, self.bands, selected_channels=selected)
+        features_ready()
         return crnn_probabilities(
-            self.crnn, features, self.offsets, len(self.manifest.classes)
+            self.crnn, features, self.offsets, len(self.manifest.classes), check_cancelled=check_cancelled
         )
 
     def _select_channels(self, path, requested):
@@ -150,13 +152,31 @@ class MixedSleepStagePredictor:
             raise ValueError("Selecciona al menos un EEG a 100 Hz: EEG Fpz-Cz o EEG Pz-Oz.")
         return tuple(selected), replace(config, channels=tuple(tabular))
 
-    def predict_edf(self, path, channels=None):
+    def predict_edf(self, path, channels=None, *, on_progress=None, check_cancelled=None):
+        prepared_branches = 0
+        progress_lock = Lock()
+
+        def features_ready():
+            nonlocal prepared_branches
+            if check_cancelled:
+                check_cancelled()
+            if on_progress is not None:
+                with progress_lock:
+                    prepared_branches += 1
+                    on_progress("overlap" if prepared_branches == 1 else "inferring")
+
         try:
             selected, config = self._select_channels(path, channels)
             with self._lock, ThreadPoolExecutor(max_workers=1) as worker:
-                neural = worker.submit(self._neural, path, selected)
-                result, p_dart = self._tabular(path, config, selected)
+                if check_cancelled:
+                    check_cancelled()
+                if on_progress is not None:
+                    on_progress("processing")
+                neural = worker.submit(self._neural, path, selected, features_ready, check_cancelled)
+                result, p_dart = self._tabular(path, config, selected, features_ready, check_cancelled)
                 p_crnn = neural.result()
+                if check_cancelled:
+                    check_cancelled()
         except (OSError, RuntimeError, EOFError) as exc:
             raise ValueError(f"No fue posible procesar el EDF: {exc}") from exc
         if p_dart.shape != p_crnn.shape or p_dart.shape != (
