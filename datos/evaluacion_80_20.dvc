@@ -1,0 +1,6 @@
+outs:
+- md5: f5e424fb0e8957599535a8f462be56d9.dir
+  size: 14862994
+  nfiles: 3
+  hash: md5
+  path: evaluacion_80_20

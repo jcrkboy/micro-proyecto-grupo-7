@@ -1,0 +1,6 @@
+outs:
+- md5: b7c331e6201fb9f1c069db5f553720ce.dir
+  size: 8476443121
+  nfiles: 4
+  hash: md5
+  path: sleep-anphy

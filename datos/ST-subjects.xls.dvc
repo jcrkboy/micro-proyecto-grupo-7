@@ -1,0 +1,5 @@
+outs:
+- md5: 303b764a68b98c0de37afd6c6f737c69
+  size: 23552
+  hash: md5
+  path: ST-subjects.xls

@@ -1,0 +1,5 @@
+outs:
+- md5: a06c296e83a618ace8423e45c14087bf
+  size: 29439536
+  hash: md5
+  path: example.edf

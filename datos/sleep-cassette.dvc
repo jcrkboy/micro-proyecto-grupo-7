@@ -1,0 +1,6 @@
+outs:
+- md5: eb32acdd7c351440a995f790ab45299f.dir
+  size: 7596565380
+  nfiles: 306
+  hash: md5
+  path: sleep-cassette

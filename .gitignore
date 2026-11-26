@@ -1,6 +1,3 @@
-# Data tracked by DVC
-/data
-
 # Python virtual environment
 .venv/
 __pycache__/
