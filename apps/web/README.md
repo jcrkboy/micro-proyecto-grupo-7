@@ -7,6 +7,8 @@ La portada muestra el formulario hasta completar el primer análisis. Después,
 el resultado reemplaza esa sección y el botón `Nuevo análisis` reutiliza el mismo
 formulario dentro de un diálogo modal, sin descartar el resultado anterior hasta
 que la siguiente inferencia termina correctamente.
+La opción `Acerca de` del encabezado explica el propósito de la aplicación, las señales
+del estudio y el modelo. Puede consultarse mientras se procesa el archivo.
 
 ## Ejecución local
 
@@ -37,7 +39,7 @@ dominio sin incrustar una dirección particular en el bundle.
 Desde la pantalla de carga puede seleccionarse `datos/example.edf`. Es el PSG
 nocturno real y anonimizado `ST7011J0-PSG.edf` de Sleep-EDF Expanded, publicado
 por PhysioNet bajo Open Data Commons Attribution License v1.0. Contiene los
-canales `EEG Fpz-Cz` y `EEG Pz-Oz` a 100 Hz, dura 35.900 segundos y produce
+canales `EEG Fpz-Cz`, `EEG Pz-Oz`, `EOG horizontal` y `EMG submental` a 100 Hz, dura 35.900 segundos y produce
 1.196 épocas completas de 30 segundos.
 
 Fuente: <https://physionet.org/content/sleep-edfx/1.0.0/sleep-telemetry/>
@@ -79,5 +81,5 @@ Nginx espera resolver un servicio llamado `api` en el puerto 8080; el
 
 ## Alcance clínico
 
-El resultado usa únicamente `EEG Fpz-Cz` y `EEG Pz-Oz` a 100 Hz. Es una ayuda
-preliminar para revisión profesional y no constituye un diagnóstico.
+El modelo requiere `EEG Fpz-Cz`, `EEG Pz-Oz` y `EOG horizontal`. El canal
+`EMG submental` es opcional. El hipnograma es preliminar y requiere revisión profesional.

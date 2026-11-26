@@ -2,7 +2,7 @@
   class="min-h-screen bg-[radial-gradient(circle_at_top_left,_#d9f8ef_0,_#f4f7f6_34%,_#edf1f5_100%)] text-slate-900"
 >
   <header class="border-b border-white/80 bg-white/70 backdrop-blur-xl">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-3 px-5 py-4 lg:px-8">
       <div class="flex items-center gap-3">
         <div
           class="grid size-10 place-items-center rounded-2xl bg-[#113d39] text-white shadow-lg shadow-emerald-950/15"
@@ -15,23 +15,56 @@
         </div>
         <div>
           <p class="text-[11px] font-semibold tracking-[0.22em] text-emerald-700 uppercase">
-            Grupo 7 · EEG
+            Grupo 7
           </p>
           <h1 class="text-lg font-semibold tracking-tight">Sleep-EDFx Studio</h1>
         </div>
       </div>
-      <div
-        class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm"
-      >
-        <span
-          class="size-2 rounded-full"
-          [class.bg-emerald-500]="model()?.model_ready"
-          [class.bg-amber-400]="!model()?.model_ready"
-        ></span>
-        {{ model()?.model_ready ? 'Modelo disponible' : 'Modelo no disponible' }}
+      <div class="flex items-center gap-3">
+        <button
+          class="secondary-button" type="button" aria-haspopup="dialog"
+          aria-controls="about-dialog" (click)="aboutDialog.showModal()"
+        >Acerca de</button>
+        <div
+          class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm"
+        >
+          <span
+            class="size-2 rounded-full"
+            [class.bg-emerald-500]="model()?.model_ready"
+            [class.bg-amber-400]="!model()?.model_ready"
+          ></span>
+          {{ model()?.model_ready ? 'Modelo disponible' : 'Modelo no disponible' }}
+        </div>
       </div>
     </div>
   </header>
+
+  <dialog
+    #aboutDialog id="about-dialog" aria-labelledby="about-title"
+    class="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-3xl bg-white p-6 text-slate-900 shadow-2xl backdrop:bg-slate-900/45 sm:p-8"
+  >
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="about-title" class="text-2xl font-semibold tracking-tight">Acerca de Sleep-EDFx Studio</h2>
+      <button type="button" class="secondary-button" (click)="aboutDialog.close()">Cerrar</button>
+    </div>
+    <p class="mt-4 leading-7 text-slate-700">
+      Sleep-EDFx Studio ayuda a revisar cómo cambia el sueño durante la noche. A partir de un
+      registro polisomnográfico en formato EDF, genera un hipnograma y calcula cuánto tiempo
+      corresponde a vigilia, N1, N2, N3 y REM.
+    </p>
+    <h3 class="mt-6 font-semibold text-emerald-800">Señales del estudio</h3>
+    <p class="mt-1 leading-7 text-slate-700">
+      El modelo requiere dos derivaciones cerebrales (EEG Fpz-Cz y EEG Pz-Oz) y una señal de
+      movimiento ocular (EOG horizontal). También aprovecha la actividad muscular del mentón
+      cuando el estudio incluye EMG submental.
+    </p>
+    <h3 class="mt-6 font-semibold text-emerald-800">Cómo se obtiene el hipnograma</h3>
+    <p class="mt-1 leading-7 text-slate-700">
+      El modelo combina las predicciones de LightGBM DART y una red neuronal CRNN para estimar
+      el estadio de cada época de 30 segundos. El Grupo 7 lo entrenó con registros de 100 personas
+      de Sleep-EDFx. Puedes revisar el resultado preliminar y exportarlo en CSV o JSON.
+    </p>
+  </dialog>
 
   <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">
     @if (prediction(); as result) {
@@ -83,11 +116,11 @@
           <h2
             class="mt-5 max-w-xl text-4xl font-semibold leading-[1.08] tracking-[-0.04em] text-slate-950 sm:text-5xl"
           >
-            Convierte un registro EEG en un hipnograma preliminar.
+            Convierte un estudio de sueño en un hipnograma preliminar.
           </h2>
           <p class="mt-5 max-w-xl text-base leading-7 text-slate-600">
-            Carga un PSG en formato EDF. El modelo analiza épocas de 30 segundos usando los canales
-            EEG Fpz-Cz y EEG Pz-Oz.
+            El modelo analiza la actividad cerebral y los movimientos oculares del registro.
+            Si el estudio incluye EMG submental, también utiliza esa señal muscular.
           </p>
 
           <div class="mt-8 grid max-w-xl grid-cols-3 gap-3">

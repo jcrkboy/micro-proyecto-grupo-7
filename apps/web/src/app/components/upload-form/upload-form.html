@@ -48,6 +48,7 @@
       >
         <input
           id="edf-file"
+          aria-describedby="edf-signals"
           class="sr-only"
           type="file"
           accept=".edf,application/octet-stream"
@@ -73,6 +74,10 @@
           <span class="mt-1 text-xs text-slate-500">No se carga hasta iniciar el análisis</span>
         }
       </label>
+      <p id="edf-signals" class="mt-2 text-sm leading-6 text-slate-600">
+        El archivo debe incluir <strong>EEG Fpz-Cz, EEG Pz-Oz y EOG horizontal</strong>.
+        El EMG submental es opcional.
+      </p>
       @if (file.touched && file.hasError('edfExtension')) {
         <p class="mt-2 text-xs font-medium text-red-600">El archivo debe tener extensión .edf.</p>
       }
@@ -103,7 +108,4 @@
     </button>
   </form>
 
-  <div class="mt-5 flex items-center justify-center gap-5 text-[11px] font-medium text-slate-500">
-    <span>✓ Procesamiento seguro</span><span>✓ 2 canales EEG</span><span>✓ Sin diagnóstico</span>
-  </div>
 </section>

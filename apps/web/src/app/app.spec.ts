@@ -20,12 +20,12 @@ describe('App', () => {
       .flush({
         model_ready: true,
         classes: ['W', 'N1', 'N2', 'N3', 'REM'],
-        channels: ['EEG Fpz-Cz', 'EEG Pz-Oz'],
+        channels: ['EEG Fpz-Cz', 'EEG Pz-Oz', 'EOG horizontal'],
       });
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Modelo disponible');
-    expect(fixture.nativeElement.textContent).toContain('Convierte un registro EEG');
+    expect(fixture.nativeElement.textContent).toContain('Convierte un estudio de sueño');
   });
 
   it('muestra carga antes de procesamiento según las respuestas HTTP', () => {

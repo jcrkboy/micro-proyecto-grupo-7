@@ -33,7 +33,7 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
       json: {
         model_ready: true,
         classes: STAGES,
-        channels: ['EEG Fpz-Cz', 'EEG Pz-Oz'],
+        channels: ['EEG Fpz-Cz', 'EEG Pz-Oz', 'EOG horizontal'],
       },
     }),
   );
@@ -64,6 +64,9 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   expect(faviconResponse.ok()).toBe(true);
   expect(faviconResponse.headers()['content-type']).toContain('image/svg+xml');
   await page.getByLabel('Nombre o identificador del paciente').fill('Paciente Playwright');
+  await expect(page.locator('#edf-file')).toHaveAccessibleDescription(
+    /EEG Fpz-Cz, EEG Pz-Oz y EOG horizontal.*EMG submental es opcional/,
+  );
   await page.locator('#edf-file').setInputFiles({
     name: 'registro.edf',
     mimeType: 'application/octet-stream',
@@ -74,10 +77,19 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   await expect(page.getByRole('button', { name: 'Cargando archivo…' })).toBeVisible();
   releaseUpload();
   await expect(page.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
+  const about = page.getByRole('button', { name: 'Acerca de' });
+  await about.click();
+  const info = page.getByRole('dialog', { name: 'Acerca de Sleep-EDFx Studio' });
+  await expect(info.getByRole('heading', { name: 'Señales del estudio' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(info).toBeHidden();
+  await expect(about).toBeFocused();
+  await expect(page.getByText('registro.edf', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Procesando señal…' })).toBeVisible();
   releaseInference();
 
   await expect(page.getByRole('heading', { name: 'Resumen de Paciente Playwright' })).toBeVisible();
-  await expect(page.getByText('Convierte un registro EEG')).toBeHidden();
+  await expect(page.getByText('Convierte un estudio de sueño')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Hipnograma' })).toBeVisible();
   await expect(page.locator('app-hypnogram canvas').first()).toBeVisible();
   await page.waitForTimeout(500);
@@ -214,7 +226,7 @@ function createPrediction(patientName = 'Paciente Playwright') {
     patient_name: patientName,
     model_version: 'test-v1',
     preprocessing_version: 'test-v1',
-    channels: ['EEG Fpz-Cz', 'EEG Pz-Oz'],
+    channels: ['EEG Fpz-Cz', 'EEG Pz-Oz', 'EOG horizontal'],
     sfreq: 100,
     epoch_seconds: 30,
     epochs,

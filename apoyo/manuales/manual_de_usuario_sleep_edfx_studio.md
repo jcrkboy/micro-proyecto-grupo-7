@@ -52,7 +52,7 @@ Al ingresar a la plataforma, se encontrará con la pantalla de "Nuevo Estudio".
     *   Debe estar en formato `.edf`.
     *   No superar los 50 MB de tamaño.
     *   Estar muestreado a 100 Hz.
-    *   Contener obligatoriamente los canales EEG `Fpz-Cz` y `Pz-Oz`.
+    *   Contener los tres canales obligatorios `EEG Fpz-Cz`, `EEG Pz-Oz` y `EOG horizontal`. El canal `EMG submental` es opcional.
 *   **Procesamiento:** Haga clic en **"Procesar señal"**. El sistema verificará los canales y ejecutará el motor de Inteligencia Artificial de forma automática.
 
 ### Paso 2: Análisis del Resumen Estadístico
