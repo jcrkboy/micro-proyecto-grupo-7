@@ -1,8 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 import { App } from './app';
+import { UploadFormComponent } from './components/upload-form/upload-form';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -34,18 +36,11 @@ describe('App', () => {
     fixture.detectChanges();
     http.expectOne('/api/v1/model').flush({ model_ready: true, classes: [], channels: [] });
 
-    const name = fixture.nativeElement.querySelector('#patient-name') as HTMLInputElement;
-    name.value = 'Paciente de prueba';
-    name.dispatchEvent(new Event('input'));
-    const fileInput = fixture.nativeElement.querySelector('#edf-file') as HTMLInputElement;
-    Object.defineProperty(fileInput, 'files', {
-      configurable: true,
-      value: [new File(['0       contenido'], 'registro.edf')],
+    fixture.debugElement.query(By.directive(UploadFormComponent)).componentInstance.analyzeRequest.emit({
+      patientName: 'Paciente de prueba',
+      file: new File(['contenido'], 'registro.edf'),
+      channels: ['EEG Pz-Oz'],
     });
-    fileInput.dispatchEvent(new Event('change'));
-    (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
-      new Event('submit'),
-    );
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Cargando archivo…');

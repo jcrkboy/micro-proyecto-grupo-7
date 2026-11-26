@@ -24,19 +24,34 @@ describe('UploadFormComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('supera el límite de 50 MB');
   });
 
-  it('emite nombre normalizado y archivo EDF válido', () => {
+  it('emite el EEG del archivo y el nombre normalizado', async () => {
     const emitted = vi.fn();
     fixture.componentInstance.analyzeRequest.subscribe(emitted);
     const name = fixture.nativeElement.querySelector('#patient-name') as HTMLInputElement;
     name.value = '  Paciente 024  ';
     name.dispatchEvent(new Event('input'));
-    const file = new File(['0       contenido'], 'registro.edf');
+    const header = '0'.padEnd(184) + '512'.padEnd(52) + '30'.padEnd(8) + '1'.padEnd(8) + '1'.padEnd(4);
+    const signals = 'EEG Pz-Oz'.padEnd(216) + '100'.padEnd(40);
+    const file = new File([header, signals, new Uint8Array(6000)], 'registro.edf');
     selectFile(file);
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('input[type=checkbox]')?.checked).toBe(true);
+    });
     (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
       new Event('submit'),
     );
 
-    expect(emitted).toHaveBeenCalledWith({ patientName: 'Paciente 024', file });
+    expect(emitted).toHaveBeenCalledWith({ patientName: 'Paciente 024', file, channels: ['EEG Pz-Oz'] });
+  });
+
+  it('bloquea un EDF con cabecera incompleta', async () => {
+    selectFile(new File(['0       contenido'], 'registro.edf'));
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.textContent).toContain('cabecera EDF');
+    });
+    expect(fixture.nativeElement.querySelector('button[type=submit]').disabled).toBe(true);
   });
 
   function selectFile(file: File): void {

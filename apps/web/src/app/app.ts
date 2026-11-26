@@ -43,7 +43,7 @@ export class App implements OnInit {
       .pipe(
         switchMap((upload) => {
           this.state.set('processing');
-          return this.api.runInference(upload.upload_id);
+          return this.api.runInference(upload.upload_id, request.channels);
         }),
       )
       .subscribe({

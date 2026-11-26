@@ -81,5 +81,8 @@ Nginx espera resolver un servicio llamado `api` en el puerto 8080; el
 
 ## Alcance clínico
 
-El modelo requiere `EEG Fpz-Cz`, `EEG Pz-Oz` y `EOG horizontal`. El canal
-`EMG submental` es opcional. El hipnograma es preliminar y requiere revisión profesional.
+Al elegir el EDF, el navegador lee su cabecera y muestra los canales disponibles.
+Seleccione al menos un EEG a 100 Hz (`EEG Fpz-Cz` o `EEG Pz-Oz`). Puede usar ambos
+y añadir `EOG horizontal` a 100 Hz y `EMG submental` a 1 o 100 Hz. El archivo se
+envía al pulsar **Analizar registro**. El resumen y el JSON identifican los canales
+utilizados. El hipnograma es preliminar y requiere revisión profesional.

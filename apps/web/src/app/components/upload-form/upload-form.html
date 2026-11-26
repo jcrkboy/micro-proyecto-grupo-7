@@ -52,6 +52,7 @@
           class="sr-only"
           type="file"
           accept=".edf,application/octet-stream"
+          [disabled]="busy()"
           (change)="onFileSelected($event)"
         />
         <span
@@ -75,8 +76,8 @@
         }
       </label>
       <p id="edf-signals" class="mt-2 text-sm leading-6 text-slate-600">
-        El archivo debe incluir <strong>EEG Fpz-Cz, EEG Pz-Oz y EOG horizontal</strong>.
-        El EMG submental es opcional.
+        Elige al menos un EEG a 100 Hz: <strong>Fpz-Cz o Pz-Oz</strong>. Puedes añadir EOG
+        horizontal y EMG submental si están disponibles.
       </p>
       @if (file.touched && file.hasError('edfExtension')) {
         <p class="mt-2 text-xs font-medium text-red-600">El archivo debe tener extensión .edf.</p>
@@ -90,12 +91,43 @@
       @if (file.touched && file.hasError('required')) {
         <p class="mt-2 text-xs font-medium text-red-600">Selecciona un archivo EDF.</p>
       }
+      @if (reading()) {
+        <p role="status" class="mt-2 text-sm text-slate-600">Leyendo los canales del EDF…</p>
+      }
+      @if (readError()) {
+        <p role="alert" class="mt-2 text-sm text-red-700">{{ readError() }}</p>
+      }
     </div>
+
+    @if (available(); as channels) {
+      <fieldset class="space-y-2" [disabled]="busy()">
+        <legend class="mb-2 text-sm font-semibold text-slate-700">Canales del registro</legend>
+        <div class="grid gap-2 sm:grid-cols-2">
+          @for (channel of channels; track channel.name) {
+            <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              [class.cursor-pointer]="channel.selectable" [class.bg-slate-50]="!channel.selectable">
+              <input #checkbox type="checkbox" class="size-4 shrink-0 accent-emerald-700"
+                [disabled]="!channel.selectable" [checked]="selected().includes(channel.name)"
+                (change)="toggle(channel.name, checkbox.checked)" />
+              <span>
+                <span class="block font-medium">{{ channel.name }}</span>
+                <span class="text-xs text-slate-600">{{ channel.hz }} Hz@if (channel.reason) { · {{ channel.reason }}}</span>
+              </span>
+            </label>
+          }
+        </div>
+        @if (!hasSelectedEeg()) {
+          <p role="alert" class="text-sm text-red-700">
+            {{ hasAvailableEeg() ? 'Selecciona al menos un EEG para continuar.' : 'Este archivo necesita un EEG Fpz-Cz o Pz-Oz a 100 Hz para poder analizarlo.' }}
+          </p>
+        }
+      </fieldset>
+    }
 
     <button
       class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#113d39] px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-emerald-950/15 transition hover:-translate-y-0.5 hover:bg-[#164b46] disabled:cursor-wait disabled:opacity-65 disabled:hover:translate-y-0"
       type="submit"
-      [disabled]="busy()"
+      [disabled]="busy() || reading() || (!!file.value && !hasSelectedEeg())"
       aria-live="polite"
     >
       @if (busy()) {

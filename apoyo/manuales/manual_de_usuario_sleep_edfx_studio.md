@@ -47,13 +47,13 @@ Al ingresar a la plataforma, se encontrará con la pantalla de "Nuevo Estudio".
 
 
 *   **Identificación:** Ingrese manualmente el nombre o el Identificador (ID) del paciente en el campo correspondiente.
-*   **Carga del Archivo:** Arrastre y suelte el archivo del estudio polisomnográfico en el recuadro punteado, o haga clic para buscarlo en su computadora.
+*   **Carga del archivo.** Haga clic en el recuadro punteado y elija el estudio polisomnográfico en su computadora.
 *   **Requisitos del archivo:** 
     *   Debe estar en formato `.edf`.
     *   No superar los 50 MB de tamaño.
-    *   Estar muestreado a 100 Hz.
-    *   Contener los tres canales obligatorios `EEG Fpz-Cz`, `EEG Pz-Oz` y `EOG horizontal`. El canal `EMG submental` es opcional.
-*   **Procesamiento:** Haga clic en **"Procesar señal"**. El sistema verificará los canales y ejecutará el motor de Inteligencia Artificial de forma automática.
+    *   Contener al menos 30 segundos y una de las derivaciones `EEG Fpz-Cz` o `EEG Pz-Oz` a 100 Hz.
+*   **Selección de canales.** El panel muestra las señales que contiene el EDF y marca las compatibles. Deje seleccionado al menos un EEG. También puede incluir el EOG horizontal a 100 Hz y el EMG submental a 1 o 100 Hz. Las señales adicionales aparecen deshabilitadas.
+*   **Procesamiento.** Haga clic en **Analizar registro** para enviar el EDF. El resumen del paciente y la descarga JSON indican los canales utilizados.
 
 ### Paso 2: Análisis del Resumen Estadístico
 

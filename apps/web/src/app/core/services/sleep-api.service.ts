@@ -21,9 +21,10 @@ export class SleepApiService {
     return this.http.post<UploadResponse>(`${this.apiRoot}/uploads`, body);
   }
 
-  runInference(uploadId: string): Observable<PredictionResponse> {
+  runInference(uploadId: string, channels: string[]): Observable<PredictionResponse> {
     return this.http.post<PredictionResponse>(`${this.apiRoot}/inferencia`, {
       upload_id: uploadId,
+      channels,
     });
   }
 }

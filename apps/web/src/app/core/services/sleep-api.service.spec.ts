@@ -40,11 +40,12 @@ describe('SleepApiService', () => {
   });
 
   it('solicita inferencia usando el upload_id', () => {
-    service.runInference('00000000-0000-0000-0000-000000000000').subscribe();
+    const channels = ['EEG Pz-Oz'];
+    service.runInference('00000000-0000-0000-0000-000000000000', channels).subscribe();
 
     const request = http.expectOne('/api/v1/inferencia');
     expect(request.request.method).toBe('POST');
-    expect(request.request.body).toEqual({ upload_id: '00000000-0000-0000-0000-000000000000' });
+    expect(request.request.body).toEqual({ upload_id: '00000000-0000-0000-0000-000000000000', channels });
     request.flush({});
   });
 });

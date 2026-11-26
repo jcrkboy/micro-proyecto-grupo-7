@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -9,12 +9,14 @@ import {
 } from '@angular/forms';
 
 import type { WorkflowState } from '../../app';
+import { EdfChannel, hasEeg, readEdfChannels } from '../../core/utils/edf-channels';
 
 export const MAX_EDF_BYTES = 50 * 1024 * 1024;
 
 export interface AnalysisRequest {
   patientName: string;
   file: File;
+  channels: string[];
 }
 
 function validEdf(control: AbstractControl<File | null>): ValidationErrors | null {
@@ -50,6 +52,14 @@ export class UploadFormComponent {
   });
   protected readonly form = new FormGroup({ patientName: this.patientName, file: this.file });
   protected readonly busy = computed(() => ['uploading', 'processing'].includes(this.state()));
+  protected readonly reading = signal(false);
+  protected readonly readError = signal('');
+  protected readonly available = signal<EdfChannel[] | null>(null);
+  protected readonly selected = signal<string[]>([]);
+  protected readonly hasSelectedEeg = computed(() => hasEeg(this.selected()));
+  protected readonly hasAvailableEeg = computed(() =>
+    hasEeg((this.available() ?? []).filter((ch) => ch.selectable).map((ch) => ch.name)),
+  );
   protected readonly statusLabel = computed(() => {
     const labels: Partial<Record<WorkflowState, string>> = {
       uploading: 'Cargando archivo…',
@@ -58,17 +68,39 @@ export class UploadFormComponent {
     return labels[this.state()] ?? 'Analizar registro';
   });
 
-  protected onFileSelected(event: Event): void {
+  protected async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    this.file.setValue(input.files?.[0] ?? null);
+    const file = input.files?.[0] ?? null;
+    this.file.setValue(file);
     this.file.markAsTouched();
+    this.available.set(null);
+    this.selected.set([]);
+    this.readError.set('');
+    this.reading.set(!!file && this.file.valid);
+    if (!file || this.file.invalid) return;
+    try {
+      const channels = await readEdfChannels(file);
+      if (this.file.value !== file) return;
+      this.available.set(channels);
+      this.selected.set(channels.filter((ch) => ch.selectable).map((ch) => ch.name));
+    } catch (error) {
+      if (this.file.value === file) {
+        this.readError.set(error instanceof Error ? error.message : 'No se pudo leer el EDF.');
+      }
+    } finally {
+      if (this.file.value === file) this.reading.set(false);
+    }
+  }
+
+  protected toggle(name: string, checked: boolean): void {
+    this.selected.update((current) => checked ? [...current, name] : current.filter((ch) => ch !== name));
   }
 
   protected submit(): void {
     this.form.markAllAsTouched();
     const file = this.file.value;
-    if (this.form.invalid || !file || this.busy()) return;
-    this.analyzeRequest.emit({ patientName: this.patientName.value.trim(), file });
+    if (this.form.invalid || !file || this.busy() || !this.hasSelectedEeg()) return;
+    this.analyzeRequest.emit({ patientName: this.patientName.value.trim(), file, channels: this.selected() });
   }
 
   protected formatSize(bytes: number): string {

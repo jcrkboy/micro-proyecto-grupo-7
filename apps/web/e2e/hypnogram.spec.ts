@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const STAGES = ['W', 'REM', 'N1', 'N2', 'N3'] as const;
 const COLORS = [
@@ -65,12 +67,12 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   expect(faviconResponse.headers()['content-type']).toContain('image/svg+xml');
   await page.getByLabel('Nombre o identificador del paciente').fill('Paciente Playwright');
   await expect(page.locator('#edf-file')).toHaveAccessibleDescription(
-    /EEG Fpz-Cz, EEG Pz-Oz y EOG horizontal.*EMG submental es opcional/,
+    /al menos un EEG.*Fpz-Cz o Pz-Oz/,
   );
   await page.locator('#edf-file').setInputFiles({
     name: 'registro.edf',
     mimeType: 'application/octet-stream',
-    buffer: Buffer.from('0       contenido de prueba'),
+    buffer: readFileSync(resolve(__dirname, '../../api/tests/fixtures/sample_eeg_60s.edf')),
   });
   await page.getByRole('button', { name: 'Analizar registro' }).click();
 
@@ -182,7 +184,7 @@ test('muestra los estados en orden y dibuja los cinco colores del hipnograma', a
   await modal.locator('#edf-file').setInputFiles({
     name: 'segundo-registro.edf',
     mimeType: 'application/octet-stream',
-    buffer: Buffer.from('0       segundo contenido de prueba'),
+    buffer: readFileSync(resolve(__dirname, '../../api/tests/fixtures/sample_eeg_60s.edf')),
   });
   await modal.getByRole('button', { name: 'Analizar registro' }).click();
 
