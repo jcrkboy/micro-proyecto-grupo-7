@@ -1,15 +1,20 @@
-# Sleep-EDFx Studio · Grupo 7
+# Sleep-EDFx Studio · Clasificación automática de estadios del sueño
 
-Sleep-EDFx Studio convierte un registro de sueño en formato EDF en un hipnograma preliminar. El usuario elige los canales de la polisomnografía y el modelo estima un estadio por cada 30 segundos de señal. El resultado permite explorar la noche, consultar la confianza de cada predicción y exportar los datos para revisión profesional.
+Sleep-EDFx Studio es la aplicación del proyecto final de la Maestría en Inteligencia Artificial **«Clasificación automática de estadios del sueño mediante aprendizaje de máquina a partir de señales de EEG de polisomnografía»**, propuesto por el Grupo de Ingeniería Biomédica de la Universidad de los Andes. Para apoyar la revisión profesional de un registro EDF, genera un hipnograma preliminar que asigna a cada época de 30 segundos uno de cinco estadios (vigilia, N1, N2, N3 o REM).
+
+El microproyecto de un solo canal EEG fue el antecedente. En el proyecto final, el usuario puede elegir una o ambas derivaciones EEG (Fpz-Cz y Pz-Oz) y añadir, de forma independiente, el movimiento ocular (EOG horizontal) y la actividad muscular del mentón (EMG submental) cuando el registro los contiene.
 
 | Acceso | Ubicación |
 |---|---|
-| Repositorio | [GitHub · micro-proyecto-grupo-7](https://github.com/jcrkboy/micro-proyecto-grupo-7) |
+| Repositorio | [Código del proyecto en GitHub](https://github.com/jcrkboy/micro-proyecto-grupo-7) |
 | Aplicación pública | **POR DEFINIR** |
-| Demostración | [Video de presentación del proyecto](https://drive.google.com/file/d/1NIcqw7noABbsWgwwZVIIpzwrwPM_Cwm5/view) |
 | Credenciales de la aplicación | Acceso directo, sin cuenta ni contraseña. |
 
 El Grupo 7 está integrado por Juan Carlos Gamboa Peñaranda, Jhoan Sebastián Saavedra Romero, Juan David Rozo Verástegui y Juan Javier Valera Mejías.
+
+## Modelo actual
+
+LightGBM DART clasifica cada época a partir de características tabulares de las señales, mientras que una red convolucional recurrente (CRNN) utiliza la evolución temporal de su espectro. El modelo combina las probabilidades de ambas ramas en escala logarítmica con un peso del 59 % para DART y del 41 % para la CRNN. [Resultados de evaluación, cuadro III del informe (pág. 6)](docs/versionPreFinal/EntregaFinal_v3_20261121/Informe_final_V8.pdf#page=6)
 
 ## Despliegue
 
@@ -63,18 +68,11 @@ GitHub Actions publica las imágenes al cambiar los componentes correspondientes
 3. Pulsa **Analizar registro**. Con el ejemplo aparecen **2 épocas**. En el resumen verás qué canales se usaron y cuánto tiempo y porcentaje correspondieron a cada estadio.
 4. En el hipnograma, el eje horizontal representa el tiempo y el vertical identifica vigilia (W), sueño N1, N2, N3 y REM. Pasa el cursor sobre una época para consultar el estadio y sus probabilidades. Usa **Descargar CSV** para obtener una fila por época o **Descargar JSON** para conservar también los canales, la versión del modelo y el resumen.
 
-El resultado es preliminar y requiere revisión profesional. El modelo combina DART (59 %) y una red CRNN (41 %). Las entradas de los canales desmarcados quedan en cero. [Manual de usuario](apoyo/manuales/manual_de_usuario_sleep_edfx_studio.md) · [Contrato de la API y ejemplo con curl](apps/api/README.md)
+Las entradas de los canales desmarcados quedan en cero. El hipnograma y las probabilidades por época sirven de apoyo a la revisión profesional. [Manual de usuario](apoyo/manuales/manual_de_usuario_sleep_edfx_studio.md) · [Contrato de la API y ejemplo con curl](apps/api/README.md)
 
-## Cómo verificar la entrega
+### Verificar la aplicación
 
-| Criterio de la rúbrica | Comprobación reproducible |
-|---|---|
-| Funcionamiento (35 %) | Carga el EDF de ejemplo, elige un EEG y comprueba que aparecen dos épocas y que el CSV contiene dos filas de datos. [Prueba de despliegue con Playwright](apps/web/e2e/despliegue.spec.ts) |
-| Documentación del despliegue (15 %) | Sigue uno de los dos procedimientos desde un clon nuevo y consulta la salud de la API. La dirección pública se completará al desplegar la VM. |
-| Parametrización (15 %) | Arranca en otro puerto con `LOCAL_WEB_PORT=8090` o cambia un valor del servidor en el archivo de entorno y vuelve a desplegar. [Plantilla con valores iniciales](apps/deploy/.env.example) |
-| Usabilidad y presentación (35 %) | Comprueba que el formulario impide analizar sin EEG, que la leyenda permite identificar los cinco estadios y que el cursor muestra la confianza por época. [Prueba de interacción del hipnograma](apps/web/e2e/hypnogram.spec.ts) |
-
-La [guía de pruebas en Chromium](apps/deploy/README.md#prueba-con-navegador) incluye el comando para repetir las verificaciones de interfaz.
+Las pruebas de navegador comprueban que el formulario exige al menos un EEG, que el resumen identifica los canales usados y que el CSV contiene una fila por época. También verifican la leyenda y la consulta de probabilidades en el hipnograma. [Ejecutar las pruebas con Chromium](apps/deploy/README.md#prueba-con-navegador)
 
 ## Datos, modelos y análisis
 
@@ -87,7 +85,9 @@ La [guía de pruebas en Chromium](apps/deploy/README.md#prueba-con-navegador) in
 | [packages/sleep-staging/](packages/sleep-staging/) | Preprocesamiento, extracción de características e inferencia. |
 | [docs/](docs/) y [apoyo/](apoyo/) | Informes, material de presentación, manuales y análisis de apoyo. |
 
-Sleep Telemetry aporta 44 noches de 22 personas y Sleep Cassette aporta 153 noches de 78 personas. La evaluación separa a las personas entre entrenamiento (80 personas, 158 noches) y prueba (20 personas, 39 noches). El ajuste final distribuido con la aplicación utiliza las 100 personas. [Evaluación por persona](Notebooks/dart_crnn_mixto.ipynb) · [Entrenamiento final](Notebooks/dart_crnn_mixto_final_100.ipynb)
+Sleep Telemetry aporta 44 noches de 22 personas y Sleep Cassette aporta 153 noches de 78 personas. Durante el desarrollo, las noches de cada participante quedaron en un mismo grupo. Se utilizaron los registros de 80 personas para entrenar y los de otras 20 para elegir los parámetros y la proporción de la mezcla. [Selección de parámetros del modelo](Notebooks/dart_crnn_mixto.ipynb)
+
+Las etiquetas de entrenamiento proceden de los hipnogramas anotados por expertos. Los estadios 3 y 4 de la anotación original se agrupan en N3. La propuesta también contempla una clase de movimiento (`M`). El modelo clasifica cinco estadios y excluye del entrenamiento las épocas anotadas como movimiento o sin clasificar (`?`). [Correspondencia de etiquetas](packages/sleep-staging/src/sleep_staging/datasets/sleep_edfx.py)
 
 ### Reproducir los notebooks
 
