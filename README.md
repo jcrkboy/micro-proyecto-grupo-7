@@ -187,3 +187,222 @@ dvc status
 ### Reproducir los notebooks
 
 Con los datos descargados y el entorno virtual activo, instala las dependencias con `python -m pip install -r requirements.txt` y abre `jupyter lab`. Si regeneras una colección como `datos/processed/`, revisa los cambios con `dvc status`. Quienes tengan acceso de escritura a R2 pueden registrar la colección con `dvc add datos/processed`, subir los datos con `dvc push` y guardar el puntero actualizado en Git. [EDA de Sleep Telemetry](Notebooks/EDA/EDA_Sleep_EEG_ST7242J0_datset/EDA_Sleep_EEG_dataset.ipynb)
+
+
+# Sleep-EDFx Studio: manual funcional de usuario
+
+> [!WARNING]
+> **Uso de apoyo profesional.** Sleep-EDFx Studio genera un hipnograma **preliminar**. El resultado requiere revisión de un experto en sueño y no constituye un diagnóstico clínico.
+
+## Contenido
+
+1. [Propósito y alcance](#1-propósito-y-alcance)
+2. [Requisitos previos](#2-requisitos-previos)
+3. [Recorrido general](#3-recorrido-general)
+4. [Guía paso a paso](#4-guía-paso-a-paso)
+5. [Caso de prueba: Jhon Doe 3](#5-caso-de-prueba-jhon-doe-3)
+6. [Anexo técnico](#6-anexo-técnico)
+7. [Solución de problemas](#7-solución-de-problemas)
+8. [Limitaciones y uso responsable](#8-limitaciones-y-uso-responsable)
+
+---
+
+## 1. Propósito y alcance
+
+Sleep-EDFx Studio es una aplicación web que recibe un registro polisomnográfico (PSG) en formato EDF y estima, para cada época de 30 segundos, el estadio de sueño correspondiente: vigilia (W), N1, N2, N3 o REM. Con esas predicciones construye un **hipnograma** interactivo y calcula el tiempo y el porcentaje que el registro pasa en cada estadio.
+
+Todas las capturas provienen de una ejecución real con un archivo de prueba (paciente ficticio **Jhon Doe 3**).
+
+## 2. Requisitos previos
+
+| Elemento | Requisito |
+|---|---|
+| Navegador | Chrome, Edge, Firefox o Safari con Internet. No requiere instalación ni inicio de sesión. |
+| Formato | EDF, **máximo 70 MiB**. |
+| Frecuencia | Las señales que usa el modelo deben estar a **100 Hz**. |
+| Señales obligatorias | Al menos un EEG: **Fpz-Cz** o **Pz-Oz**. |
+| Señales opcionales | **EOG horizontal** y **EMG submental**. |
+| Identificador | Nombre o código del estudio. Se recomienda un seudónimo. |
+
+> [!NOTE]
+> **Archivo de prueba:** `paciente_prueba.edf` (28,1 MiB). Contiene EEG Fpz-Cz, EEG Pz-Oz, EOG horizontal y EMG submental a 100 Hz, y un canal *Marker* que el modelo no usa. Duración: 9 h 58 min.
+
+## 3. Recorrido general
+
+La aplicación tiene una sola página que cambia de estado según el avance:
+
+**Carga** → **Análisis** → **Resultados** → **Exportación o nuevo análisis**
+
+| Elemento | Función |
+|---|---|
+| **Acerca de** | Panel con la descripción de la herramienta, las señales admitidas y el método de clasificación. |
+| **Modelo disponible** | El punto verde indica que el servicio de inferencia está activo. |
+| Tarjetas 100 Hz · 30 s · 5 | Frecuencia de muestreo, duración de cada época y número de estadios. |
+| Aviso “Uso de apoyo profesional” | Recuerda que el resultado es preliminar. |
+
+![Pantalla inicial de Sleep-EDFx Studio](<img width="1308" height="805" alt="01-pantalla-inicial" src="https://github.com/user-attachments/assets/67b05170-f20b-42d7-8373-3687c3a53d6f" />)
+*Figura 1. Pantalla inicial: descripción y parámetros del modelo a la izquierda, formulario “Carga del registro” a la derecha.*
+
+## 4. Guía paso a paso
+
+### Paso 1. Abrir la aplicación y verificar el modelo
+
+1. Ingrese a <https://sleepedfx.fly.dev>.
+2. Confirme que en la esquina superior derecha aparece **“Modelo disponible”** con el punto verde.
+
+> [!TIP]
+> Si la aplicación estuvo inactiva, el primer acceso puede tardar unos segundos mientras el servidor se activa.
+
+### Paso 2. Consultar “Acerca de” (opcional)
+
+Haga clic en **Acerca de** para ver qué calcula la herramienta, qué señales admite y cómo se obtiene el hipnograma. Para salir, pulse **Cerrar** o la tecla *Esc*.
+
+### Paso 3. Ingresar el identificador del paciente
+
+En **Nombre o identificador del paciente**, escriba el nombre o código del estudio. Este texto aparece luego como título de los resultados (“Resumen de …”). Por privacidad, use un seudónimo.
+
+### Paso 4. Seleccionar el archivo EDF
+
+1. Haga clic en **Selecciona un archivo EDF**.
+2. Elija el archivo `.edf` en la ventana del sistema operativo.
+3. La tarjeta muestra el nombre y el tamaño del archivo. Para cambiarlo, pulse **Reemplazar**.
+
+> [!NOTE]
+> El archivo **no se sube** al seleccionarlo. La transferencia comienza solo al pulsar **Analizar registro**.
+
+### Paso 5. Revisar los canales del registro
+
+Después de elegir el archivo aparece **Canales del registro**, con cada señal del EDF y su frecuencia:
+
+- Los canales compatibles (EEG Fpz-Cz, EEG Pz-Oz, EOG horizontal y EMG submental a 100 Hz) vienen **marcados** por defecto.
+- Los canales que el modelo no usa aparecen deshabilitados con la etiqueta **“Fuera del modelo”** (en el ejemplo, *Marker* a 10 Hz).
+- Puede desmarcar señales, pero debe quedar **al menos un EEG** seleccionado.
+
+<img src="img/02-carga-y-canales.jpg" alt="Formulario con archivo cargado y canales seleccionados" width="420">
+<img width="400" height="670" alt="02-carga-y-canales" alt="Formulario con archivo cargado y canales seleccionados" src="https://github.com/user-attachments/assets/ece497c0-35b4-4d56-bed3-80a10f1220e7" />
+
+*Figura 2. Formulario con identificador, archivo cargado y los cuatro canales compatibles seleccionados.*
+
+### Paso 6. Ejecutar el análisis
+
+Pulse **Analizar registro**. El progreso avanza por tres etapas:
+
+| Etapa | Qué ocurre | Tiempo observado* |
+|---|---|---:|
+| **Subiendo archivo** | Envío del EDF al servidor, con barra y porcentaje. | 4,9 s |
+| **Procesando señales** | Filtrado de las señales y extracción de características. | 31,8 s |
+| **Clasificando etapas del sueño** | Inferencia de los dos modelos. Uno puede terminar antes mientras el otro prepara sus señales. | 0,4 s |
+
+\* Registro de 28,1 MiB y 9 h 58 min. Tiempo total: 37,3 s.
+
+<img src="img/03-analisis-en-curso.jpg" alt="Análisis del registro en curso" width="520">
+
+*Figura 3. Subida completa; procesamiento de señales en curso.*
+
+> [!TIP]
+> **Cancelar** detiene el proceso y regresa al formulario. No cierre ni recargue la pestaña durante el análisis.
+
+### Paso 7. Interpretar el resumen
+
+Al terminar aparece **Análisis completado** y el título **Resumen de [identificador]**, con tres bloques:
+
+1. **Encabezado técnico**: tiempo total y su desglose (carga, procesamiento, inferencia), número de épocas, versión del modelo y señales usadas.
+2. **Tiempo analizado**: duración total clasificada (hh:mm:ss) y número de épocas.
+3. **Distribución por estadio**: porcentaje y minutos en W, REM, N1, N2 y N3.
+
+![Resumen de resultados](img/04-resumen-resultados.jpg)
+*Figura 4. Pantalla de resultados.*
+
+> [!NOTE]
+> Comprobación: épocas × 30 s = tiempo analizado. En el ejemplo, 1196 × 30 s = 598 min = 09:58:00.
+
+### Paso 8. Explorar el hipnograma
+
+El hipnograma muestra el estadio estimado de cada época a lo largo del registro. El eje vertical ordena los estadios (W, REM, N1, N2, N3) y el horizontal muestra el tiempo desde el inicio.
+
+- **Acercar o alejar:** rueda del ratón o gesto de pellizco sobre el gráfico.
+- **Desplazarse:** arrastre el gráfico o la barra de rango inferior.
+- **Consultar una época:** pase el cursor para ver la hora, el estadio, el número de época y la **confianza**, con la probabilidad de cada estadio.
+
+![Hipnograma completo](img/05-hipnograma.jpg)
+*Figura 5. Hipnograma completo del registro de prueba.*
+
+![Detalle de una época](img/06-detalle-epoca.jpg)
+*Figura 6. Vista ampliada: la época 386 (03:12:30) se clasificó como N3 con 98,4 % de confianza.*
+
+> [!TIP]
+> Las épocas con probabilidades repartidas entre dos estadios (por ejemplo, N1 frente a W o N2) son las que más conviene verificar manualmente.
+
+### Paso 9. Exportar los resultados
+
+- **Descargar CSV**: tabla para hojas de cálculo, Python (pandas) o R.
+- **Descargar JSON**: formato estructurado para integración o reprocesamiento.
+
+### Paso 10. Iniciar un nuevo análisis
+
+Pulse **Nuevo análisis** para volver al formulario. Descargue antes los resultados que quiera conservar: la interfaz no guarda historial.
+
+## 5. Caso de prueba: Jhon Doe 3
+
+Señales: EEG Fpz-Cz + EEG Pz-Oz + EOG horizontal + EMG submental · **09:58:00** analizadas · **1196** épocas · **37,3 s** de análisis.
+
+| Estadio | Minutos | Porcentaje | Épocas* |
+|---|---:|---:|---:|
+| W (vigilia) | 159,5 | 26,7 % | 319 |
+| N1 | 92,0 | 15,4 % | 184 |
+| N2 | 219,0 | 36,6 % | 438 |
+| N3 | 64,0 | 10,7 % | 128 |
+| REM | 63,5 | 10,6 % | 127 |
+| **Total** | **598,0** | **100 %** | **1196** |
+
+\* Minutos × 2 (cada época dura 30 s).
+
+**Lectura del hipnograma:**
+
+- Los episodios de **N3** se concentran cerca de 03:10–03:25 y reaparecen hacia el final (07:30–08:40).
+- El bloque de **REM** más largo aparece en la segunda mitad (06:20–07:00).
+- El registro termina con casi una hora continua de **W**, que cuenta dentro del 26,7 % de vigilia.
+
+> [!NOTE]
+> Para métricas como la eficiencia del sueño, conviene acotar el análisis al periodo entre “luces apagadas” y “luces encendidas”. Los porcentajes de la aplicación se calculan sobre todo el registro.
+
+## 6. Anexo técnico
+
+| Parámetro | Valor |
+|---|---|
+| Entrenamiento | Registros de **100 personas** de Sleep-EDF Expanded (PhysioNet). |
+| Unidad de clasificación | Época de **30 s**. |
+| Clases | W, N1, N2, N3, REM. |
+| Frecuencia de entrada | 100 Hz. |
+| Señales | EEG Fpz-Cz, EEG Pz-Oz (al menos uno), EOG horizontal y EMG submental (opcionales). |
+| Arquitectura | Ensamble de **LightGBM DART** (sobre características extraídas) y una red **CRNN** (convolucional y recurrente). |
+| Versión del modelo | `dart_666_crnn_27_20261119_191036` |
+| Salida por época | Estadio y probabilidad de cada clase. |
+| Exportación | CSV y JSON. |
+| Límite de archivo | 70 MiB. |
+
+**Flujo:** EDF → detección de canales → preprocesamiento (filtrado y épocas de 30 s) → LightGBM DART + CRNN en paralelo → ensamble de probabilidades → hipnograma.
+
+En la prueba, “procesamiento e inferencia coincidieron durante 0,3 s”: un modelo empezó a predecir mientras el otro seguía preparando sus señales. Los detalles internos de cada rama no se ven en la aplicación y se documentan en el informe técnico del proyecto.
+
+## 7. Solución de problemas
+
+| Situación | Qué hacer |
+|---|---|
+| No aparece “Modelo disponible” | Espere unos segundos y recargue la página. |
+| Archivo mayor de 70 MiB | Recorte el registro o elimine canales que no usa el modelo. |
+| No hay EEG seleccionable | Verifique que el EDF tenga Fpz-Cz o Pz-Oz a 100 Hz. |
+| Canal “Fuera del modelo” | Es normal en canales auxiliares; no afecta al análisis. |
+| El análisis tarda demasiado | Use **Cancelar** y reintente. |
+| Analizar otro registro | Descargue los resultados y pulse **Nuevo análisis**. |
+
+## 8. Limitaciones y uso responsable
+
+- **Resultado preliminar:** debe revisarlo un especialista según el manual de la AASM.
+- **Generalización:** el modelo se entrenó con Sleep-EDFx (Fpz-Cz/Pz-Oz, 100 Hz). Otros equipos, montajes o poblaciones pueden rendir menos.
+- **Estadio N1:** es el de menor acuerdo incluso entre expertos. Revise con cuidado las épocas de N1 y las de baja confianza.
+- **Periodo analizado:** las métricas incluyen la vigilia antes y después del sueño.
+- **Privacidad:** el EDF se envía a un servidor externo. Use identificadores seudonimizados y registros anonimizados.
+
+
+
