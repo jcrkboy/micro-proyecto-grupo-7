@@ -240,7 +240,6 @@ La aplicación tiene una sola página que cambia de estado según el avance:
 | Tarjetas 100 Hz · 30 s · 5 | Frecuencia de muestreo, duración de cada época y número de estadios. |
 | Aviso “Uso de apoyo profesional” | Recuerda que el resultado es preliminar. |
 
-![Pantalla inicial de Sleep-EDFx Studio]()
 <img width="1308" height="805" alt="01-pantalla-inicial" src="https://github.com/user-attachments/assets/b29059a5-200b-4018-98f7-4239d36873cd" />
 *Figura 1. Pantalla inicial: descripción y parámetros del modelo a la izquierda, formulario “Carga del registro” a la derecha.*
 
@@ -279,8 +278,7 @@ Después de elegir el archivo aparece **Canales del registro**, con cada señal 
 - Los canales que el modelo no usa aparecen deshabilitados con la etiqueta **“Fuera del modelo”** (en el ejemplo, *Marker* a 10 Hz).
 - Puede desmarcar señales, pero debe quedar **al menos un EEG** seleccionado.
 
-<img src="img/02-carga-y-canales.jpg" alt="Formulario con archivo cargado y canales seleccionados" width="420">
-<img width="400" height="670" alt="02-carga-y-canales" alt="Formulario con archivo cargado y canales seleccionados" src="https://github.com/user-attachments/assets/ece497c0-35b4-4d56-bed3-80a10f1220e7" />
+<img width="600" height="670" alt="02-carga-y-canales" alt="Formulario con archivo cargado y canales seleccionados" src="https://github.com/user-attachments/assets/ece497c0-35b4-4d56-bed3-80a10f1220e7" />
 *Figura 2. Formulario con identificador, archivo cargado y los cuatro canales compatibles seleccionados.*
 
 ### Paso 6. Ejecutar el análisis
@@ -295,7 +293,6 @@ Pulse **Analizar registro**. El progreso avanza por tres etapas:
 
 \* Registro de 28,1 MiB y 9 h 58 min. Tiempo total: 37,3 s.
 
-<img src="img/03-analisis-en-curso.jpg" alt="Análisis del registro en curso" width="520">
 <img width="672" height="448" alt="03-analisis-en-curso" src="https://github.com/user-attachments/assets/9b64bee4-0412-4569-83cd-6acb9850d9b6" />
 *Figura 3. Subida completa; procesamiento de señales en curso.*
 
@@ -310,7 +307,6 @@ Al terminar aparece **Análisis completado** y el título **Resumen de [identifi
 2. **Tiempo analizado**: duración total clasificada (hh:mm:ss) y número de épocas.
 3. **Distribución por estadio**: porcentaje y minutos en W, REM, N1, N2 y N3.
 
-![Resumen de resultados](img/04-resumen-resultados.jpg)
 <img width="1308" height="805" alt="04-resumen-resultados" src="https://github.com/user-attachments/assets/ade6b7e0-7494-4aa6-95bd-8c87f9138c8d" />
 *Figura 4. Pantalla de resultados.*
 
@@ -325,11 +321,9 @@ El hipnograma muestra el estadio estimado de cada época a lo largo del registro
 - **Desplazarse:** arrastre el gráfico o la barra de rango inferior.
 - **Consultar una época:** pase el cursor para ver la hora, el estadio, el número de época y la **confianza**, con la probabilidad de cada estadio.
 
-![Hipnograma completo](img/05-hipnograma.jpg)
 <img width="1308" height="805" alt="05-hipnograma" src="https://github.com/user-attachments/assets/f5c17da7-88c9-47d1-964c-49cf7cebdb37" />
 *Figura 5. Hipnograma completo del registro de prueba.*
 
-![Detalle de una época](img/06-detalle-epoca.jpg)
 <img width="1308" height="805" alt="06-detalle-epoca" src="https://github.com/user-attachments/assets/a55d28a8-d3b8-4106-b5b4-0e0d59d0ddb6" />
 *Figura 6. Vista ampliada: la época 386 (03:12:30) se clasificó como N3 con 98,4 % de confianza.*
 
